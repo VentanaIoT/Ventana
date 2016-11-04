@@ -346,11 +346,19 @@ PlayerSettings:
     14: VUFORIA_WSA_SETTINGS
   metroPackageName: Ventana
   metroPackageVersion: 
+<<<<<<< HEAD
   metroCertificatePath: Assets\WSATestCertificate.pfx
   metroCertificatePassword: 
   metroCertificateSubject: DefaultCompany
   metroCertificateIssuer: DefaultCompany
   metroCertificateNotAfter: 0028959e5655d301
+=======
+  metroCertificatePath: 
+  metroCertificatePassword: 
+  metroCertificateSubject: 
+  metroCertificateIssuer: 
+  metroCertificateNotAfter: 0000000000000000
+>>>>>>> 1cb025bcea00774eae44998aefcc44b4b90e58a6
   metroApplicationDescription: Ventana
   wsaImages: {}
   metroTileShortName: 
@@ -441,7 +449,11 @@ PlayerSettings:
   - iOS::VR::enable
   - tvOS::VR::enable
   Android::VR::enable: 0
+<<<<<<< HEAD
   Metro::VR::enable: 1
+=======
+  Metro::VR::enable: 0
+>>>>>>> 1cb025bcea00774eae44998aefcc44b4b90e58a6
   N3DS::VR::enable: 0
   PS3::VR::enable: 0
   PS4::VR::enable: 0
