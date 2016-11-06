@@ -4,9 +4,9 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 8
-  productGUID: f583a5fd314084e4eb4ba7dea18fa01a
+  productGUID: 7e520fc8d88b285479fc630124bc418a
   AndroidProfiler: 0
-  defaultScreenOrientation: 0
+  defaultScreenOrientation: 4
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
@@ -163,12 +163,12 @@ PlayerSettings:
   iOSLaunchScreeniPadCustomXibPath: 
   iOSDeviceRequirements: []
   iOSURLSchemes: []
-  AndroidTargetDevice: 3
+  AndroidTargetDevice: 0
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
   AndroidKeystoreName: 
   AndroidKeyaliasName: 
-  AndroidTVCompatibility: 0
+  AndroidTVCompatibility: 1
   AndroidIsGame: 1
   androidEnableBanner: 1
   m_AndroidBanners:
@@ -179,10 +179,7 @@ PlayerSettings:
   resolutionDialogBanner: {fileID: 0}
   m_BuildTargetIcons: []
   m_BuildTargetBatching: []
-  m_BuildTargetGraphicsAPIs:
-  - m_BuildTarget: AndroidPlayer
-    m_APIs: 08000000
-    m_Automatic: 0
+  m_BuildTargetGraphicsAPIs: []
   webPlayerTemplate: APPLICATION:Default
   m_TemplateCustomTags: {}
   wiiUTitleID: 0005000011000000
@@ -340,25 +337,14 @@ PlayerSettings:
   psp2UseDebugIl2cppLibs: 0
   psmSplashimage: {fileID: 0}
   spritePackerPolicy: 
-  scriptingDefineSymbols:
-    4: VUFORIA_IOS_SETTINGS
-    7: VUFORIA_SAMPLE_ORIENTATION_SETTINGS;VUFORIA_ANDROID_SETTINGS
-    14: VUFORIA_WSA_SETTINGS
+  scriptingDefineSymbols: {}
   metroPackageName: Ventana
   metroPackageVersion: 
-<<<<<<< HEAD
-  metroCertificatePath: Assets\WSATestCertificate.pfx
-  metroCertificatePassword: 
-  metroCertificateSubject: DefaultCompany
-  metroCertificateIssuer: DefaultCompany
-  metroCertificateNotAfter: 0028959e5655d301
-=======
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
   metroCertificateIssuer: 
   metroCertificateNotAfter: 0000000000000000
->>>>>>> 1cb025bcea00774eae44998aefcc44b4b90e58a6
   metroApplicationDescription: Ventana
   wsaImages: {}
   metroTileShortName: 
@@ -373,11 +359,7 @@ PlayerSettings:
   metroSplashScreenBackgroundColor: {r: 0.12941177, g: 0.17254902, b: 0.21568628,
     a: 1}
   metroSplashScreenUseBackgroundColor: 0
-  platformCapabilities:
-    WindowsStoreApps:
-      InternetClient: True
-      Microphone: True
-      WebCam: True
+  platformCapabilities: {}
   metroFTAName: 
   metroFTAFileTypes: []
   metroProtocolName: 
@@ -423,112 +405,14 @@ PlayerSettings:
   XboxOneAllowedProductIds: []
   XboxOnePersistentLocalStorageSize: 0
   intPropertyNames:
-  - Metro::ScriptingBackend
-  - Standalone::ScriptingBackend
   - WebPlayer::ScriptingBackend
-  Metro::ScriptingBackend: 2
-  Standalone::ScriptingBackend: 0
   WebPlayer::ScriptingBackend: 0
   boolPropertyNames:
-  - Android::VR::enable
-  - Metro::VR::enable
-  - N3DS::VR::enable
-  - PS3::VR::enable
-  - PS4::VR::enable
-  - PSM::VR::enable
-  - PSP2::VR::enable
-  - SamsungTV::VR::enable
-  - Standalone::VR::enable
-  - Tizen::VR::enable
-  - WebGL::VR::enable
-  - WebPlayer::VR::enable
-  - WiiU::VR::enable
-  - Xbox360::VR::enable
-  - XboxOne::VR::enable
   - XboxOne::enus
-  - iOS::VR::enable
-  - tvOS::VR::enable
-  Android::VR::enable: 0
-<<<<<<< HEAD
-  Metro::VR::enable: 1
-=======
-  Metro::VR::enable: 0
->>>>>>> 1cb025bcea00774eae44998aefcc44b4b90e58a6
-  N3DS::VR::enable: 0
-  PS3::VR::enable: 0
-  PS4::VR::enable: 0
-  PSM::VR::enable: 0
-  PSP2::VR::enable: 0
-  SamsungTV::VR::enable: 0
-  Standalone::VR::enable: 0
-  Tizen::VR::enable: 0
-  WebGL::VR::enable: 0
-  WebPlayer::VR::enable: 0
-  WiiU::VR::enable: 0
-  Xbox360::VR::enable: 0
-  XboxOne::VR::enable: 0
   XboxOne::enus: 1
-  iOS::VR::enable: 0
-  tvOS::VR::enable: 0
-  stringPropertyNames:
-  - Analytics_ServiceEnabled::Analytics_ServiceEnabled
-  - Build_ServiceEnabled::Build_ServiceEnabled
-  - Collab_ServiceEnabled::Collab_ServiceEnabled
-  - ErrorHub_ServiceEnabled::ErrorHub_ServiceEnabled
-  - Game_Performance_ServiceEnabled::Game_Performance_ServiceEnabled
-  - Hub_ServiceEnabled::Hub_ServiceEnabled
-  - Purchasing_ServiceEnabled::Purchasing_ServiceEnabled
-  - UNet_ServiceEnabled::UNet_ServiceEnabled
-  - Unity_Ads_ServiceEnabled::Unity_Ads_ServiceEnabled
-  Analytics_ServiceEnabled::Analytics_ServiceEnabled: False
-  Build_ServiceEnabled::Build_ServiceEnabled: False
-  Collab_ServiceEnabled::Collab_ServiceEnabled: False
-  ErrorHub_ServiceEnabled::ErrorHub_ServiceEnabled: False
-  Game_Performance_ServiceEnabled::Game_Performance_ServiceEnabled: False
-  Hub_ServiceEnabled::Hub_ServiceEnabled: False
-  Purchasing_ServiceEnabled::Purchasing_ServiceEnabled: False
-  UNet_ServiceEnabled::UNet_ServiceEnabled: True
-  Unity_Ads_ServiceEnabled::Unity_Ads_ServiceEnabled: False
-  vectorPropertyNames:
-  - Android::VR::enabledDevices
-  - Metro::VR::enabledDevices
-  - N3DS::VR::enabledDevices
-  - PS3::VR::enabledDevices
-  - PS4::VR::enabledDevices
-  - PSM::VR::enabledDevices
-  - PSP2::VR::enabledDevices
-  - SamsungTV::VR::enabledDevices
-  - Standalone::VR::enabledDevices
-  - Tizen::VR::enabledDevices
-  - WebGL::VR::enabledDevices
-  - WebPlayer::VR::enabledDevices
-  - WiiU::VR::enabledDevices
-  - Xbox360::VR::enabledDevices
-  - XboxOne::VR::enabledDevices
-  - iOS::VR::enabledDevices
-  - tvOS::VR::enabledDevices
-  Android::VR::enabledDevices:
-  - Oculus
-  Metro::VR::enabledDevices:
-  - HoloLens
-  N3DS::VR::enabledDevices: []
-  PS3::VR::enabledDevices: []
-  PS4::VR::enabledDevices:
-  - PlayStationVR
-  PSM::VR::enabledDevices: []
-  PSP2::VR::enabledDevices: []
-  SamsungTV::VR::enabledDevices: []
-  Standalone::VR::enabledDevices:
-  - Oculus
-  Tizen::VR::enabledDevices: []
-  WebGL::VR::enabledDevices: []
-  WebPlayer::VR::enabledDevices: []
-  WiiU::VR::enabledDevices: []
-  Xbox360::VR::enabledDevices: []
-  XboxOne::VR::enabledDevices: []
-  iOS::VR::enabledDevices: []
-  tvOS::VR::enabledDevices: []
-  cloudProjectId: 7e7ca6d4-935e-4dfd-b979-239c305e93b4
-  projectName: Ventana
-  organizationId: johannos
+  stringPropertyNames: []
+  vectorPropertyNames: []
+  cloudProjectId: 
+  projectName: 
+  organizationId: 
   cloudEnabled: 0
