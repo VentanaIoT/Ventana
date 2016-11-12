@@ -22,7 +22,9 @@ public class AlbumSlabTextureController : MonoBehaviour {
         if ( www.error == null ) {
             Debug.Log("WWW OK!");
             Renderer renderer = GetComponent<Renderer>();
-            renderer.material.mainTexture = www.texture;
+            Texture2D image = www.texture;
+
+            renderer.material.mainTexture = image;
 
         } else {
 

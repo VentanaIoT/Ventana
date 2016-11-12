@@ -14,6 +14,10 @@ public class RequestScript : MonoBehaviour {
                 Debug.Log("Bubbled play");
                 StartCoroutine(callToAPI("play"));
                 break;
+            case "pause":
+                Debug.Log("Bubbled pause");
+                StartCoroutine(callToAPI("pause"));
+                break;
             case "next":
                 Debug.Log("Bubbled next");
                 StartCoroutine(callToAPI("next"));
