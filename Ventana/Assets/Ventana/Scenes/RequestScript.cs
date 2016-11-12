@@ -35,13 +35,15 @@ public class RequestScript : MonoBehaviour {
 
     IEnumerator callToAPI(string request, string parameters = null)
     {
-        url += request;
-
+        string newUrl = url;
         if (parameters != null)
         {
-            url += "?" + parameters;
+            newUrl += "?" + parameters;
         }
-        WWW www = new WWW(url);
+
+        newUrl += request;
+        Debug.Log(newUrl);
+        WWW www = new WWW(newUrl);
 
         yield return www;
         string responseString = www.text;
