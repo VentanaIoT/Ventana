@@ -42,7 +42,7 @@ public class Interactible : MonoBehaviour {
     /* TODO: DEVELOPER CODING EXERCISE 2.d */
 
     void GazeEntered() {
-        Debug.Log("Gaze Entered");
+        //Debug.Log("Gaze Entered");
         for ( int i = 0; i < defaultMaterials.Length; i++ ) {
             // 2.d: Uncomment the below line to highlight the material when gaze enters.
             defaultMaterials[i].SetFloat("_Highlight", .25f);
@@ -50,7 +50,7 @@ public class Interactible : MonoBehaviour {
     }
 
     void GazeExited() {
-        Debug.Log("Gaze Exited");
+        //Debug.Log("Gaze Exited");
         for ( int i = 0; i < defaultMaterials.Length; i++ ) {
             // 2.d: Uncomment the below line to remove highlight on material when gaze exits.
             defaultMaterials[i].SetFloat("_Highlight", 0f);
@@ -70,7 +70,7 @@ public class Interactible : MonoBehaviour {
         /* TODO: DEVELOPER CODING EXERCISE 6.a */
         // 6.a: Handle the OnSelect by sending a PerformTagAlong message.
         Debug.Log("I am: " + gameObject.name);
-        Debug.Log("And I Pooted");
+        //Debug.Log("And I Pooted");
 
         // EXAMPLE: NavButton btn = gameObject.GetComponentInParent<NavButton>();
         gameObject.SendMessageUpwards("makeAPIRequest", gameObject.name);

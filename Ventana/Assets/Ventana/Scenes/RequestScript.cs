@@ -1,9 +1,14 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
 public class RequestScript : MonoBehaviour {
 
     public string url = "http://localhost:5000/";
+
+    void Start() {
+        InvokeRepeating("requestAlbum", 1.0f, 1.0f);
+    }
 
     // Use this for initialization
     void makeAPIRequest(string child) {
@@ -26,15 +31,18 @@ public class RequestScript : MonoBehaviour {
                 Debug.Log("Bubbled previous");
                 StartCoroutine(callToAPI("previous"));
                 break;
-            case "albumArt":
-                Debug.Log("Bubbled albumArt");
-                StartCoroutine(callToAPI("picture"));
+            case "status":
+                //Debug.Log("Bubbled albumArt");
+                StartCoroutine(callToAPI("status"));
                 break;
             default:
                 Debug.Log("No good bubble called");
                 break;
         }
 
+    }
+    void requestAlbum() {
+        makeAPIRequest("status");
     }
 
     IEnumerator callToAPI(string request, string parameters = null)
@@ -47,17 +55,21 @@ public class RequestScript : MonoBehaviour {
 
         newUrl += request;
         Debug.Log(newUrl);
-        WWW www = new WWW(newUrl);
-
-        yield return www;
-        string responseString = www.text;
+        UnityWebRequest www = UnityWebRequest.Get(newUrl);
+        yield return www.Send();
+        
 
 
         // check for errors
-        if (www.error == null)
+        if (!www.isError)
         {
-            Debug.Log("WWW Ok!: " + responseString);
-            gameObject.BroadcastMessage("OnURLSent", responseString);
+            //Debug.Log("WWW Ok!: " + responseString);
+            
+            if (newUrl == url + "status" ) {
+                VentanaInteractable myVentana = SonosInfo.CreateFromJSON(www.downloadHandler.text);
+                gameObject.BroadcastMessage("OnURLSent", myVentana);
+            }
+            
         }
         else
         {
