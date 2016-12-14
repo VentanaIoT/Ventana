@@ -4,7 +4,7 @@ using System.Collections;
 
 public class RequestScript : MonoBehaviour {
 
-    public string url = "http://localhost:5000/";
+    public string url = "http://localhost:50000/";
 
     void Start() {
         InvokeRepeating("requestAlbum", 1.0f, 1.0f);
