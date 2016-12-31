@@ -130,7 +130,7 @@ public class BuildMesh : MonoBehaviour {
         mesh.vertices = vertices;
         mesh.triangles = triangles;
         mesh.uv = uvs;
-        mesh.Optimize();
+        ;
         mesh.RecalculateNormals();
         MeshCollider collider = gameObject.GetComponent<MeshCollider>();
         collider.sharedMesh = mesh;
