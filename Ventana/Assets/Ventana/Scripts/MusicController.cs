@@ -7,7 +7,7 @@ public class MusicController : MonoBehaviour  {
     public Transform playButton;
     public Transform pauseButton;
     public bool isMusicPlaying = false;
-    private string requestURL;
+    private string requestURL = "";
     private bool modelIsShowing = false;
 
 
