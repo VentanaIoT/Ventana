@@ -66,7 +66,7 @@ namespace Vuforia
         #region PRIVATE_METHODS
 
 
-        private void OnTrackingFound()
+         virtual public void OnTrackingFound()
         {
             Renderer[] rendererComponents = GetComponentsInChildren<Renderer>(true);
             Collider[] colliderComponents = GetComponentsInChildren<Collider>(true);
@@ -87,7 +87,7 @@ namespace Vuforia
         }
 
 
-        private void OnTrackingLost()
+        virtual public void OnTrackingLost()
         {
             Renderer[] rendererComponents = GetComponentsInChildren<Renderer>(true);
             Collider[] colliderComponents = GetComponentsInChildren<Collider>(true);

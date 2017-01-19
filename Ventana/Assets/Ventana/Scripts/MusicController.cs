@@ -3,12 +3,12 @@ using System.Collections;
 using Vuforia;
 using System;
 
-public class MusicController : MonoBehaviour  {
+public class MusicController : MonoBehaviour, ITrackerEventHandler  {
     public Transform playButton;
     public Transform pauseButton;
     public bool isMusicPlaying = false;
     private string requestURL = "";
-    private bool modelIsShowing = false;
+    public bool isModelShowing = false;
 
 
 
@@ -34,39 +34,53 @@ public class MusicController : MonoBehaviour  {
 
     // Update is called once per frame
     void Update() {
+
         Renderer playRenderer = playButton.GetComponent<Renderer>();
         Renderer pauseRenderer = pauseButton.GetComponent<Renderer>();
-        BoxCollider playCollider = playButton.GetComponent<BoxCollider>();
-        BoxCollider pauseCollider = pauseButton.GetComponent<BoxCollider>();
-        if ( modelIsShowing ) {
+        MeshCollider playCollider = playButton.GetComponent<MeshCollider>();
+        MeshCollider pauseCollider = pauseButton.GetComponent<MeshCollider>();
+        if ( isModelShowing ) {
             if ( !isMusicPlaying ) {
-                playRenderer.enabled = true;
-                playCollider.enabled = true;
-                pauseRenderer.enabled = false;
-                pauseCollider.enabled = false;
-            } else {
-                playRenderer.enabled = false;
-                playCollider.enabled = false;
-                pauseRenderer.enabled = true;
-                pauseCollider.enabled = true;
 
+                if ( playRenderer ) {
+                    playRenderer.enabled = true;
+                }
+                if ( playCollider ) {
+                    playCollider.enabled = true;
+                }
+                if ( pauseRenderer ) {
+                    pauseRenderer.enabled = false;
+                }
+                if ( pauseCollider ) {
+                    pauseCollider.enabled = false;
+                }
+            } else {
+                if ( playRenderer ) {
+                    playRenderer.enabled = false;
+                }
+                if ( playCollider ) {
+                    playCollider.enabled = false;
+                }
+
+                if ( pauseRenderer ) {
+                    pauseRenderer.enabled = true;
+                }
+                if ( pauseCollider ) {
+                    pauseCollider.enabled = true;
+                }
             }
         }
-
     }
     public void OnURLSent(VentanaInteractable ventana) {
         SonosInfo info = ventana as SonosInfo;
         isMusicPlaying = !info.isPaused;
     }
 
-    void ObjectFound() {
-        modelIsShowing = true;
+    public void OnInitialized() {
+        throw new NotImplementedException();
     }
 
-    void ObjectLost() {
-        modelIsShowing = false;
+    public void OnTrackablesUpdated() {
+        throw new NotImplementedException();
     }
-    
-
 }
-
