@@ -21,7 +21,7 @@ public class VentanaImageTargetController : MonoBehaviour {
             objectTracker.Stop();  // stop tracker so that we can add new dataset
 
             if ( !objectTracker.ActivateDataSet(dataSet) ) {
-                // Note: ImageTracker cannot have more than 100 total targets activated
+                // Note: ImageTracker cannot have more than 1000 total targets activated
                 Debug.Log("<color=yellow>Failed to Activate DataSet: " + dataSetName + "</color>");
             }
 
