@@ -1143,13 +1143,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4114ca95ba12f394a8ad43abfc86745c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mWorldCenterMode: 1
+  mWorldCenterMode: 2
   mWorldCenter: {fileID: 0}
   mCentralAnchorPoint: {fileID: 0}
   mParentAnchorPoint: {fileID: 0}
   mPrimaryCamera: {fileID: 0}
   mSecondaryCamera: {fileID: 0}
-  mWereBindingFieldsExposed: 0
+  mWereBindingFieldsExposed: 1
 --- !u!81 &556801047
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1227,7 +1227,7 @@ Transform:
   m_GameObject: {fileID: 1176864198}
   m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 0.5794715, y: 0.106236346, z: 0}
-  m_LocalScale: {x: 0.04828945, y: 0.04828938, z: 0.04828941}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children:
   - {fileID: 1408682558}
   - {fileID: 368779893}
