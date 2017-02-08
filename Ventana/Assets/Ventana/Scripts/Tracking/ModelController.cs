@@ -28,11 +28,10 @@ public class ModelController  {
         VentanaModelDictionary vmDictionary = new VentanaModelDictionary();
         VentanaUser jsonObject = null;
 
-        using ( StreamReader r = new StreamReader(Args.VENTANA_MARK_CONFIG_FILE_LOCATION) ) {
-            string json = r.ReadToEnd();
-            jsonObject = JsonUtility.FromJson<VentanaUser>(json);
-        }
-
+        TextAsset jsonFile = Resources.Load<TextAsset>(Args.VENTANA_MARK_CONFIG_FILE_LOCATION.Replace(".json", ""));
+        string json = jsonFile.text;
+        jsonObject = JsonUtility.FromJson<VentanaUser>(json);
+        
         if ( jsonObject == null ) {
             Debug.Log("<color=yellow>Warning: Missing or malformed Ventana configuration file");
             return null;
