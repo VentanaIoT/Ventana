@@ -43,6 +43,7 @@ public class VentanaImageTargetController : MonoBehaviour {
                     tb.gameObject.AddComponent<VentanaSpeakerEventHandler>();
                     tb.gameObject.AddComponent<TurnOffBehaviour>();
                     GameObject control = mc.GetPrefabWithId(tb.TrackableName);
+                    
                     if ( control ) {
                         control.transform.SetParent(tb.gameObject.transform);
                         control.transform.localPosition = new Vector3(0f, 0f, 0.9f);
