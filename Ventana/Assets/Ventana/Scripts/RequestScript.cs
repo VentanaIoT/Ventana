@@ -54,7 +54,7 @@ public class RequestScript : MonoBehaviour {
         }
 
         newUrl += request;
-        Debug.Log(newUrl);
+        //Debug.Log(newUrl);
         UnityWebRequest www = UnityWebRequest.Get(newUrl);
         yield return www.Send();
         
@@ -73,7 +73,7 @@ public class RequestScript : MonoBehaviour {
         }
         else
         {
-            Debug.Log("WWW Error: " + www.error);
+            //Debug.Log("WWW Error: " + www.error);
         }
 
     }

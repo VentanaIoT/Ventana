@@ -25,7 +25,7 @@ public class AlbumSlabTextureController : MonoBehaviour {
             //www.LoadImageIntoTexture(renderer.material.mainTexture);
             Renderer renderer = GetComponent<Renderer>();
             renderer.material.mainTexture = www.texture;
-            Debug.Log(www.texture);
+            //Debug.Log(www.texture);
 
 
         } else {
@@ -36,7 +36,7 @@ public class AlbumSlabTextureController : MonoBehaviour {
     void OnURLSent(VentanaInteractable venta) {
         //album art contains the URL
         SonosInfo info = venta as SonosInfo;
-        Debug.Log(info.album_art);
+        //Debug.Log(info.album_art);
         if ( newURL != info.album_art ) {
             Debug.Log("Im getting changed");
             WWW www = new WWW(info.album_art);

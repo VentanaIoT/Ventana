@@ -16,7 +16,7 @@ public class MusicController : MonoBehaviour, ITrackerEventHandler  {
     void Start() {
         playButton = gameObject.transform.Find("play");
         pauseButton = gameObject.transform.Find("pause");
-        Debug.Log("In Music Controller");
+        //Debug.Log("In Music Controller");
         requestURL = GetComponent<RequestScript>().url;
     }
 
