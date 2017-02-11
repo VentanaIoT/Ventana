@@ -1,0 +1,20 @@
+{
+  "User": "VentanaUser",
+  "VentanaMarks": [
+    {
+      "id": "Chips",
+      "name": "Chips",
+      "path": "Ventana/Prefabs/LightControl"
+    },
+    {
+      "id": "Tarmac",
+      "name": "Tarmac",
+      "path": "Ventana/Prefabs/MusicController"
+    },
+    {
+      "id": "Psycho",
+      "name": "Psycho",
+      "path": "Ventana/Prefabs/DoorOpener"
+    }
+  ]
+}
