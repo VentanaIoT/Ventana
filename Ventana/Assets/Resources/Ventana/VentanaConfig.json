@@ -2,17 +2,17 @@
   "User": "VentanaUser",
   "VentanaMarks": [
     {
-      "id": "Chips",
+      "id": "0x00",
       "name": "Chips",
       "path": "Ventana/Prefabs/LightControl"
     },
     {
-      "id": "Tarmac",
+      "id": "0x01",
       "name": "Tarmac",
       "path": "Ventana/Prefabs/MusicController"
     },
     {
-      "id": "Psycho",
+      "id": "0x02",
       "name": "Psycho",
       "path": "Ventana/Prefabs/DoorOpener"
     }

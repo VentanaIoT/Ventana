@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <VuforiaUnityInfo>
-    <TargetSet toolVersion="" version="6.0"><VuMark name="VentanaVumark" previewImage="542dd05e66cc49d99419a3601576c3f7_scaled.png" targetId="542dd05e66cc49d99419a3601576c3f7" version="9.0">
+    <TargetSet toolVersion="" version="6.0"><VuMark name="myVumarkWithMarker_smaller" previewImage="4cf3321a6cab4be1b21eacaafdddfdff_scaled.png" targetId="4cf3321a6cab4be1b21eacaafdddfdff" version="9.0">
             <Shape bbox2D="0 0 516.298 606.771" origin="257.88 300.874" />
             <Code IDlength="9" IDtype="bytes" />
         </VuMark>

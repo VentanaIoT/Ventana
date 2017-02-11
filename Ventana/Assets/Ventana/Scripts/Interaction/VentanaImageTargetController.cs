@@ -42,7 +42,7 @@ public class VentanaImageTargetController : MonoBehaviour {
                     // add additional script components for trackable
                     tb.gameObject.AddComponent<VentanaSpeakerEventHandler>();
                     tb.gameObject.AddComponent<TurnOffBehaviour>();
-                    GameObject control = mc.GetPrefabWithId(tb.TrackableName);
+                    GameObject control = mc.GetPrefabWithId(Convert.ToInt32(tb.TrackableName, 16));
                     
                     if ( control ) {
                         control.transform.SetParent(tb.gameObject.transform);

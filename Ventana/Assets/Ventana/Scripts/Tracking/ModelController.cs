@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using VentanaModelDictionary = System.Collections.Generic.Dictionary<string, string>;
+using VentanaModelDictionary = System.Collections.Generic.Dictionary<int, string>;
 using System.IO;
+using System;
 
 public class ModelController  {
     
@@ -38,18 +39,18 @@ public class ModelController  {
         }
 
         foreach (VentanaMarkObject vmo in jsonObject.VentanaMarks ) {
-            vmDictionary.Add(vmo.id, vmo.path);
+            vmDictionary.Add(Convert.ToInt32(vmo.id, 16), vmo.path);
         }
 
         return vmDictionary;
     }
 
-    public GameObject GetPrefabWithId(string id) {
+    public GameObject GetPrefabWithId(int id) {
         GameObject prefab = null;
         string value = "";
         if ( modelDictionary.TryGetValue(id, out value) ) { //key exists
             //now check if a prefab exists...
-            Object possiblePrefab = Resources.Load(value);
+            UnityEngine.Object possiblePrefab = Resources.Load(value);
             if ( possiblePrefab ) {
                 if ( !(prefab = GameObject.Instantiate(possiblePrefab) as GameObject )) {
                     Debug.Log("<color=red>Error: the prefab at " + value + " does not exist</color>");

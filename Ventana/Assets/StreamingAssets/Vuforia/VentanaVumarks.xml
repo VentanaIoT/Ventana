@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <QCARConfig>
     <Tracking>
-        <VuMark name="VentanaVumark" size="0.10000000149011612 0.117523408776" />
+        <VuMark name="myVumarkWithMarker_smaller" size="0.10000000149011612 0.117523408776" />
     </Tracking>
 </QCARConfig>

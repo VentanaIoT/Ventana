@@ -73,13 +73,7 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
 
         ModelController mc = ModelController.Instance;
         GameObject control = null;
-        if ( Convert.ToInt32(GetVuMarkString(mTrackableBehaviour.VuMarkTarget), 16 ) == 0x01 ) {
-            control = mc.GetPrefabWithId("Tarmac");
-
-        } else if ( Convert.ToInt32(GetVuMarkString(mTrackableBehaviour.VuMarkTarget) , 16) == 0x00)  {
-            control = mc.GetPrefabWithId("Chips");
-
-        }
+        control = mc.GetPrefabWithId(Convert.ToInt32(GetVuMarkString(mTrackableBehaviour.VuMarkTarget), 16)); 
         if ( control ) {
             mTrackableBehaviour.transform.DestroyChildren();
             control.transform.SetParent(mTrackableBehaviour.gameObject.transform);
