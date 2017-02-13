@@ -4,6 +4,8 @@ using UnityEngine;
 using HoloToolkit.Unity.InputModule;
 using System;
 using Vuforia;
+using HoloToolkit.Unity.SpatialMapping;
+
 public class VentanaImageTargetController : MonoBehaviour {
     private void Start() {
         VuforiaARController vb = VuforiaARController.Instance;
@@ -43,11 +45,14 @@ public class VentanaImageTargetController : MonoBehaviour {
                     tb.gameObject.AddComponent<VentanaSpeakerEventHandler>();
                     tb.gameObject.AddComponent<TurnOffBehaviour>();
                     GameObject control = mc.GetPrefabWithId(Convert.ToInt32(tb.TrackableName, 16));
-                    
+                    SpawnBehaviourScript spb = tb.gameObject.AddComponent<SpawnBehaviourScript>();
+                    spb.prefabObject = control;
+
                     if ( control ) {
                         control.transform.SetParent(tb.gameObject.transform);
                         control.transform.localPosition = new Vector3(0f, 0f, 0.9f);
                         //control.transform.localRotation = Quaternion.identity * Quaternion.Euler(0, 180, 0);
+                       
                         control.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
                     }
                 }

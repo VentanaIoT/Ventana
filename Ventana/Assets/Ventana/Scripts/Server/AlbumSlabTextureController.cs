@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class AlbumSlabTextureController : MonoBehaviour {
@@ -36,7 +36,7 @@ public class AlbumSlabTextureController : MonoBehaviour {
     void OnURLSent(VentanaInteractable venta) {
         //album art contains the URL
         SonosInfo info = venta as SonosInfo;
-        Debug.Log(info.album_art);
+        //Debug.Log(info.album_art);
         if ( newURL != info.album_art ) {
             Debug.Log("Im getting changed");
             WWW www = new WWW(info.album_art);

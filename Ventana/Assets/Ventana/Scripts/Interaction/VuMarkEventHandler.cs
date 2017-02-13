@@ -80,6 +80,8 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
             control.transform.localPosition = new Vector3(0f, 0f, 0f);
             control.transform.localRotation = Quaternion.identity * Quaternion.Euler(0, 180, 0);
             control.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
+            SpawnBehaviourScript spb = control.gameObject.AddComponent<SpawnBehaviourScript>();
+            spb.prefabObject = control;
         }
 
     }
