@@ -8,6 +8,9 @@ using HoloToolkit.Unity.SpatialMapping;
 public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
     #region PUBLIC_MEMBERS
     public GameObject prefabObject;
+    public bool shouldSpawn = false;
+    public Vector3 scaleMultiplier;
+    public Vector3 placementPosition;
 
     #endregion //PUBLIC_MEMBERS
 
@@ -97,11 +100,21 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
     protected virtual void OnDoubleTap()
     {
         Debug.Log("sb ODT reached");
-        if (spawnCount == 0)
+        if ( shouldSpawn )
         {
-            GameObject prefabObjectClone = (GameObject)Instantiate(prefabObject, transform.position, transform.rotation);
-            prefabObjectClone.AddComponent<TapToPlace>();
-            spawnCount = 1;
+            Debug.Log("Creating new control copy");
+            GameObject prefabObjectClone = GameObject.Instantiate(gameObject);
+            prefabObjectClone.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z);
+            prefabObjectClone.transform.localScale = new Vector3(0.25f * scaleMultiplier.x, 0.25f *scaleMultiplier.y, 0.25f *scaleMultiplier.y);
+            prefabObjectClone.transform.localRotation = Quaternion.identity * Quaternion.Euler(0, 180, 0);
+            TapToPlace ttp = prefabObjectClone.AddComponent<TapToPlace>();
+            Debug.Log(DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString());
+            ttp.SavedAnchorFriendlyName = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
+
+
+            var spb =  prefabObjectClone.GetComponent<SpawnBehaviourScript>();
+            spb.shouldSpawn = false;
+            shouldSpawn = false;
         }
     }
 

@@ -96,9 +96,9 @@ namespace HoloToolkit.Unity.SpatialMapping
                 if (Physics.Raycast(headPosition, gazeDirection, out hitInfo, 30.0f, spatialMappingManager.LayerMask))
                 {
                     // Rotate this object to face the user.
-                    Quaternion toQuat = Camera.main.transform.localRotation;
-                    toQuat.x = 0;
-                    toQuat.z = 0;
+                   // Quaternion toQuat = Camera.main.transform.localRotation;
+                   // toQuat.x = 0;
+                   // toQuat.z = 0;
 
                     // Move this object to where the raycast
                     // hit the Spatial Mapping mesh.
@@ -111,12 +111,13 @@ namespace HoloToolkit.Unity.SpatialMapping
                         // Place the parent object as well but keep the focus on the current game object
                         Vector3 currentMovement = hitInfo.point - gameObject.transform.position;
                         ParentGameObjectToPlace.transform.position += currentMovement;
-                        ParentGameObjectToPlace.transform.rotation = toQuat;
+
+                        //ParentGameObjectToPlace.transform.rotation = toQuat;
                     }
                     else
                     {
                         gameObject.transform.position = hitInfo.point;
-                        gameObject.transform.rotation = toQuat;
+                        //gameObject.transform.rotation = toQuat;
                     }
                 }
             }

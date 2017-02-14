@@ -81,10 +81,13 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
             control.transform.localRotation = Quaternion.identity * Quaternion.Euler(0, 180, 0);
             control.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
             SpawnBehaviourScript spb = control.gameObject.AddComponent<SpawnBehaviourScript>();
-            spb.prefabObject = control;
+            spb.shouldSpawn = true;
+            spb.scaleMultiplier = gameObject.transform.localScale;
         }
 
     }
+
+   
 
 
     private void OnTrackingLost() {
