@@ -117,8 +117,7 @@ namespace HoloToolkit.Unity.SpatialMapping
                     else
                     {
                         gameObject.transform.position = hitInfo.point;
-                        //gameObject.transform.rotation = toQuat;
-                        transform.LookAt(Camera.main.transform);
+                        gameObject.transform.rotation = toQuat;
                     }
                 }
             }
