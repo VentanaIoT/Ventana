@@ -17,6 +17,7 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
     #region PRIVATE_MEMBER_VARIABLES
 
     private VuMarkBehaviour mTrackableBehaviour; //this is exclusively for vumarks 
+    private GameObject control; //the control this vumark currently has
 
     #endregion // PRIVATE_MEMBER_VARIABLES
     #region UNTIY_MONOBEHAVIOUR_METHODS
@@ -54,6 +55,7 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
     #region PRIVATE_METHODS
 
     private void OnTrackingFound() {
+        
         Renderer[] rendererComponents = GetComponentsInChildren<Renderer>(true);
         Collider[] colliderComponents = GetComponentsInChildren<Collider>(true);
         
@@ -72,13 +74,16 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
         Debug.Log("VuMark of Type: " + GetVuMarkType( mTrackableBehaviour.VuMarkTarget) + " and Value: " + GetVuMarkString(mTrackableBehaviour.VuMarkTarget) + " found");
 
         ModelController mc = ModelController.Instance;
-        GameObject control = null;
+        control = null;
         control = mc.GetPrefabWithId(Convert.ToInt32(GetVuMarkString(mTrackableBehaviour.VuMarkTarget), 16)); 
         if ( control ) {
             mTrackableBehaviour.transform.DestroyChildren();
+            BaseVentanaController bvc = control.GetComponent<BaseVentanaController>();
+            bvc.OnVumarkFound();
             control.transform.SetParent(mTrackableBehaviour.gameObject.transform);
             control.transform.localPosition = new Vector3(0f, 0f, 0f);
             control.transform.localRotation = Quaternion.identity * Quaternion.Euler(0, 180, 0);
+            
             control.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
             SpawnBehaviourScript spb = control.gameObject.AddComponent<SpawnBehaviourScript>();
             spb.shouldSpawn = true;
@@ -107,10 +112,12 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
         Debug.Log("Trackable " + mTrackableBehaviour.TrackableName + " lost");
 
         //delete all children
-
+        if ( control ) {
+            BaseVentanaController bvc = control.GetComponent<BaseVentanaController>();
+            bvc.OnVumarkLost();
+        }
+        
         mTrackableBehaviour.transform.DestroyChildren();
-
-
     }
 
     private string GetVuMarkType(VuMarkTarget vumark) {
