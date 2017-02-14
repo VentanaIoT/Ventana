@@ -106,7 +106,7 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
             GameObject prefabObjectClone = GameObject.Instantiate(gameObject);
             prefabObjectClone.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z);
             prefabObjectClone.transform.localScale = new Vector3(0.25f * scaleMultiplier.x, 0.25f *scaleMultiplier.y, 0.25f *scaleMultiplier.y);
-            prefabObjectClone.transform.localRotation = Quaternion.identity * Quaternion.Euler(0, 180, 0);
+            prefabObjectClone.transform.rotation = gameObject.transform.rotation;
             TapToPlace ttp = prefabObjectClone.AddComponent<TapToPlace>();
             Debug.Log(DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString());
             ttp.SavedAnchorFriendlyName = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();

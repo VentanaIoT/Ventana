@@ -79,7 +79,9 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
         if ( control ) {
             mTrackableBehaviour.transform.DestroyChildren();
             BaseVentanaController bvc = control.GetComponent<BaseVentanaController>();
-            bvc.OnVumarkFound();
+            if ( bvc ) {
+                bvc.OnVumarkFound();
+            }
             control.transform.SetParent(mTrackableBehaviour.gameObject.transform);
             control.transform.localPosition = new Vector3(0f, 0f, 0f);
             control.transform.localRotation = Quaternion.identity * Quaternion.Euler(0, 180, 0);
@@ -114,7 +116,9 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
         //delete all children
         if ( control ) {
             BaseVentanaController bvc = control.GetComponent<BaseVentanaController>();
-            bvc.OnVumarkLost();
+            if ( bvc ) {
+                bvc.OnVumarkLost();
+            }
         }
         
         mTrackableBehaviour.transform.DestroyChildren();
