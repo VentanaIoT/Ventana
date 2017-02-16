@@ -177,8 +177,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   limitScanningByTime: 1
   scanTime: 10
-  defaultMaterial: {fileID: 2100000, guid: 7e84f580ec2dd89469be276f040255fa, type: 2}
-  secondaryMaterial: {fileID: 2100000, guid: 7e84f580ec2dd89469be276f040255fa, type: 2}
+  defaultMaterial: {fileID: 2100000, guid: d698790d3facd3d4289a13fa1243030a, type: 2}
+  secondaryMaterial: {fileID: 15302, guid: 0000000000000000f000000000000000, type: 0}
   minimumFloors: 1
   minimumWalls: 1
 --- !u!114 &44709924
@@ -192,7 +192,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4077c41b4858904d8088a87ef45baed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BoundsExpansion: 0
+  BoundsExpansion: 0.5
 --- !u!114 &44709925
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -208,7 +208,7 @@ MonoBehaviour:
   SurfacePlanePrefab: {fileID: 1000010593991404, guid: 184d6e9ce2d89844489583805253eb83,
     type: 2}
   MinArea: 0.025
-  drawPlanesMask: -1
+  drawPlanesMask: -17
   destroyPlanesMask: 16
 --- !u!21 &74065310
 Material:
@@ -236,6 +236,11 @@ Material:
     - first:
         name: _Color
       second: {r: 0.82089555, g: 0.82089555, b: 0.82089555, a: 1}
+--- !u!1 &119884309 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1000012125673284, guid: 90749889d87976143a9e21072d2434b4,
+    type: 2}
+  m_PrefabInternal: {fileID: 1955807813}
 --- !u!1001 &350060998
 Prefab:
   m_ObjectHideFlags: 0
@@ -273,7 +278,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4000010560871102, guid: d379ed0a5618c9f479f58bd83a2d0ad3, type: 2}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 20000013304850028, guid: d379ed0a5618c9f479f58bd83a2d0ad3,
         type: 2}
@@ -421,12 +426,12 @@ Transform:
   m_PrefabParentObject: {fileID: 400000, guid: bf30d577eead1ef40bcf2b404289daf4, type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 556801044}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_Father: {fileID: 350060999}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &556801049
 MonoBehaviour:
@@ -574,7 +579,7 @@ Transform:
   - {fileID: 2145080556}
   - {fileID: 44709922}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1420464741
 GameObject:
@@ -816,7 +821,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 474980, guid: 7b4d558ce607ad842ae11dd4c2d88ba3, type: 2}
       propertyPath: m_RootOrder
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3307842, guid: 7b4d558ce607ad842ae11dd4c2d88ba3, type: 2}
       propertyPath: m_Mesh
@@ -905,6 +910,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 114000011803902180, guid: 90749889d87976143a9e21072d2434b4,
+        type: 2}
+      propertyPath: CursorStateData.Array.size
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 4000013243965410, guid: 90749889d87976143a9e21072d2434b4, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -935,8 +945,23 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4000013243965410, guid: 90749889d87976143a9e21072d2434b4, type: 2}
       propertyPath: m_RootOrder
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114000011803902180, guid: 90749889d87976143a9e21072d2434b4,
+        type: 2}
+      propertyPath: CursorStateData.Array.data[3].Name
+      value: Select
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011803902180, guid: 90749889d87976143a9e21072d2434b4,
+        type: 2}
+      propertyPath: CursorStateData.Array.data[3].CursorState
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011803902180, guid: 90749889d87976143a9e21072d2434b4,
+        type: 2}
+      propertyPath: CursorStateData.Array.data[3].CursorObject
+      value: 
+      objectReference: {fileID: 119884309}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 90749889d87976143a9e21072d2434b4, type: 2}
   m_IsPrefabParent: 0
