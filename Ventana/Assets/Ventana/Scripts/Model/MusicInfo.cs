@@ -10,13 +10,10 @@ public class SonosInfo : VentanaInteractable {
             switch ( current_transport_state ) {
                 case "PLAYING":
                 return false;
-                    break;
                 case "PAUSED_PLAYBACK":
                 return true;
-                    break;
                 default:
                 return true;
-                break;
             }
         }
     }

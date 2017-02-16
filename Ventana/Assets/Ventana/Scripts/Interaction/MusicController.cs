@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using Vuforia;
 using System;
 
-public class MusicController : MonoBehaviour, ITrackerEventHandler  {
+public class MusicController : BaseVentanaController  {
     public Transform playButton;
     public Transform pauseButton;
     public bool isMusicPlaying = false;
@@ -76,11 +76,13 @@ public class MusicController : MonoBehaviour, ITrackerEventHandler  {
         isMusicPlaying = !info.isPaused;
     }
 
-    public void OnInitialized() {
-        throw new NotImplementedException();
+    public override void OnVumarkFound() {
+        base.OnVumarkFound();
+        isModelShowing = true;
     }
 
-    public void OnTrackablesUpdated() {
-        throw new NotImplementedException();
+    public override void OnVumarkLost() {
+        base.OnVumarkLost();
+        isModelShowing = false;
     }
 }
