@@ -16,11 +16,10 @@ public class MusicButtonHandler : MonoBehaviour, IInputClickHandler, IFocusable 
         gameObject.GetComponent<Renderer>().material = normalButtonMaterial;
     }
 
-    public void OnInputClicked(InputEventData eventData) {
+    public void OnInputClicked(InputClickedEventData eventData) {
         Debug.Log("Clicked " + gameObject.name);
         gameObject.SendMessageUpwards("makeAPIRequest", gameObject.name);
         source.PlayOneShot(clickSound, 1F);
-
     }
 
     // Use this for initialization

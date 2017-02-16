@@ -118,7 +118,7 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
         }
     }
 
-    public void OnInputClicked(InputEventData eventData)
+    public void OnInputClicked(InputClickedEventData eventData)
     {
         Debug.Log("<color=yellow>EY BAY BAY</color>");
         mTapCount++;
