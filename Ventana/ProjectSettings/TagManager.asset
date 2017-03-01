@@ -13,6 +13,8 @@ TagManager:
   - UI
   - 
   - 
+  - Processed Room Layer
+  - Control Layer
   - 
   - 
   - 
@@ -33,10 +35,8 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
-  - 
+  - Raw Spacial Mapping Layer
+  - Spatial Mapping Layer
   m_SortingLayers:
   - name: Default
     uniqueID: 0

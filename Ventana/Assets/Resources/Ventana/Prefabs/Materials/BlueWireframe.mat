@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Taylor-Swift-1989-Deluxe-2014-1200x1200_2
-  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  m_Name: BlueWireframe
+  m_Shader: {fileID: 4800000, guid: 4bb285e6e3afd36468f154d960c37cbd, type: 3}
   m_ShaderKeywords: _EMISSION
   m_LightmapFlags: 1
   m_CustomRenderQueue: -1
@@ -49,7 +49,7 @@ Material:
         name: _MainTex
       second:
         m_Texture: {fileID: 0}
-        m_Scale: {x: -1, y: -1}
+        m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - first:
         name: _MetallicGlossMap
@@ -116,12 +116,21 @@ Material:
         name: _UVSec
       second: 0
     - first:
+        name: _WireThickness
+      second: 152
+    - first:
         name: _ZWrite
       second: 1
     m_Colors:
     - first:
+        name: _BaseColor
+      second: {r: 0, g: 0, b: 0, a: 1}
+    - first:
         name: _Color
-      second: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+      second: {r: 1, g: 1, b: 1, a: 1}
     - first:
         name: _EmissionColor
       second: {r: 0, g: 0, b: 0, a: 1}
+    - first:
+        name: _WireColor
+      second: {r: 0, g: 0.0896554, b: 1, a: 1}

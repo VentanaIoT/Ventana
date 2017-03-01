@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 114219151922873574}
   - component: {fileID: 114258749542446430}
   - component: {fileID: 23190246917799722}
+  - component: {fileID: 114095443416667456}
   m_Layer: 0
   m_Name: MusicController
   m_TagString: Untagged
@@ -181,35 +182,35 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1884306067295614}
-  m_LocalRotation: {x: 0, y: 0.7069895, z: 0.707224, w: 0}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
   m_LocalPosition: {x: 0, y: 0.049996145, z: -2}
   m_LocalScale: {x: 300.00003, y: 300, z: 10}
   m_Children: []
   m_Father: {fileID: 4542637858393946}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -89.981, y: 0, z: 180}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 180}
 --- !u!4 &4317772362149894
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1866478574516908}
-  m_LocalRotation: {x: 0.16907571, y: -0.75588036, z: 0.27217132, w: 0.57094747}
-  m_LocalPosition: {x: -4.0762453, y: 5.903862, z: -1.005454}
+  m_LocalRotation: {x: 0.2768719, y: -0.3269179, z: 0.49726024, w: -0.75445276}
+  m_LocalPosition: {x: 4.0979075, y: 2.0709934, z: -5.5516276}
   m_LocalScale: {x: 100.00001, y: 100, z: 100}
   m_Children: []
   m_Father: {fileID: 4537107038032780}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -5.3160005, y: -309.47, z: -69.288}
 --- !u!4 &4536203625286560
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1868216159707064}
-  m_LocalRotation: {x: -0.00000005338508, y: 0.7071068, z: -0.7071067, w: 0.000000053385072}
-  m_LocalPosition: {x: 2, y: 0.15, z: 4}
-  m_LocalScale: {x: 60.000004, y: 60.000004, z: 12.5}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.997024, y: -3.8516016, z: -0.7707593}
+  m_LocalScale: {x: 60, y: 60.000004, z: 20}
   m_Children: []
   m_Father: {fileID: 4537107038032780}
   m_RootOrder: 6
@@ -221,7 +222,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1052640740918930}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.02, z: 0.9}
+  m_LocalPosition: {x: 0.110999994, y: -0.097, z: 0.923}
   m_LocalScale: {x: 0.100000165, y: 0.10000009, z: 0.10000012}
   m_Children:
   - {fileID: 4542637858393946}
@@ -240,66 +241,66 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1939654540379240}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.0013759853, y: -0.70710546, z: 0.70710546, w: -0.0013759853}
+  m_LocalPosition: {x: -0.0002906074, y: 0.062593885, z: 0.07450248}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4285037714982362}
   m_Father: {fileID: 4537107038032780}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: -180.22299, z: 0}
 --- !u!4 &4765702072238832
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1760186208440872}
-  m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: 0, y: 0.15, z: 4}
-  m_LocalScale: {x: 60.000004, y: 60.000004, z: 12.5}
+  m_LocalRotation: {x: -0, y: -1, z: 0, w: 0}
+  m_LocalPosition: {x: 0.0029715893, y: -3.8516057, z: -0.7629773}
+  m_LocalScale: {x: 60, y: 60.000004, z: 20}
   m_Children: []
   m_Father: {fileID: 4537107038032780}
   m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -180, y: 0, z: -180}
 --- !u!4 &4836706472093828
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1458700600065976}
-  m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -1, z: 0, w: 0}
+  m_LocalPosition: {x: -0.0002906074, y: 0.062593885, z: 0.07450248}
   m_LocalScale: {x: 338.16528, y: 549.76685, z: 12.372919}
   m_Children: []
   m_Father: {fileID: 4537107038032780}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -180, y: 0, z: -180}
 --- !u!4 &4954478990631414
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1791107580853572}
-  m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: -2, y: 0.15, z: 4}
-  m_LocalScale: {x: 60.000004, y: 60.000004, z: 12.5}
+  m_LocalRotation: {x: -0, y: -1, z: 0, w: 0}
+  m_LocalPosition: {x: 2.0029664, y: -3.8516128, z: -0.7551915}
+  m_LocalScale: {x: 60, y: 60.000004, z: 20}
   m_Children: []
   m_Father: {fileID: 4537107038032780}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -180, y: 0, z: -180}
 --- !u!4 &4963177554044496
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1448223760632336}
-  m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
-  m_LocalPosition: {x: 0, y: 0.15, z: 4}
-  m_LocalScale: {x: 20, y: 60.000004, z: 12.5}
+  m_LocalRotation: {x: -0, y: -1, z: 0, w: 0}
+  m_LocalPosition: {x: 0.0029715893, y: -3.8516057, z: -0.7629773}
+  m_LocalScale: {x: 60, y: 60.000004, z: 20}
   m_Children: []
   m_Father: {fileID: 4537107038032780}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -180, y: 0, z: -180}
 --- !u!23 &23190246917799722
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -960,7 +961,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 001676eff2cbf5c4590856ded198e58c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  newURL: http://is5.mzstatic.com/image/thumb/Music71/v4/c0/39/b4/c039b43b-11cf-2a33-6a77-2323fb4c2b9f/source/100000x100000-999.jpg
+  newURL: http://is5.mzstatic.com/image/thumb/Music3/v4/47/97/af/4797af7e-24c9-7428-ac64-5b5f35eba51e/source/100000x100000-999.jpg
   oldTexture: {fileID: 0}
 --- !u!114 &114085436979515322
 MonoBehaviour:
@@ -978,6 +979,24 @@ MonoBehaviour:
     type: 2}
   normalButtonMaterial: {fileID: 2100000, guid: 2e4b95167689e634ba93cace377b517d,
     type: 2}
+--- !u!114 &114095443416667456
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1052640740918930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbad991a9894486418e4988222483ef8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SavedAnchorFriendlyName: SavedAnchorFriendlyName
+  PlaceParentOnTap: 0
+  ParentGameObjectToPlace: {fileID: 0}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 2147483648
+  IsBeingPlaced: 0
 --- !u!114 &114219151922873574
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1001,8 +1020,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9517efa7e2220414693f08b8b8b21cad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playButton: {fileID: 1760186208440872}
-  pauseButton: {fileID: 1448223760632336}
+  playButton: {fileID: 4765702072238832}
+  pauseButton: {fileID: 4963177554044496}
   isMusicPlaying: 0
   isModelShowing: 0
 --- !u!114 &114583268110497790
