@@ -84,15 +84,14 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
             }
             control.transform.SetParent(mTrackableBehaviour.gameObject.transform);
             control.transform.localPosition = new Vector3(0f, 0f, 0f);
-            control.transform.localRotation = Quaternion.identity * Quaternion.Euler(0, 180, 0);
             Collider bc = control.GetComponent<Collider>();
             if ( !bc ) {
                 control.AddComponent<BoxCollider>();
             }
 
-            
+            control.layer = 9;
 
-            control.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
+            control.transform.localScale = new Vector3(1f, 1f, 1f);
             SpawnBehaviourScript spb = control.gameObject.AddComponent<SpawnBehaviourScript>();
             spb.shouldSpawn = true;
             spb.scaleMultiplier = gameObject.transform.localScale;

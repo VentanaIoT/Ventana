@@ -86,7 +86,6 @@ public class VentanaSpacialProcessor : Singleton<VentanaSpacialProcessor> {
     /// <param name="source">Source of the event.</param>
     /// <param name="args">Args for the event.</param>
     private void SurfaceMeshesToPlanes_MakePlanesComplete(object source, System.EventArgs args) {
-        /* TODO: 3.a DEVELOPER CODING EXERCISE 3.a */
 
         // Collection of floor and table planes that we can use to set horizontal items on.
         List<GameObject> horizontal = new List<GameObject>();
@@ -94,12 +93,12 @@ public class VentanaSpacialProcessor : Singleton<VentanaSpacialProcessor> {
         // Collection of wall planes that we can use to set vertical items on.
         List<GameObject> vertical = new List<GameObject>();
 
-        // 3.a: Get all floor and table planes by calling
+        // Get all floor and table planes by calling
         // SurfaceMeshesToPlanes.Instance.GetActivePlanes().
         // Assign the result to the 'horizontal' list.
         horizontal = SurfaceMeshesToPlanes.Instance.GetActivePlanes(PlaneTypes.Table | PlaneTypes.Floor);
 
-        // 3.a: Get all wall planes by calling
+        // Get all wall planes by calling
         // SurfaceMeshesToPlanes.Instance.GetActivePlanes().
         // Assign the result to the 'vertical' list.
         vertical = SurfaceMeshesToPlanes.Instance.GetActivePlanes(PlaneTypes.Wall);
@@ -109,23 +108,20 @@ public class VentanaSpacialProcessor : Singleton<VentanaSpacialProcessor> {
         if ( horizontal.Count >= minimumFloors && vertical.Count >= minimumWalls ) {
             // We have enough floors and walls to place our holograms on...
 
-            // 3.a: Let's reduce our triangle count by removing triangles
+            // Let's reduce our triangle count by removing triangles
             // from SpatialMapping meshes that intersect with our active planes.
             // Call RemoveVertices().
             // Pass in all activePlanes found by SurfaceMeshesToPlanes.Instance.
             RemoveVertices(SurfaceMeshesToPlanes.Instance.ActivePlanes);
 
-            // 3.a: We can indicate to the user that scanning is over by
+            // We can indicate to the user that scanning is over by
             // changing the material applied to the Spatial Mapping meshes.
             // Call SpatialMappingManager.Instance.SetSurfaceMaterial().
             // Pass in the secondaryMaterial.
             SpatialMappingManager.Instance.SetSurfaceMaterial(secondaryMaterial);
 
-            // 3.a: We are all done processing the mesh, so we can now
+            // We are all done processing the mesh, so we can now
             // initialize a collection of Placeable holograms in the world
-            // and use horizontal/vertical planes to set their starting positions.
-            // Call SpaceCollectionManager.Instance.GenerateItemsInWorld().
-            // Pass in the lists of horizontal and vertical planes that we found earlier.
 
         } else {
             // We do not have enough floors/walls to place our holograms on...
@@ -134,7 +130,7 @@ public class VentanaSpacialProcessor : Singleton<VentanaSpacialProcessor> {
             // calling StartObserver() on the SpatialMappingManager.Instance.
             SpatialMappingManager.Instance.StartObserver();
 
-            // 3.a: Re-process spatial data after scanning completes by
+            // Re-process spatial data after scanning completes by
             // re-setting meshesProcessed to false.
             meshesProcessed = false;
         }

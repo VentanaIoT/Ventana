@@ -105,11 +105,12 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
             Debug.Log("Creating new control copy");
             GameObject prefabObjectClone = GameObject.Instantiate(gameObject);
             prefabObjectClone.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z);
-            prefabObjectClone.transform.localScale = new Vector3(0.25f * scaleMultiplier.x, 0.25f *scaleMultiplier.y, 0.25f *scaleMultiplier.y);
+            prefabObjectClone.transform.localScale = new Vector3( scaleMultiplier.x, scaleMultiplier.y, scaleMultiplier.y);
             prefabObjectClone.transform.rotation = gameObject.transform.rotation;
             TapToPlace ttp = prefabObjectClone.AddComponent<TapToPlace>();
             Debug.Log(DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString());
             ttp.SavedAnchorFriendlyName = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
+            ttp.layerMask = SpatialMappingManager.Instance.LayerMask;
 
 
             var spb =  prefabObjectClone.GetComponent<SpawnBehaviourScript>();
