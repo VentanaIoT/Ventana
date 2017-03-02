@@ -22,7 +22,6 @@ GameObject:
   - component: {fileID: 114219151922873574}
   - component: {fileID: 114258749542446430}
   - component: {fileID: 23190246917799722}
-  - component: {fileID: 114095443416667456}
   m_Layer: 0
   m_Name: MusicController
   m_TagString: Untagged
@@ -222,7 +221,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1052640740918930}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.110999994, y: -0.097, z: 0.923}
+  m_LocalPosition: {x: 0.110999994, y: 4.28, z: 0.923}
   m_LocalScale: {x: 0.100000165, y: 0.10000009, z: 0.10000012}
   m_Children:
   - {fileID: 4542637858393946}
@@ -296,7 +295,7 @@ Transform:
   m_GameObject: {fileID: 1448223760632336}
   m_LocalRotation: {x: -0, y: -1, z: 0, w: 0}
   m_LocalPosition: {x: 0.0029715893, y: -3.8516057, z: -0.7629773}
-  m_LocalScale: {x: 60, y: 60.000004, z: 20}
+  m_LocalScale: {x: 30, y: 60.000004, z: 20}
   m_Children: []
   m_Father: {fileID: 4537107038032780}
   m_RootOrder: 4
@@ -493,7 +492,7 @@ MeshRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1448223760632336}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_MotionVectors: 1
@@ -979,24 +978,6 @@ MonoBehaviour:
     type: 2}
   normalButtonMaterial: {fileID: 2100000, guid: 2e4b95167689e634ba93cace377b517d,
     type: 2}
---- !u!114 &114095443416667456
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1052640740918930}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dbad991a9894486418e4988222483ef8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SavedAnchorFriendlyName: SavedAnchorFriendlyName
-  PlaceParentOnTap: 0
-  ParentGameObjectToPlace: {fileID: 0}
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 2147483648
-  IsBeingPlaced: 0
 --- !u!114 &114219151922873574
 MonoBehaviour:
   m_ObjectHideFlags: 1
