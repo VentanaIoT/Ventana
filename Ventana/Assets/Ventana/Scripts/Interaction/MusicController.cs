@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using Vuforia;
 using System;
-
+[ExecuteInEditMode]
 public class MusicController : BaseVentanaController  {
     public Transform playButton;
     public Transform pauseButton;

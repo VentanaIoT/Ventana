@@ -83,7 +83,7 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
                 bvc.OnVumarkFound();
             }
             control.transform.SetParent(mTrackableBehaviour.gameObject.transform);
-            control.transform.localPosition = new Vector3(0f, 0f, 0f);
+            control.transform.position = gameObject.transform.position;
             Collider bc = control.GetComponent<Collider>();
             if ( !bc ) {
                 control.AddComponent<BoxCollider>();
@@ -91,7 +91,7 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
 
             control.layer = 9;
 
-            control.transform.localScale = new Vector3(1f, 1f, 1f);
+            control.transform.localScale = new Vector3(.4f, .4f, .4f);
             SpawnBehaviourScript spb = control.gameObject.AddComponent<SpawnBehaviourScript>();
             spb.shouldSpawn = true;
             spb.scaleMultiplier = gameObject.transform.localScale;
