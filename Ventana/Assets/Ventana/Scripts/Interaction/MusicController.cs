@@ -14,8 +14,6 @@ public class MusicController : BaseVentanaController  {
 
     // Use this for initialization
     void Start() {
-        playButton = gameObject.transform.Find("play");
-        pauseButton = gameObject.transform.Find("pause");
         Debug.Log("In Music Controller");
         requestURL = GetComponent<RequestScript>().url;
     }

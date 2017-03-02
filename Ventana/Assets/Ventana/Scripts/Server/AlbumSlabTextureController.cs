@@ -19,13 +19,19 @@ public class AlbumSlabTextureController : MonoBehaviour {
     IEnumerator ChangeAlbumTexture(WWW www) {
         yield return www;
 
+        
+        
+
         if ( www.error == null ) {
-            //Debug.Log("WWW OK!");
-            GetComponent<Renderer>().material.mainTexture = null;
+            var materials = gameObject.GetComponent<Renderer>().materials;
+            materials[1].mainTexture = www.texture;
+
             //www.LoadImageIntoTexture(renderer.material.mainTexture);
-            Renderer renderer = GetComponent<Renderer>();
-            renderer.material.mainTexture = www.texture;
-           // Debug.Log(www.texture);
+
+            //www.LoadImageIntoTexture(gameObject.GetComponent<Renderer>().materials[1].tex)
+            //gameObject.GetComponent<Renderer>().materials[1].SetTexture("album", www.texture);
+            gameObject.GetComponent<Renderer>().materials = materials;
+            // Debug.Log(www.texture);
 
 
         } else {
