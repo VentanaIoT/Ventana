@@ -13,8 +13,7 @@ public class MusicController : BaseVentanaController  {
 
 
     // Use this for initialization
-    void Start() {
-        Debug.Log("In Music Controller");
+    public virtual void Start() {
         requestURL = GetComponent<RequestScript>().url;
     }
 
@@ -83,4 +82,5 @@ public class MusicController : BaseVentanaController  {
         base.OnVumarkLost();
         isModelShowing = false;
     }
+
 }

@@ -41,7 +41,7 @@ namespace HoloToolkit.Unity.InputModule
         public bool IsDraggingEnabled = true;
 
         private Camera mainCamera;
-        private bool isDragging;
+        protected bool isDragging;
         private bool isGazed;
         private Vector3 objRefForward;
         private float objRefDistance;
@@ -55,7 +55,7 @@ namespace HoloToolkit.Unity.InputModule
         private IInputSource currentInputSource = null;
         private uint currentInputSourceId;
 
-        private void Start()
+        public virtual void Start()
         {
             if (HostTransform == null)
             {
@@ -78,7 +78,7 @@ namespace HoloToolkit.Unity.InputModule
             }
         }
 
-        private void Update()
+        public virtual void Update()
         {
             if (IsDraggingEnabled && isDragging)
             {
@@ -89,7 +89,7 @@ namespace HoloToolkit.Unity.InputModule
         /// <summary>
         /// Starts dragging the object.
         /// </summary>
-        public void StartDragging()
+        public virtual void StartDragging()
         {
             if (!IsDraggingEnabled)
             {
@@ -214,7 +214,7 @@ namespace HoloToolkit.Unity.InputModule
         /// <summary>
         /// Stops dragging the object.
         /// </summary>
-        public void StopDragging()
+        public virtual void StopDragging()
         {
             if (!isDragging)
             {
