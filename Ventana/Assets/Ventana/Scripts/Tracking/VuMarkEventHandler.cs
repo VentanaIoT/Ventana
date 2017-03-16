@@ -91,7 +91,7 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
 
             control.layer = 9;
 
-            control.transform.localScale = new Vector3(.4f, .4f, .4f);
+            control.transform.localScale = new Vector3(.2f, .2f, .2f);
             SpawnBehaviourScript spb = control.gameObject.AddComponent<SpawnBehaviourScript>();
             spb.shouldSpawn = true;
             spb.scaleMultiplier = gameObject.transform.localScale;
