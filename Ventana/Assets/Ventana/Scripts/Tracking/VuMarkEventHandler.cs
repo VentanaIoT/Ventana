@@ -74,20 +74,19 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
         Debug.Log("VuMark of Type: " + GetVuMarkType( mTrackableBehaviour.VuMarkTarget) + " and Value: " + GetVuMarkString(mTrackableBehaviour.VuMarkTarget) + " found");
 
         ModelController mc = ModelController.Instance;
+        int vuMarkId = Convert.ToInt32(GetVuMarkString(mTrackableBehaviour.VuMarkTarget), 16);
         control = null;
-        control = mc.GetPrefabWithId(Convert.ToInt32(GetVuMarkString(mTrackableBehaviour.VuMarkTarget), 16)); 
+        control = mc.GetPrefabWithId(vuMarkId); 
         if ( control ) {
             mTrackableBehaviour.transform.DestroyChildren();
             BaseVentanaController bvc = control.GetComponent<BaseVentanaController>();
             if ( bvc ) {
                 bvc.OnVumarkFound();
+                bvc.VentanaID = vuMarkId;
             }
             control.transform.SetParent(mTrackableBehaviour.gameObject.transform);
             control.transform.position = gameObject.transform.position;
-            Collider bc = control.GetComponent<Collider>();
-            if ( !bc ) {
-                control.AddComponent<BoxCollider>();
-            }
+            
 
             control.layer = 9;
 
