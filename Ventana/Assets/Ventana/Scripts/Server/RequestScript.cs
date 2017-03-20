@@ -45,6 +45,14 @@ public class RequestScript : MonoBehaviour {
         makeAPIRequest("status");
     }
 
+    void OnSliderChangeRequest(KnobHandler.SliderLevels levels) {
+
+        Debug.Log("Requesting a: " + levels.XAxisLevel + (levels.XAxisLevel > 0? " increase" : " decrease") );
+
+
+
+    }
+
     IEnumerator callToAPI(string request, string parameters = null)
     {
         string newUrl = url;
