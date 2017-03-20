@@ -10,9 +10,9 @@ public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
 
     [Tooltip("In the form of http://yourholohubip:port")]
     public string HoloHubURI = "http://192.168.0.108:8081";
-    private string MusicEndpoint = "/music/";
-    private string LightEndpoint = "/light/";
-    private string PowerEndpoint = "/power/";
+    private string MusicEndpoint = "/sonos/";
+    private string LightEndpoint = "/wink/";
+    private string PowerEndpoint = "/wink/";
 
     // Use this for initialization
     void Start () {
@@ -33,9 +33,18 @@ public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
         StringBuilder url = new StringBuilder(HoloHubURI);
         url.Append(MusicEndpoint);
         url.Append(action + "/");
-        url.Append(id.ToString());
+        //url.Append(id.ToString());
         //post data is not needed for this endpoint
         //Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+        if (id == 0 || id == 3) {
+#warning CHANGE THIS BEFORE CONTINUING WITH SERVER WORK
+            url.Append("Living Room");
+        } else {
+            url.Append(id.ToString());
+        }
+
+        Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+       
         UnityWebRequest holoHubRequest = UnityWebRequest.Post(url.ToString(), data);
         yield return holoHubRequest.Send();
         if ( !holoHubRequest.isError ) {
@@ -55,6 +64,13 @@ public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
         //realistically its only for status...
 
         //Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+        if ( id == 0 || id == 3 ) {
+#warning CHANGE THIS BEFORE CONTINUING WITH SERVER WORK
+            url.Append("Living Room");
+        } else {
+            url.Append(id.ToString());
+        }
+        Debug.Log("ACTION: " + action + " URL: " + url.ToString());
         UnityWebRequest holoHubRequest = UnityWebRequest.Get(url.ToString());
         yield return holoHubRequest.Send();
 
