@@ -83,6 +83,7 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
             if ( bvc ) {
                 bvc.OnVumarkFound();
                 bvc.VentanaID = vuMarkId;
+                
             }
             control.transform.SetParent(mTrackableBehaviour.gameObject.transform);
             control.transform.position = gameObject.transform.position;
