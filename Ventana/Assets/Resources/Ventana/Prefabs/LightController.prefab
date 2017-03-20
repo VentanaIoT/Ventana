@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 82745306857411932}
   - component: {fileID: 114274057041212116}
   m_Layer: 0
-  m_Name: Light
+  m_Name: light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -108,14 +108,14 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4183716588528430}
-  - component: {fileID: 114451467380199586}
+  - component: {fileID: 114408491966698620}
   m_Layer: 0
   m_Name: LightController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1977222696946388
 GameObject:
   m_ObjectHideFlags: 1
@@ -697,7 +697,7 @@ MonoBehaviour:
   normalButtonMaterial: {fileID: 2100000, guid: a772cb29754fdc6408270b8b9cca42f9,
     type: 2}
   scale: {x: 0.0009, y: 2, z: 2}
---- !u!114 &114451467380199586
+--- !u!114 &114408491966698620
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -705,6 +705,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1470629491711206}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d9ff84be58258f43b789a5459156406, type: 3}
+  m_Script: {fileID: 11500000, guid: db0ce04eaa49366438b0fb2a1d5282a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

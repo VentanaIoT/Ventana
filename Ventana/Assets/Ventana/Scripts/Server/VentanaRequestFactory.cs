@@ -1,0 +1,135 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using HoloToolkit.Unity;
+using System.Text;
+using System;
+using UnityEngine.Networking;
+
+public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
+
+    [Tooltip("In the form of http://yourholohubip:port")]
+    public string HoloHubURI = "http://192.168.0.108:8081";
+    private string MusicEndpoint = "/music/";
+    private string LightEndpoint = "/light/";
+    private string PowerEndpoint = "/power/";
+
+    // Use this for initialization
+    void Start () {
+		
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+    
+
+    //this will do web requests...
+    /* MUSIC */
+
+
+    public IEnumerator PostToMusicAPIEndpoint(string action, int id, string data) {
+        StringBuilder url = new StringBuilder(HoloHubURI);
+        url.Append(MusicEndpoint);
+        url.Append(action + "/");
+        url.Append(id.ToString());
+        //post data is not needed for this endpoint
+        //Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+        UnityWebRequest holoHubRequest = UnityWebRequest.Post(url.ToString(), data);
+        yield return holoHubRequest.Send();
+        if ( !holoHubRequest.isError ) {
+            //Debug.Log("WWW Ok!: " + responseString);
+        } else {
+            Debug.Log("WWW Error: " + holoHubRequest.error);
+        }
+
+
+    }
+
+    public IEnumerator GetFromMusicAPIEndpoint(string action, int id, Action<VentanaInteractable> callback) {
+        StringBuilder url = new StringBuilder(HoloHubURI);
+        url.Append(MusicEndpoint);
+        url.Append(action + "/");
+        url.Append(id.ToString());
+        //realistically its only for status...
+
+        //Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+        UnityWebRequest holoHubRequest = UnityWebRequest.Get(url.ToString());
+        yield return holoHubRequest.Send();
+
+        if ( !holoHubRequest.isError ) {
+            //Debug.Log("WWW Ok!: " + responseString);
+
+            if ( action == "status" ) {
+                VentanaInteractable myVentana = SonosInfo.CreateFromJSON(holoHubRequest.downloadHandler.text);
+                callback(myVentana);
+            }
+
+        } else {
+            Debug.Log("WWW Error: " + holoHubRequest.error);
+        }
+    }
+
+
+    /* LIGHT */
+
+    public IEnumerator PostToLightAPIEndpoint(string action, int id, string data) {
+        StringBuilder url = new StringBuilder(HoloHubURI);
+        url.Append(LightEndpoint);
+        url.Append(action + "/");
+        url.Append(id.ToString() + "/");
+        url.Append(data);
+
+        Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+        UnityWebRequest holoHubRequest = UnityWebRequest.Get(url.ToString());
+        yield return holoHubRequest.Send();
+
+        if ( !holoHubRequest.isError ) {
+            //Debug.Log("WWW Ok!: " + responseString);
+        } else {
+            Debug.Log("WWW Error: " + holoHubRequest.error);
+        }
+
+    }
+
+    public IEnumerator GetFromLightAPIEndpoint(string action, int id, Action<string, VentanaInteractable> callback) {
+        StringBuilder url = new StringBuilder(HoloHubURI);
+        url.Append(LightEndpoint);
+        url.Append(action + "/");
+        url.Append(id.ToString() + "/");
+
+        Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+        UnityWebRequest holoHubRequest = UnityWebRequest.Get(url.ToString());
+        yield return holoHubRequest.Send();
+
+        if ( !holoHubRequest.isError ) {
+            //Debug.Log("WWW Ok!: " + responseString);
+            if ( action == "status" ) {
+                //VentanaInteractable myVentana = SonosInfo.CreateFromJSON(holoHubRequest.downloadHandler.text);
+                //callback("OnURLSent", myVentana);
+            }
+
+        } else {
+            Debug.Log("WWW Error: " + holoHubRequest.error);
+        }
+    }
+
+    /* POWER */
+
+    public void PostToPowerAPIEndpoint(string action, int id, string data) {
+        StringBuilder url = new StringBuilder(HoloHubURI);
+        url.Append(PowerEndpoint);
+        throw new NotImplementedException();
+
+
+    }
+
+    public void GetFromPowerAPIEndpoint(string action, int id) {
+        StringBuilder url = new StringBuilder(HoloHubURI);
+        url.Append(PowerEndpoint);
+        throw new NotImplementedException();
+
+    }
+
+}
