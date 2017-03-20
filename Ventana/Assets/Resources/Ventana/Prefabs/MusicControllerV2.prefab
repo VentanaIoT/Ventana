@@ -50,7 +50,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1202010540200782
 GameObject:
   m_ObjectHideFlags: 1
@@ -104,7 +104,6 @@ GameObject:
   - component: {fileID: 23333792173123834}
   - component: {fileID: 64359944099067038}
   - component: {fileID: 114255110375387828}
-  - component: {fileID: 114798241378510736}
   m_Layer: 0
   m_Name: Album Artwork
   m_TagString: Untagged
@@ -120,7 +119,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4360010813408474}
-  - component: {fileID: 114168171781234882}
   - component: {fileID: 114443526743563782}
   m_Layer: 0
   m_Name: MusicControllerV2
@@ -128,7 +126,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1559222770613488
 GameObject:
   m_ObjectHideFlags: 0
@@ -503,7 +501,7 @@ MeshRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1148229187829074}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_MotionVectors: 1
@@ -769,7 +767,7 @@ MeshCollider:
   m_GameObject: {fileID: 1148229187829074}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Convex: 0
   m_InflateMesh: 0
@@ -1310,18 +1308,6 @@ MonoBehaviour:
     type: 2}
   normalButtonMaterial: {fileID: 2100000, guid: a772cb29754fdc6408270b8b9cca42f9,
     type: 2}
---- !u!114 &114168171781234882
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1488850799281272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c64adcf0960125542b9e7c229999e5f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  url: http://192.168.0.108:8081/
 --- !u!114 &114255110375387828
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1346,8 +1332,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9517efa7e2220414693f08b8b8b21cad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playButton: {fileID: 4530091045943996}
-  pauseButton: {fileID: 4994225737109422}
+  playButton: {fileID: 1148229187829074}
+  pauseButton: {fileID: 1202010540200782}
   isMusicPlaying: 1
   isModelShowing: 1
 --- !u!114 &114549201562180062
@@ -1386,7 +1372,7 @@ MonoBehaviour:
   allowY: 0
   allowZ: 0
   containerObject: {fileID: 1941645587011164}
-  bounds: {x: 0.00079081993, y: 0.07545068, z: 0.95180416}
+  bounds: {x: 0.00089896255, y: 0.0771934, z: 0.057076953}
   period: 1.5
   clickSound: {fileID: 8300000, guid: 19f89c6e740e7447f9e12a8310d3e973, type: 3}
   highlightButtonMaterial: {fileID: 2100000, guid: a32c289ddf6bd8140b9ca684e64ecdb5,
@@ -1426,16 +1412,3 @@ MonoBehaviour:
     type: 2}
   normalButtonMaterial: {fileID: 2100000, guid: a772cb29754fdc6408270b8b9cca42f9,
     type: 2}
---- !u!114 &114798241378510736
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1345820803054238}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 001676eff2cbf5c4590856ded198e58c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  newURL: http://192.168.0.101:1400/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a4vlbjBSMqycZk6t4HVRpnC%3fsid%3d12%26flags%3d8224%26sn%3d1
-  oldTexture: {fileID: 0}
