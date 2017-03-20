@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class VentanaSpeakerEventHandler : DefaultTrackableEventHandler {
+    
     override public void OnTrackingFound() {
         MusicController musicController = GetComponentInChildren<MusicController>();
         if ( musicController ) {
