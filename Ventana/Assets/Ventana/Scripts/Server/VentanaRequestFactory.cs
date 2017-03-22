@@ -8,14 +8,10 @@ using UnityEngine.Networking;
 using SocketIO;
 
 public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
-
-    public static string GlobalHoloHubURI = "http://192.168.0.108:8081";
-    public static string GlobalHoloHubWS = "ws://192.168.0.108:3001";
+    
 
     [Tooltip("In the form of http://yourholohubip:port")]
     public string HoloHubURI = "http://192.168.0.108:8081";
-    [Tooltip("In the form of ws://yourholohubip:port")]
-    public string HoloHubWS = "ws://192.168.0.108:3001";
     private string MusicEndpoint = "/sonos/";
     private string LightEndpoint = "/wink/";
     private string PowerEndpoint = "/wink/";
@@ -86,7 +82,6 @@ public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
 
         if ( !holoHubRequest.isError ) {
             //Debug.Log("WWW Ok!: " + responseString);
-
             if ( action == "status" && callback != null ) {
                 VentanaInteractable myVentana = SonosInfo.CreateFromJSON(holoHubRequest.downloadHandler.text);
                 callback(myVentana);

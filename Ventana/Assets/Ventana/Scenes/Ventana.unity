@@ -210,6 +210,48 @@ GameObject:
   m_PrefabParentObject: {fileID: 1000012125673284, guid: 90749889d87976143a9e21072d2434b4,
     type: 2}
   m_PrefabInternal: {fileID: 1955807813}
+--- !u!1001 &292605721
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4360010813408474, guid: b909e5d316c371b428cb049561dd010f, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360010813408474, guid: b909e5d316c371b428cb049561dd010f, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360010813408474, guid: b909e5d316c371b428cb049561dd010f, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 4.119
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360010813408474, guid: b909e5d316c371b428cb049561dd010f, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360010813408474, guid: b909e5d316c371b428cb049561dd010f, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360010813408474, guid: b909e5d316c371b428cb049561dd010f, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360010813408474, guid: b909e5d316c371b428cb049561dd010f, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4360010813408474, guid: b909e5d316c371b428cb049561dd010f, type: 2}
+      propertyPath: m_RootOrder
+      value: 5
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: b909e5d316c371b428cb049561dd010f, type: 2}
+  m_IsPrefabParent: 0
 --- !u!43 &556445838
 Mesh:
   m_ObjectHideFlags: 0
@@ -505,6 +547,10 @@ Prefab:
     - target: {fileID: 400000, guid: 010d39cbd03ee4c99a746c1f8ecdc0d8, type: 2}
       propertyPath: m_LocalScale.y
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 010d39cbd03ee4c99a746c1f8ecdc0d8, type: 2}
+      propertyPath: HoloHubWS
+      value: ws://192.168.0.115:4200/socket.io/?EIO=3&transport=websocket
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 010d39cbd03ee4c99a746c1f8ecdc0d8, type: 2}
@@ -818,7 +864,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   HoloHubURI: http://192.168.0.108:8081
-  HoloHubWS: ws://localhost:3001/socket.io/?EIO=3&transport=websocket
   socket: {fileID: 1276407256}
 --- !u!1 &1931140017
 GameObject:

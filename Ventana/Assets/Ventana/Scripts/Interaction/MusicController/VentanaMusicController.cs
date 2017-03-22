@@ -20,7 +20,7 @@ public class VentanaMusicController : BaseVentanaController  {
     // Use this for initialization
     void Start() {
         base.Start();
-        InvokeRepeating("requestAlbum", 1.0f, 6.0f);
+        requestAlbum();
     }
 
     // Use this for initialization
@@ -62,18 +62,36 @@ public class VentanaMusicController : BaseVentanaController  {
     void Update() { 
         if ( isModelShowing ) {
             if ( !isMusicPlaying ) {
-                playButton.SetActive(true);
-                pauseButton.SetActive(false);
+                SetPlayButton();
             } else {
-                playButton.SetActive(false);
-                pauseButton.SetActive(true);
+                SetPauseButton();
             }
         }
     }
+    public void SetPauseState() {
+        isMusicPlaying = false;
+        SetPlayButton();
+    }
+
+    public void SetPlayState() {
+        isMusicPlaying = true;
+        SetPauseButton();
+    }
+    public void SetPauseButton() {
+        playButton.SetActive(false);
+        pauseButton.SetActive(true);
+    }
+
+    public void SetPlayButton() {
+        playButton.SetActive(true);
+        pauseButton.SetActive(false);
+    }
+    
+
     public void GetRequestCompleted(VentanaInteractable ventana) {
         SonosInfo info = ventana as SonosInfo;
         isMusicPlaying = !info.isPaused;
-        gameObject.BroadcastMessage("OnURLSent", ventana);
+        BroadcastMessage("OnURLSent", ventana);
     }
 
     void OnSliderChangeRequest(KnobHandler.SliderLevels levels) {

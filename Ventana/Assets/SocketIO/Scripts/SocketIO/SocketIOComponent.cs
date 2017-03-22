@@ -40,10 +40,11 @@ namespace SocketIO
 {
 	public class SocketIOComponent : MonoBehaviour
 	{
-		#region Public Properties
+        #region Public Properties
 
-		public string url = VentanaRequestFactory.GlobalHoloHubWS;
-		public bool autoConnect = true;
+        [Tooltip("In the form of ws://yourholohubip:port")]
+        public string HoloHubWS = "ws://localhost:3001/socket.io/?EIO=3&transport=websocket";
+        public bool autoConnect = true;
 		public int reconnectDelay = 5;
 		public float ackExpirationTime = 1800f;
 		public float pingInterval = 25f;
@@ -99,7 +100,7 @@ namespace SocketIO
 			sid = null;
 			packetId = 0;
 
-			ws = new WebSocket(url);
+			ws = new WebSocket(HoloHubWS);
 			ws.OnOpen += OnOpen;
 			ws.OnMessage += OnMessage;
 			ws.OnError += OnError;
