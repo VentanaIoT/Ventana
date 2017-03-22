@@ -65,6 +65,7 @@ GameObject:
   - component: {fileID: 82498478469224056}
   - component: {fileID: 114048073177255750}
   - component: {fileID: 82381395530809310}
+  - component: {fileID: 65351954477303752}
   m_Layer: 0
   m_Name: pause
   m_TagString: Untagged
@@ -753,7 +754,7 @@ MeshCollider:
   m_GameObject: {fileID: 1202010540200782}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Convex: 0
   m_InflateMesh: 0
@@ -787,6 +788,18 @@ MeshCollider:
   m_InflateMesh: 0
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300002, guid: bad447bfd09a3e44fad577628aeaaad1, type: 3}
+--- !u!65 &65351954477303752
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1202010540200782}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.03600002, y: 0.012000003, z: 0.012000017}
+  m_Center: {x: -2.0679515e-25, y: -0.0000000037252903, z: 4.656612e-10}
 --- !u!82 &82081884369785030
 AudioSource:
   m_ObjectHideFlags: 1
@@ -1321,6 +1334,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   newURL: http://192.168.0.101:1400/getaa?s=1&u=x-sonos-spotify%3aspotify%253atrack%253a4vlbjBSMqycZk6t4HVRpnC%3fsid%3d12%26flags%3d8224%26sn%3d1
   oldTexture: {fileID: 0}
+  socket: {fileID: 0}
 --- !u!114 &114443526743563782
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1336,6 +1350,7 @@ MonoBehaviour:
   pauseButton: {fileID: 1202010540200782}
   isMusicPlaying: 1
   isModelShowing: 1
+  volumeMultiplier: 5
 --- !u!114 &114549201562180062
 MonoBehaviour:
   m_ObjectHideFlags: 1

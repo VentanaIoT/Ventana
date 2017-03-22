@@ -111,6 +111,7 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
             Debug.Log(DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString());
             ttp.SavedAnchorFriendlyName = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
             ttp.layerMask = SpatialMappingManager.Instance.LayerMask;
+            prefabObjectClone.gameObject.AddComponent<HandDraggable>();
 
 
             var spb =  prefabObjectClone.GetComponent<SpawnBehaviourScript>();

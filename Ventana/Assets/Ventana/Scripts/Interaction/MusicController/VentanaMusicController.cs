@@ -9,6 +9,8 @@ public class VentanaMusicController : BaseVentanaController  {
     public bool isMusicPlaying = false;
     public bool isModelShowing = false;
 
+    public int volumeMultiplier = 2;
+
     private string playCommand = "playtoggle";
     private string statusCommand = "status";
     private string nextCommand = "forward";
@@ -18,7 +20,7 @@ public class VentanaMusicController : BaseVentanaController  {
     // Use this for initialization
     void Start() {
         base.Start();
-        InvokeRepeating("requestAlbum", 1.0f, 1.0f);
+        InvokeRepeating("requestAlbum", 1.0f, 6.0f);
     }
 
     // Use this for initialization
@@ -28,19 +30,19 @@ public class VentanaMusicController : BaseVentanaController  {
         switch ( child ) {
             case "play":
             Debug.Log("Bubbled play");
-            StartCoroutine(requestFactory.PostToMusicAPIEndpoint(playCommand, this.VentanaID, "play"));
+            StartCoroutine(requestFactory.GetFromMusicAPIEndpoint(playCommand, VentanaID, null));
             break;
             case "pause":
             Debug.Log("Bubbled pause");
-            StartCoroutine(requestFactory.PostToMusicAPIEndpoint(playCommand, this.VentanaID, "pause"));
+            StartCoroutine(requestFactory.GetFromMusicAPIEndpoint(playCommand, VentanaID, null));
             break;
             case "next":
             Debug.Log("Bubbled next");
-            StartCoroutine(requestFactory.PostToMusicAPIEndpoint(nextCommand, this.VentanaID, "next"));
+            StartCoroutine(requestFactory.GetFromMusicAPIEndpoint(nextCommand, VentanaID, null));
             break;
             case "previous":
             Debug.Log("Bubbled previous");
-            StartCoroutine(requestFactory.PostToMusicAPIEndpoint(previousCommand, this.VentanaID, "previous"));
+            StartCoroutine(requestFactory.GetFromMusicAPIEndpoint(previousCommand, VentanaID, null));
             break;
             case "status":
             //Debug.Log("Bubbled albumArt");
@@ -77,8 +79,8 @@ public class VentanaMusicController : BaseVentanaController  {
     void OnSliderChangeRequest(KnobHandler.SliderLevels levels) {
         VentanaRequestFactory requestFactory = VentanaRequestFactory.Instance;
         Debug.Log("Requesting a: " + levels.XAxisLevel + (levels.XAxisLevel > 0 ? " increase" : " decrease"));
-        int baseLevel = levels.XAxisLevel * 5;
-        StartCoroutine(requestFactory.PostToMusicAPIEndpoint("volume", VentanaID, baseLevel.ToString()));
+        int baseLevel = levels.XAxisLevel * volumeMultiplier;
+        StartCoroutine(requestFactory.PostToMusicAPIEndpoint("volume", VentanaID, (levels.XAxisLevel > 0 ? "+" : "") + baseLevel.ToString()));
 
     }
 

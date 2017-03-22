@@ -5,15 +5,21 @@ using HoloToolkit.Unity;
 using System.Text;
 using System;
 using UnityEngine.Networking;
+using SocketIO;
 
 public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
 
+    public static string GlobalHoloHubURI = "http://192.168.0.108:8081";
+    public static string GlobalHoloHubWS = "ws://192.168.0.108:3001";
+
     [Tooltip("In the form of http://yourholohubip:port")]
     public string HoloHubURI = "http://192.168.0.108:8081";
+    [Tooltip("In the form of ws://yourholohubip:port")]
+    public string HoloHubWS = "ws://192.168.0.108:3001";
     private string MusicEndpoint = "/sonos/";
     private string LightEndpoint = "/wink/";
     private string PowerEndpoint = "/wink/";
-
+    public SocketIOComponent socket;
     // Use this for initialization
     void Start () {
 		
@@ -42,10 +48,12 @@ public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
         } else {
             url.Append(id.ToString());
         }
+        url.Append("/");
 
         Debug.Log("ACTION: " + action + " URL: " + url.ToString());
-       
-        UnityWebRequest holoHubRequest = UnityWebRequest.Post(url.ToString(), data);
+        Dictionary<string, string> request = new Dictionary<string, string>();
+        request.Add("value", data);
+        UnityWebRequest holoHubRequest = UnityWebRequest.Post(url.ToString(), request);
         yield return holoHubRequest.Send();
         if ( !holoHubRequest.isError ) {
             //Debug.Log("WWW Ok!: " + responseString);
@@ -60,7 +68,7 @@ public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
         StringBuilder url = new StringBuilder(HoloHubURI);
         url.Append(MusicEndpoint);
         url.Append(action + "/");
-        url.Append(id.ToString());
+        //url.Append(id.ToString());
         //realistically its only for status...
 
         //Debug.Log("ACTION: " + action + " URL: " + url.ToString());
@@ -70,14 +78,16 @@ public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
         } else {
             url.Append(id.ToString());
         }
-        Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+
+        url.Append("/");
+        //Debug.Log("ACTION: " + action + " URL: " + url.ToString());
         UnityWebRequest holoHubRequest = UnityWebRequest.Get(url.ToString());
         yield return holoHubRequest.Send();
 
         if ( !holoHubRequest.isError ) {
             //Debug.Log("WWW Ok!: " + responseString);
 
-            if ( action == "status" ) {
+            if ( action == "status" && callback != null ) {
                 VentanaInteractable myVentana = SonosInfo.CreateFromJSON(holoHubRequest.downloadHandler.text);
                 callback(myVentana);
             }
