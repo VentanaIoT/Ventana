@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="qcar_config.xsd">
+  <Tracking>
+    <ImageTarget name="Chips" size="0.200000 0.286034" />
+    <ImageTarget name="Tarmac" size="0.200000 0.140000" />
+    <ImageTarget name="Psycho" size="0.200000 0.150000" />
+    <ImageTarget name="VentanaMark" size="0.200000 0.096579" />
+  </Tracking>
+</QCARConfig>

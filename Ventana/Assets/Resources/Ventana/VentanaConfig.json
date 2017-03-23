@@ -1,0 +1,25 @@
+{
+  "User": "VentanaUser",
+  "VentanaMarks": [
+    {
+      "id": "0x00",
+      "name": "Living Room",
+      "path": "Ventana/Prefabs/MusicControllerV2"
+    },
+    {
+      "id": "0x01",
+      "name": "Tarmac",
+      "path": "Ventana/Prefabs/MusicControllerV2"
+    },
+    {
+        "id": "0x02",
+        "name": "Psycho",
+        "path": "Ventana/Prefabs/LightController"
+    },
+    {
+        "id": "0x03",
+        "name": "Psycho",
+        "path": "Ventana/Prefabs/MusicControllerV2"
+    }
+  ]
+}

@@ -15,16 +15,16 @@ MonoBehaviour:
     vuforiaLicenseKey: ARKW2p3/////AAAAG+5uK0S6TU1ashnlfG8G1EBEehRXBGFeoVOFUJdqMAQIrt98q42s87XBy7huvpz/1JIcFOl2AdhtKwSsEtdqV7DgipVi9WC60tGfPKihVELhPWOh9uCXcsO5K82SI64YZnTwjgQsX85aKmF14VpiqTprwIjuQ4AdaxCjbIupntIW12g7q3lMgWBBuho1DDgq3n9t9286RTtzYYJjMSz+Ldk1FciWcgBIEmsm+hb0blpyLJby63cNo1knGsYPYW6CFRG7ON5wcrnhk2/dLaAZ08tuzSwXvnUgwy7mxQbYmEgwUUuNZ+xF969ARWlaJRO/fZgPuCgH3mqk+qq3YU5qF0JFrzhjE50PMoWiS5dhI4VP
     delayedInitialization: 0
     cameraDeviceModeSetting: -3
-    maxSimultaneousImageTargets: 1
-    maxSimultaneousObjectTargets: 1
-    useDelayedLoadingObjectTargets: 1
+    maxSimultaneousImageTargets: 10
+    maxSimultaneousObjectTargets: 10
+    useDelayedLoadingObjectTargets: 0
     cameraDirection: 0
-    mirrorVideoBackground: 1
+    mirrorVideoBackground: 0
   digitalEyewear:
     cameraOffset: 0.06
     distortionRenderingMode: 2
     distortionRenderingLayer: 31
-    eyewearType: 0
+    eyewearType: 1
     stereoFramework: 0
     seeThroughConfiguration: 1
     viewerName: Generic Cardboard
@@ -44,9 +44,9 @@ MonoBehaviour:
       ContainsMagnet: 0
   databaseLoad:
     dataSetsToLoad:
-    - Sonos_speaker
+    - VentanaVumarks
     dataSetsToActivate:
-    - Sonos_speaker
+    - VentanaVumarks
   videoBackground:
     clippingMode: 0
     matteShader: {fileID: 4800000, guid: f84e93cca971cda47a225f4c6a4156c9, type: 3}
