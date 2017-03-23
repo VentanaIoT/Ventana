@@ -4270,12 +4270,6 @@
             Returns the ith element in the filter list
             </summary>
         </member>
-        <member name="T:Vuforia.VuforiaNativeIosWrapper">
-            <summary>
-            This class encapsulates the access to native methods
-            by implementing the IVuforiaWrapper interface
-            </summary>
-        </member>
         <member name="T:Vuforia.VuforiaNullWrapper">
             <summary>
             This is the null implementation for the IVuforiaWrapper interface.

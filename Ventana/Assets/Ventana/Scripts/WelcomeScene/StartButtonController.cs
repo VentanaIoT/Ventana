@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 public class StartButtonController : MonoBehaviour, IInputClickHandler {
     public void OnInputClicked(InputClickedEventData eventData) {
         //Load the next scene.
+        Debug.Log("Changing Scenes");
         SceneManager.LoadSceneAsync("Ventana", LoadSceneMode.Single);
         
     }
