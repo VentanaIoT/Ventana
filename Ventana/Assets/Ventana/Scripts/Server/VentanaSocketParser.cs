@@ -24,8 +24,7 @@ public class VentanaSocketData  {
                 string channel = str.Substring(firstBracketIndex + 2, (firstCommaIndex - firstBracketIndex) - 3);
                 string JSON = str.Substring(firstCommaIndex + 2, (str.Length - firstCommaIndex) - 3);
                 socc.channel = channel;
-                byte[] bytes = Encoding.UTF8.GetBytes(JSON);
-                socc.jsonPayload = Encoding.UTF8.GetString(bytes);
+                socc.jsonPayload = "{" + JSON + "}";
                 //Debug.Log("CHANNEL: " + channel);
                 //Debug.Log("JSON: " + JSON);
             } else {

@@ -43,7 +43,7 @@ namespace SocketIO {
 #region Public Properties
 
         [Tooltip("In the form of ws://yourholohubip:port")]
-        public string HoloHubWS = "ws://localhost:3001/socket.io/?EIO=3&transport=websocket";
+        public string HoloHubWS = Args.HOLOHUB_WEBSOCKET_ADDRESS;
         public bool autoConnect = true;
 		public int reconnectDelay = 5;
 		public float ackExpirationTime = 1800f;
@@ -439,7 +439,7 @@ using System.Text.RegularExpressions;
 namespace SocketIO {
     public class SocketIOComponent : MonoBehaviour {
         private Dictionary<string, List<Action<SocketIOEvent>>> handlers;
-        public string HoloHubWS = "ws://192.168.0.115:4200/socket.io/?EIO=3&transport=websocket";
+        public string HoloHubWS = Args.HOLOHUB_WEBSOCKET_ADDRESS;
         public MessageWebSocket websocket;
         public DataWriter writer;
         private bool isConnected = false;
@@ -466,7 +466,6 @@ namespace SocketIO {
         private async Task ConnectWebsocket() {
             websocket = new MessageWebSocket();
             Uri server = new Uri(HoloHubWS);
-            //Uri server = new Uri("ws://192.168.0.113:3001/socket.io/?EIO=3&transport=websocket"); 
 
             websocket.Control.MessageType = SocketMessageType.Utf8;
             websocket.MessageReceived += Websocket_MessageReceived;
@@ -558,6 +557,29 @@ namespace SocketIO {
             }
             handlers[ev].Add(callback);
         }
+
+        public void Off(string ev, Action<SocketIOEvent> callback) {
+            if ( !handlers.ContainsKey(ev) ) {
+#if SOCKET_IO_DEBUG
+				debugMethod.Invoke("[SocketIO] No callbacks registered for event: " + ev);
+#endif
+                return;
+            }
+
+            List<Action<SocketIOEvent>> l = handlers[ev];
+            if ( !l.Contains(callback) ) {
+#if SOCKET_IO_DEBUG
+				debugMethod.Invoke("[SocketIO] Couldn't remove callback action for event: " + ev);
+#endif
+                return;
+            }
+
+            l.Remove(callback);
+            if ( l.Count == 0 ) {
+                handlers.Remove(ev);
+            }
+        }
+
         private void EmitEvent(SocketIOEvent ev) {
             if ( !handlers.ContainsKey(ev.name) ) { return; }
             foreach ( Action<SocketIOEvent> handler in this.handlers[ev.name] ) {

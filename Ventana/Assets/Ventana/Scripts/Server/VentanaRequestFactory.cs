@@ -11,7 +11,7 @@ public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
     
 
     [Tooltip("In the form of http://yourholohubip:port")]
-    public string HoloHubURI = "http://192.168.0.115:8081";
+    public string HoloHubURI = Args.HOLOHUB_ADDRESS;
     private string MusicEndpoint = "/sonos/";
     private string LightEndpoint = "/wink/";
     private string PowerEndpoint = "/wink/";

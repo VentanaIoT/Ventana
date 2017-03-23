@@ -15,8 +15,6 @@ public class AlbumSlabTextureController : MonoBehaviour {
     void Start() {
         socket = VentanaRequestFactory.Instance.socket;
         newURL = "http://is5.mzstatic.com/image/thumb/Music3/v4/47/97/af/4797af7e-24c9-7428-ac64-5b5f35eba51e/source/100000x100000-999.jpg";
-        WWW www = new WWW(newURL);
-        StartCoroutine(ChangeAlbumTexture(www));
         socket.On("push", HandlePush);
         vmc = GetComponentInParent<VentanaMusicController>();
     }
@@ -26,9 +24,9 @@ public class AlbumSlabTextureController : MonoBehaviour {
         if ( myVentana as SonosInfo != null ) {
             SonosInfo ventana = (SonosInfo)myVentana;
             if ( ventana.isPaused ) {
-                SendMessageUpwards("SetPauseState");
+                gameObject.SendMessageUpwards("SetPauseState");
             } else {
-                SendMessageUpwards("SetPlayState");
+                gameObject.SendMessageUpwards("SetPlayState");
             }
         }
         OnURLSent(myVentana);
@@ -58,5 +56,11 @@ public class AlbumSlabTextureController : MonoBehaviour {
             StartCoroutine(ChangeAlbumTexture(www));
 
         }
+    }
+
+
+    private void OnDestroy() {
+        //free socket resources...
+        socket.Off("push", HandlePush);
     }
 }
