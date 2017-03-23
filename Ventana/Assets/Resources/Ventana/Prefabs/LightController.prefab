@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 82745306857411932}
   - component: {fileID: 114274057041212116}
   m_Layer: 0
-  m_Name: Light
+  m_Name: light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -108,7 +108,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4183716588528430}
-  - component: {fileID: 114451467380199586}
+  - component: {fileID: 114408491966698620}
   m_Layer: 0
   m_Name: LightController
   m_TagString: Untagged
@@ -158,7 +158,7 @@ Transform:
   m_GameObject: {fileID: 1977222696946388}
   m_LocalRotation: {x: -0.0000000027939673, y: 2.7755566e-17, z: 7.589413e-19, w: 1}
   m_LocalPosition: {x: -1e-15, y: -0.00000014984, z: -9e-15}
-  m_LocalScale: {x: 0.057142857, y: 76.69367, z: 2}
+  m_LocalScale: {x: 0.08, y: 107.37112, z: 2}
   m_Children: []
   m_Father: {fileID: 4246244930677696}
   m_RootOrder: 0
@@ -185,7 +185,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1161941917713648}
   m_LocalRotation: {x: 0.0000010999357, y: 0.00000001835861, z: 0.7071067, w: -0.7071068}
-  m_LocalPosition: {x: -0.007, y: -1.5522e-11, z: -0.0005}
+  m_LocalPosition: {x: -0.0059, y: 0, z: -0.0005}
   m_LocalScale: {x: 34.9451, y: 0.02651866, z: 0.66666657}
   m_Children:
   - {fileID: 4025081787123774}
@@ -227,8 +227,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1455818063876886}
   m_LocalRotation: {x: 1, y: 0, z: -0, w: 0.0000000754979}
-  m_LocalPosition: {x: 0.0020000003, y: -6.556711e-11, z: -0.00075}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.0029, y: -6.556711e-11, z: -0.0008}
+  m_LocalScale: {x: 0.7850397, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4652035549824904}
   m_RootOrder: 0
@@ -697,7 +697,7 @@ MonoBehaviour:
   normalButtonMaterial: {fileID: 2100000, guid: a772cb29754fdc6408270b8b9cca42f9,
     type: 2}
   scale: {x: 0.0009, y: 2, z: 2}
---- !u!114 &114451467380199586
+--- !u!114 &114408491966698620
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -705,6 +705,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1470629491711206}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d9ff84be58258f43b789a5459156406, type: 3}
+  m_Script: {fileID: 11500000, guid: db0ce04eaa49366438b0fb2a1d5282a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
