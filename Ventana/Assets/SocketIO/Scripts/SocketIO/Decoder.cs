@@ -1,4 +1,5 @@
-﻿#region License
+﻿#if UNITY_EDITOR
+#region License
 /*
  * Decoder.cs
  *
@@ -117,3 +118,4 @@ namespace SocketIO
 		}
 	}
 }
+#endif

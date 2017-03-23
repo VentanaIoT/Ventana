@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * Ext.cs
@@ -1806,3 +1807,4 @@ namespace WebSocketSharp
     #endregion
   }
 }
+#endif

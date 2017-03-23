@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * HttpUtility.cs
@@ -1202,3 +1203,4 @@ namespace WebSocketSharp.Net
     #endregion
   }
 }
+#endif

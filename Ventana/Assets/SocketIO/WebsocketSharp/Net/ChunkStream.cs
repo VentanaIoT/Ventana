@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * ChunkStream.cs
@@ -366,3 +367,4 @@ namespace WebSocketSharp.Net
     #endregion
   }
 }
+#endif

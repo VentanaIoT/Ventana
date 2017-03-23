@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 
 public static partial class JSONTemplates {
@@ -235,3 +236,4 @@ public static partial class JSONTemplates {
 	}
 	
 }
+#endif

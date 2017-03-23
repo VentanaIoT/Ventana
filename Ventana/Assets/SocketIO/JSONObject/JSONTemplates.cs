@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using System.Collections.Generic;
 using System.Reflection;
@@ -86,3 +87,4 @@ for(int i = 0; i < obj.Count; i++){
 foreach(JSONObject ob in obj.list)
 	do stuff with ob;
  */
+#endif

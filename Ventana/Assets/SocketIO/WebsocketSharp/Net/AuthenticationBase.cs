@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * AuthenticationBase.cs
@@ -149,3 +150,4 @@ namespace WebSocketSharp.Net
     #endregion
   }
 }
+#endif

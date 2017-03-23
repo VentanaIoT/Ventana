@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * MessageEventArgs.cs
@@ -125,3 +126,4 @@ namespace WebSocketSharp
     #endregion
   }
 }
+#endif

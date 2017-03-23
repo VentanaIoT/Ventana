@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * SocketPacketType.cs
@@ -41,3 +42,4 @@ namespace SocketIO
 		CONTROL         =  7
 	}
 }
+#endif

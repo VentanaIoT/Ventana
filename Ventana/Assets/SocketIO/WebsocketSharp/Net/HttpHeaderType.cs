@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * HttpHeaderType.cs
@@ -42,3 +43,4 @@ namespace WebSocketSharp.Net
     MultiValueInResponse = 1 << 5
   }
 }
+#endif

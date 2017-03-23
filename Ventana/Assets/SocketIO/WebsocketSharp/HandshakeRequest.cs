@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * HandshakeRequest.cs
@@ -177,3 +178,4 @@ namespace WebSocketSharp
     #endregion
   }
 }
+#endif

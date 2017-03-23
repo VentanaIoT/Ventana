@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * PayloadData.cs
@@ -179,3 +180,4 @@ namespace WebSocketSharp
     #endregion
   }
 }
+#endif

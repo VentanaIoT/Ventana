@@ -1,4 +1,5 @@
-﻿#region License
+﻿#if UNITY_EDITOR
+#region License
 /*
  * SocketIO.cs
  *
@@ -422,3 +423,4 @@ namespace SocketIO
 		#endregion
 	}
 }
+#endif

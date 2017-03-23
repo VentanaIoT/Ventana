@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * AuthenticationChallenge.cs
@@ -144,3 +145,4 @@ namespace WebSocketSharp.Net
     #endregion
   }
 }
+#endif

@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * HttpListenerResponse.cs
@@ -904,3 +905,4 @@ namespace WebSocketSharp.Net
     #endregion
   }
 }
+#endif

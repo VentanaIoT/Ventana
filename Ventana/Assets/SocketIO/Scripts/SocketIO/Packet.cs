@@ -1,4 +1,5 @@
-﻿#region License
+﻿#if UNITY_EDITOR
+#region License
 /*
  * Packet.cs
  *
@@ -57,3 +58,4 @@ namespace SocketIO
 		}
 	}
 }
+#endif

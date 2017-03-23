@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * NetworkCredential.cs
@@ -177,3 +178,4 @@ namespace WebSocketSharp.Net
     #endregion
   }
 }
+#endif

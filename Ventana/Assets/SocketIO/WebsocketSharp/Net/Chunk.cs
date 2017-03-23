@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * Chunk.cs
@@ -89,3 +90,4 @@ namespace WebSocketSharp.Net
     #endregion
   }
 }
+#endif

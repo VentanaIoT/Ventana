@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * Parser.cs
@@ -53,3 +54,4 @@ namespace SocketIO
 		}
 	}
 }
+#endif

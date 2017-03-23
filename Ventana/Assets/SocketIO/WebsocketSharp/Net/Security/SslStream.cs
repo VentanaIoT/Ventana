@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * SslStream.cs
@@ -80,3 +81,4 @@ namespace WebSocketSharp.Net.Security
     #endregion
   }
 }
+#endif

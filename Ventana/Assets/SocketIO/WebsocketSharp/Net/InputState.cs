@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * InputState.cs
@@ -47,3 +48,4 @@ namespace WebSocketSharp.Net
     Headers
   }
 }
+#endif

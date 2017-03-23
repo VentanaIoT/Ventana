@@ -1,4 +1,5 @@
-﻿#region License
+﻿#if UNITY_EDITOR
+#region License
 /*
  * TestSocketIO.cs
  *
@@ -99,3 +100,4 @@ public class TestSocketIO : MonoBehaviour
 		Debug.Log("[SocketIO] Close received: " + e.name + " " + e.data);
 	}
 }
+#endif

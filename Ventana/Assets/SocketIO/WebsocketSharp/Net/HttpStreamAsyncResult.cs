@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * HttpStreamAsyncResult.cs
@@ -131,3 +132,4 @@ namespace WebSocketSharp.Net
     #endregion
   }
 }
+#endif

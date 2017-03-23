@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * WebSocketStream.cs
@@ -285,3 +286,4 @@ namespace WebSocketSharp
     #endregion
   }
 }
+#endif

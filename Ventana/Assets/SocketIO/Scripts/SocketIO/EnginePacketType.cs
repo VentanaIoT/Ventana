@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * EnginePacketType.cs
@@ -44,3 +45,4 @@ namespace SocketIO
 		NOOP   	 =  6
 	}
 }
+#endif

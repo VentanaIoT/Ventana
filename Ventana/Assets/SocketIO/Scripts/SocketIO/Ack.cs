@@ -1,4 +1,5 @@
-﻿#region License
+﻿#if UNITY_EDITOR
+#region License
 /*
  * Ack.cs
  *
@@ -55,4 +56,4 @@ namespace SocketIO
 		}
 	}
 }
-
+#endif

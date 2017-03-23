@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * SocketIOException.cs
@@ -36,3 +37,4 @@ namespace SocketIO
 		public SocketIOException(string message, Exception innerException): base(message, innerException){}
 	}
 }
+#endif

@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 #region License
 /*
  * LogData.cs
@@ -150,3 +151,4 @@ namespace WebSocketSharp
     #endregion
   }
 }
+#endif
