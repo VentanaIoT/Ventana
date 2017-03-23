@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class BaseVentanaController : MonoBehaviour, IVentanaVumarkEventHandler {
 
-    public int VentanaID { get;  set; }
-    public string ControllerName { get; set; }
+    public int VentanaID = -1;
+    public string ControllerName;
     
     // Use this for initialization
     protected void Start () {
