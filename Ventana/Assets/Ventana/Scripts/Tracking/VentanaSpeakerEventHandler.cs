@@ -6,7 +6,7 @@ using UnityEngine;
 public class VentanaSpeakerEventHandler : DefaultTrackableEventHandler {
     
     override public void OnTrackingFound() {
-        VentanaMusicController musicController = GetComponentInChildren<VentanaMusicController>();
+        MusicController musicController = GetComponentInChildren<MusicController>();
         if ( musicController ) {
             musicController.isModelShowing = true;
         }
@@ -14,7 +14,7 @@ public class VentanaSpeakerEventHandler : DefaultTrackableEventHandler {
     }
 
     public override void OnTrackingLost() {
-        VentanaMusicController musicController = GetComponentInChildren<VentanaMusicController>();
+        MusicController musicController = GetComponentInChildren<MusicController>();
         if ( musicController ) {
             musicController.isModelShowing = false;
         }

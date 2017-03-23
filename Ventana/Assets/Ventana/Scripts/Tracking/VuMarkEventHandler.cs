@@ -9,7 +9,6 @@ countries.
 using UnityEngine;
 using Vuforia;
 using System;
-using HoloToolkit.Unity.InputModule;
 
 /// <summary>
 /// A custom handler that implements the ITrackableEventHandler interface.
@@ -84,7 +83,6 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
             if ( bvc ) {
                 bvc.OnVumarkFound();
                 bvc.VentanaID = vuMarkId;
-                
             }
             control.transform.SetParent(mTrackableBehaviour.gameObject.transform);
             control.transform.position = gameObject.transform.position;
@@ -92,9 +90,8 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
 
             control.layer = 9;
 
-            control.transform.localScale = new Vector3(.35f, .35f, .35f);
+            control.transform.localScale = new Vector3(.2f, .2f, .2f);
             SpawnBehaviourScript spb = control.gameObject.AddComponent<SpawnBehaviourScript>();
-            spb.ControllerID = vuMarkId;
             spb.shouldSpawn = true;
             spb.scaleMultiplier = gameObject.transform.localScale;
         }

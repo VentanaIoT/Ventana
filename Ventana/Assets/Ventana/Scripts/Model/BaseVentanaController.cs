@@ -4,16 +4,15 @@ using UnityEngine;
 
 public class BaseVentanaController : MonoBehaviour, IVentanaVumarkEventHandler {
 
-    public int VentanaID = -1;
-    public string ControllerName;
+    public int VentanaID { get;  set; }
     
     // Use this for initialization
-    protected void Start () {
-        Debug.Log("ID: " + VentanaID);
+    void Start () {
+		
 	}
 	
 	// Update is called once per frame
-	protected void Update () {
+	void Update () {
 		
 	}
 
