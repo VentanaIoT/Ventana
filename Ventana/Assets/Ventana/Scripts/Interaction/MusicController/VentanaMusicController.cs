@@ -10,7 +10,6 @@ public class VentanaMusicController : BaseVentanaController  {
     public bool isModelShowing = false;
 
     public int volumeMultiplier = 2;
-
     private string playCommand = "playtoggle";
     private string statusCommand = "status";
     private string nextCommand = "forward";
@@ -92,6 +91,7 @@ public class VentanaMusicController : BaseVentanaController  {
         SonosInfo info = ventana as SonosInfo;
         isMusicPlaying = !info.isPaused;
         BroadcastMessage("OnURLSent", ventana);
+
     }
 
     void OnSliderChangeRequest(KnobHandler.SliderLevels levels) {
@@ -99,6 +99,7 @@ public class VentanaMusicController : BaseVentanaController  {
         Debug.Log("Requesting a: " + levels.XAxisLevel + (levels.XAxisLevel > 0 ? " increase" : " decrease"));
         int baseLevel = levels.XAxisLevel * volumeMultiplier;
         StartCoroutine(requestFactory.PostToMusicAPIEndpoint("volume", VentanaID, (levels.XAxisLevel > 0 ? "+" : "") + baseLevel.ToString()));
+
 
     }
 
@@ -111,6 +112,4 @@ public class VentanaMusicController : BaseVentanaController  {
         base.OnVumarkLost();
         isModelShowing = false;
     }
-
-    
 }

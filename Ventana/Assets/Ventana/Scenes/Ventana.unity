@@ -261,6 +261,7 @@ Prefab:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b909e5d316c371b428cb049561dd010f, type: 2}
+
   m_IsPrefabParent: 0
 --- !u!43 &556445838
 Mesh:
@@ -992,6 +993,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6585881a097e2a0479bc7f98b16c2865, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+
 --- !u!4 &2078054154 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4000010560871102, guid: d379ed0a5618c9f479f58bd83a2d0ad3,

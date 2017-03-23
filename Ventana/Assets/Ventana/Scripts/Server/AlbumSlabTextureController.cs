@@ -38,6 +38,7 @@ public class AlbumSlabTextureController : MonoBehaviour {
             var materials = gameObject.GetComponent<Renderer>().materials;
             materials[1].mainTexture = www.texture;
             gameObject.GetComponent<Renderer>().materials = materials;
+
         } else {
             //Debug.Log("Not changing texture");
         }
