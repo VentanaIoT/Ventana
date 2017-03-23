@@ -9,6 +9,7 @@ public class VentanaMusicController : BaseVentanaController  {
     public bool isMusicPlaying = false;
     public bool isModelShowing = false;
 
+    public int volumeMultiplier = 2;
     private string playCommand = "playtoggle";
     private string statusCommand = "status";
     private string nextCommand = "forward";
@@ -18,7 +19,7 @@ public class VentanaMusicController : BaseVentanaController  {
     // Use this for initialization
     void Start() {
         base.Start();
-        InvokeRepeating("requestAlbum", 1.0f, 1.0f);
+        requestAlbum();
     }
 
     // Use this for initialization
@@ -28,19 +29,19 @@ public class VentanaMusicController : BaseVentanaController  {
         switch ( child ) {
             case "play":
             Debug.Log("Bubbled play");
-            StartCoroutine(requestFactory.PostToMusicAPIEndpoint(playCommand, this.VentanaID, "play"));
+            StartCoroutine(requestFactory.GetFromMusicAPIEndpoint(playCommand, VentanaID, null));
             break;
             case "pause":
             Debug.Log("Bubbled pause");
-            StartCoroutine(requestFactory.PostToMusicAPIEndpoint(playCommand, this.VentanaID, "pause"));
+            StartCoroutine(requestFactory.GetFromMusicAPIEndpoint(playCommand, VentanaID, null));
             break;
             case "next":
             Debug.Log("Bubbled next");
-            StartCoroutine(requestFactory.PostToMusicAPIEndpoint(nextCommand, this.VentanaID, "next"));
+            StartCoroutine(requestFactory.GetFromMusicAPIEndpoint(nextCommand, VentanaID, null));
             break;
             case "previous":
             Debug.Log("Bubbled previous");
-            StartCoroutine(requestFactory.PostToMusicAPIEndpoint(previousCommand, this.VentanaID, "previous"));
+            StartCoroutine(requestFactory.GetFromMusicAPIEndpoint(previousCommand, VentanaID, null));
             break;
             case "status":
             //Debug.Log("Bubbled albumArt");
@@ -60,25 +61,45 @@ public class VentanaMusicController : BaseVentanaController  {
     void Update() { 
         if ( isModelShowing ) {
             if ( !isMusicPlaying ) {
-                playButton.SetActive(true);
-                pauseButton.SetActive(false);
+                SetPlayButton();
             } else {
-                playButton.SetActive(false);
-                pauseButton.SetActive(true);
+                SetPauseButton();
             }
         }
     }
+    public void SetPauseState() {
+        isMusicPlaying = false;
+        SetPlayButton();
+    }
+
+    public void SetPlayState() {
+        isMusicPlaying = true;
+        SetPauseButton();
+    }
+    public void SetPauseButton() {
+        playButton.SetActive(false);
+        pauseButton.SetActive(true);
+    }
+
+    public void SetPlayButton() {
+        playButton.SetActive(true);
+        pauseButton.SetActive(false);
+    }
+    
+
     public void GetRequestCompleted(VentanaInteractable ventana) {
         SonosInfo info = ventana as SonosInfo;
         isMusicPlaying = !info.isPaused;
-        gameObject.BroadcastMessage("OnURLSent", ventana);
+        BroadcastMessage("OnURLSent", ventana);
+
     }
 
     void OnSliderChangeRequest(KnobHandler.SliderLevels levels) {
         VentanaRequestFactory requestFactory = VentanaRequestFactory.Instance;
         Debug.Log("Requesting a: " + levels.XAxisLevel + (levels.XAxisLevel > 0 ? " increase" : " decrease"));
-        int baseLevel = levels.XAxisLevel * 5;
-        StartCoroutine(requestFactory.PostToMusicAPIEndpoint("volume", VentanaID, baseLevel.ToString()));
+        int baseLevel = levels.XAxisLevel * volumeMultiplier;
+        StartCoroutine(requestFactory.PostToMusicAPIEndpoint("volume", VentanaID, (levels.XAxisLevel > 0 ? "+" : "") + baseLevel.ToString()));
+
 
     }
 
@@ -91,5 +112,4 @@ public class VentanaMusicController : BaseVentanaController  {
         base.OnVumarkLost();
         isModelShowing = false;
     }
-
 }
