@@ -550,7 +550,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 010d39cbd03ee4c99a746c1f8ecdc0d8, type: 2}
       propertyPath: HoloHubWS
-      value: ws://192.168.0.108:4200/socket.io/?EIO=3&transport=websocket
+      value: ws://192.168.0.115:4200/socket.io/?EIO=3&transport=websocket
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 010d39cbd03ee4c99a746c1f8ecdc0d8, type: 2}
@@ -863,7 +863,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c93db127e77cb14b8bc5224efa2302c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HoloHubURI: http://192.168.0.108:8081
+  HoloHubURI: http://192.168.0.115:8081
   socket: {fileID: 1276407256}
 --- !u!1 &1931140017
 GameObject:

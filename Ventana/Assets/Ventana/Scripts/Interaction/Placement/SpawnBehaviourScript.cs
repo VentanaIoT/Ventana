@@ -11,6 +11,7 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
     public bool shouldSpawn = false;
     public Vector3 scaleMultiplier;
     public Vector3 placementPosition;
+    public int ControllerID;
 
     #endregion //PUBLIC_MEMBERS
 
@@ -112,7 +113,8 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
             ttp.SavedAnchorFriendlyName = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
             ttp.layerMask = SpatialMappingManager.Instance.LayerMask;
             prefabObjectClone.gameObject.AddComponent<HandDraggable>();
-
+            BaseVentanaController bvc = prefabObject.GetComponent<BaseVentanaController>();
+            bvc.VentanaID = ControllerID;
 
             var spb =  prefabObjectClone.GetComponent<SpawnBehaviourScript>();
             spb.shouldSpawn = false;

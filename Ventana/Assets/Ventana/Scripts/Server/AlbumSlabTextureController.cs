@@ -9,6 +9,7 @@ public class AlbumSlabTextureController : MonoBehaviour {
     public SocketIOComponent socket;
     public Text songText;
     public Text albumText;
+    private VentanaMusicController vmc;
     
 
     void Start() {
@@ -17,11 +18,11 @@ public class AlbumSlabTextureController : MonoBehaviour {
         WWW www = new WWW(newURL);
         StartCoroutine(ChangeAlbumTexture(www));
         socket.On("push", HandlePush);
+        vmc = GetComponentInParent<VentanaMusicController>();
     }
-
     public void HandlePush(SocketIOEvent e) {
         Debug.Log("[SocketIO]" + e.data);
-        VentanaInteractable myVentana = SonosInfo.CreateFromJSON(e.data.GetField("Living Room").ToString());
+        VentanaInteractable myVentana = SonosInfo.CreateFromJSON(e.data.GetField(vmc.VentanaID.ToString()).ToString());
         if ( myVentana as SonosInfo != null ) {
             SonosInfo ventana = (SonosInfo)myVentana;
             if ( ventana.isPaused ) {

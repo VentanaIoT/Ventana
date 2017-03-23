@@ -1,4 +1,6 @@
-﻿#if UNITY_EDITOR
+﻿
+#if UNITY_EDITOR
+#region UnityCode
 #region License
 /*
  * SocketIO.cs
@@ -30,18 +32,15 @@
 
 //#define SOCKET_IO_DEBUG			// Uncomment this for debug
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using WebSocketSharp;
-using WebSocketSharp.Net;
 
-namespace SocketIO
-{
-	public class SocketIOComponent : MonoBehaviour
+namespace SocketIO {
+    public class SocketIOComponent : MonoBehaviour
 	{
-        #region Public Properties
+#region Public Properties
 
         [Tooltip("In the form of ws://yourholohubip:port")]
         public string HoloHubWS = "ws://localhost:3001/socket.io/?EIO=3&transport=websocket";
@@ -55,9 +54,9 @@ namespace SocketIO
 		public string sid { get; set; }
 		public bool IsConnected { get { return connected; } }
 
-		#endregion
+#endregion
 
-		#region Private Properties
+#region Private Properties
 
 		private volatile bool connected;
 		private volatile bool thPinging;
@@ -83,13 +82,13 @@ namespace SocketIO
 		private object ackQueueLock;
 		private Queue<Packet> ackQueue;
 
-		#endregion
+#endregion
 
-		#if SOCKET_IO_DEBUG
+#if SOCKET_IO_DEBUG
 		public Action<string> debugMethod;
-		#endif
+#endif
 
-		#region Unity interface
+#region Unity interface
 
 		public void Awake()
 		{
@@ -116,9 +115,9 @@ namespace SocketIO
 
 			connected = false;
 
-			#if SOCKET_IO_DEBUG
+#if SOCKET_IO_DEBUG
 			if(debugMethod == null) { debugMethod = Debug.Log; };
-			#endif
+#endif
 		}
 
 		public void Start()
@@ -166,9 +165,9 @@ namespace SocketIO
 			Close();
 		}
 
-		#endregion
+#endregion
 
-		#region Public Interface
+#region Public Interface
 		
 		public void Connect()
 		{
@@ -198,17 +197,17 @@ namespace SocketIO
 		public void Off(string ev, Action<SocketIOEvent> callback)
 		{
 			if (!handlers.ContainsKey(ev)) {
-				#if SOCKET_IO_DEBUG
+#if SOCKET_IO_DEBUG
 				debugMethod.Invoke("[SocketIO] No callbacks registered for event: " + ev);
-				#endif
+#endif
 				return;
 			}
 
 			List<Action<SocketIOEvent>> l = handlers [ev];
 			if (!l.Contains(callback)) {
-				#if SOCKET_IO_DEBUG
+#if SOCKET_IO_DEBUG
 				debugMethod.Invoke("[SocketIO] Couldn't remove callback action for event: " + ev);
-				#endif
+#endif
 				return;
 			}
 
@@ -240,9 +239,9 @@ namespace SocketIO
 			ackList.Add(new Ack(packetId, action));
 		}
 
-		#endregion
+#endregion
 
-		#region Private Methods
+#region Private Methods
 
 		private void RunSocketThread(object obj)
 		{
@@ -303,16 +302,16 @@ namespace SocketIO
 
 		private void EmitPacket(Packet packet)
 		{
-			#if SOCKET_IO_DEBUG
+#if SOCKET_IO_DEBUG
 			debugMethod.Invoke("[SocketIO] " + packet);
-			#endif
+#endif
 			
 			try {
 				ws.Send(encoder.Encode(packet));
 			} catch(SocketIOException ex) {
-				#if SOCKET_IO_DEBUG
+#if SOCKET_IO_DEBUG
 				debugMethod.Invoke(ex.ToString());
-				#endif
+#endif
 			}
 		}
 
@@ -323,9 +322,9 @@ namespace SocketIO
 
 		private void OnMessage(object sender, MessageEventArgs e)
 		{
-			#if SOCKET_IO_DEBUG
+#if SOCKET_IO_DEBUG
 			debugMethod.Invoke("[SocketIO] Raw message: " + e.Data);
-			#endif
+#endif
 			Packet packet = decoder.Decode(e);
 
 			switch (packet.enginePacketType) {
@@ -339,9 +338,9 @@ namespace SocketIO
 
 		private void HandleOpen(Packet packet)
 		{
-			#if SOCKET_IO_DEBUG
+#if SOCKET_IO_DEBUG
 			debugMethod.Invoke("[SocketIO] Socket.IO sid: " + packet.json["sid"].str);
-			#endif
+#endif
 			sid = packet.json["sid"].str;
 			EmitEvent("open");
 		}
@@ -368,9 +367,9 @@ namespace SocketIO
 					return;
 				}
 
-				#if SOCKET_IO_DEBUG
+#if SOCKET_IO_DEBUG
 				debugMethod.Invoke("[SocketIO] Ack received for invalid Action: " + packet.id);
-				#endif
+#endif
 			}
 
 			if (packet.socketPacketType == SocketPacketType.EVENT) {
@@ -401,9 +400,9 @@ namespace SocketIO
 				try{
 					handler(ev);
 				} catch(Exception ex){
-					#if SOCKET_IO_DEBUG
+#if SOCKET_IO_DEBUG
 					debugMethod.Invoke(ex.ToString());
-					#endif
+#endif
 				}
 			}
 		}
@@ -420,7 +419,179 @@ namespace SocketIO
 			}
 		}
 
-		#endregion
+#endregion
 	}
 }
+#endregion
+#else
+#region HoloLensCode
+
+using System.Collections;
+using UnityEngine;
+//TRY TO SET UP WEB SOCKET
+using Windows.Networking.Sockets;
+using System;
+using System.Threading.Tasks;
+using Windows.Storage.Streams;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
+namespace SocketIO {
+    public class SocketIOComponent : MonoBehaviour {
+        private Dictionary<string, List<Action<SocketIOEvent>>> handlers;
+        public string HoloHubWS = "ws://192.168.0.115:4200/socket.io/?EIO=3&transport=websocket";
+        public MessageWebSocket websocket;
+        public DataWriter writer;
+        private bool isConnected = false;
+        public bool autoConnect = true;
+        private object eventQueueLock;
+        private Queue<SocketIOEvent> eventQueue;
+        //do nothing i don't care
+        private void Awake() {
+            eventQueueLock = new object();
+            eventQueue = new Queue<SocketIOEvent>();
+            handlers = new Dictionary<string, List<Action<SocketIOEvent>>>();
+        }
+
+        async void Start () {
+            //TRY TO SET UP WEB SOCKET
+            
+            if (autoConnect) {
+                Debug.Log("Loaded This One");
+                await ConnectWebsocket();
+            }
+            //await SendAsync("beep");
+        }
+
+        private async Task ConnectWebsocket() {
+            websocket = new MessageWebSocket();
+            Uri server = new Uri(HoloHubWS);
+            //Uri server = new Uri("ws://192.168.0.113:3001/socket.io/?EIO=3&transport=websocket"); 
+
+            websocket.Control.MessageType = SocketMessageType.Utf8;
+            websocket.MessageReceived += Websocket_MessageReceived;
+            websocket.Closed += Websocket_Closed;
+            try {
+                await websocket.ConnectAsync(server);
+                isConnected = true;
+            }
+            catch ( Exception ex ) // For debugging
+            {
+                // Error happened during connect operation.
+                websocket.Dispose();
+                websocket = null;
+
+                Debug.Log(ex.Message);
+                return;
+            }
+            writer = new DataWriter(websocket.OutputStream);
+        }
+
+        private void Websocket_Closed(IWebSocket sender, WebSocketClosedEventArgs args) {
+            if ( websocket == sender ) {
+                CloseSocket();
+            }
+            isConnected = false;
+        }
+        private void CloseSocket() {
+            if ( writer != null ) {
+                // In order to reuse the socket with another DataWriter, the socket's output stream needs to be detached.
+                // Otherwise, the DataWriter's destructor will automatically close the stream and all subsequent I/O operations
+                // invoked on the socket's output stream will fail with ObjectDisposedException.
+                //
+                // This is only added for completeness, as this sample closes the socket in the very next code block.
+                writer.DetachStream();
+                writer.Dispose();
+                writer = null;
+            }
+
+            if ( websocket != null ) {
+                try {
+                    websocket.Close(1000, "Closed due to user request.");
+                }
+                catch ( Exception ex ) {
+                    Debug.Log(ex.Message);
+                }
+                websocket = null;
+            }
+        }
+
+        async void Update() {
+            lock ( eventQueueLock ) {
+                while ( eventQueue.Count > 0 ) {
+                    EmitEvent(eventQueue.Dequeue());
+                }
+            }
+            if ( !isConnected ) {
+                //try connecting again.
+                await ConnectWebsocket();               
+            }
+        }
+
+        private void Websocket_MessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args) {
+            try {
+                using ( DataReader reader = args.GetDataReader() ) {
+                    reader.UnicodeEncoding = UnicodeEncoding.Utf8;
+
+                    try {
+                        string read = reader.ReadString(reader.UnconsumedBufferLength);
+                        read = Regex.Unescape(read);
+                        VentanaSocketData socc = VentanaSocketData.ParseFromString(read);
+                        if (socc != null ) {
+                            Debug.Log(socc.ToString());
+                            SocketIOEvent e = new SocketIOEvent(socc.channel, new JSONObject( socc.jsonPayload));
+                            lock ( eventQueueLock ) { eventQueue.Enqueue(e); }
+                        }
+                    }
+                    catch ( Exception ex ) {
+                        Debug.Log(ex.Message);
+                    }
+                }
+            } catch (Exception ex ) {
+                Debug.Log(ex.Message);
+            }
+        
+        }
+        public void On(string ev, Action<SocketIOEvent> callback) {
+            if ( !handlers.ContainsKey(ev) ) {
+                handlers[ev] = new List<Action<SocketIOEvent>>();
+            }
+            handlers[ev].Add(callback);
+        }
+        private void EmitEvent(SocketIOEvent ev) {
+            if ( !handlers.ContainsKey(ev.name) ) { return; }
+            foreach ( Action<SocketIOEvent> handler in this.handlers[ev.name] ) {
+                try {
+                    handler(ev);
+                }
+                catch ( Exception ex ) {
+                    Debug.Log(ex.Message);
+#if SOCKET_IO_DEBUG
+					debugMethod.Invoke(ex.ToString());
+#endif
+                }
+            }
+        }
+
+        async Task SendAsync(string msg) {
+            string message = msg;
+
+            Debug.Log("Sending Message: " + message);
+
+            // Buffer any data we want to send.
+            writer.WriteString(message);
+
+            try {
+                // Send the data as one complete message.
+                await writer.StoreAsync();
+            }
+            catch ( Exception ex ) {
+                Debug.Log(ex.Message);
+                return;
+            }
+            Debug.Log("Send Complete");
+        }
+    }
+}
+#endregion
 #endif

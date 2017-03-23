@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+
 #region License
 /*
  * SocketIOEvent.cs
@@ -49,4 +49,3 @@ namespace SocketIO
 		}
 	}
 }
-#endif
