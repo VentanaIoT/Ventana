@@ -79,7 +79,7 @@ public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
                         callback(myVentana);
                     }
                 } catch (ArgumentException e ) {
-                    Debug.LogWarning(e.Message);
+                    Debug.LogWarning(e.Message + " \nHoloHub Response Val: " + holoHubRequest.downloadHandler.text);
                 }
             }
 
