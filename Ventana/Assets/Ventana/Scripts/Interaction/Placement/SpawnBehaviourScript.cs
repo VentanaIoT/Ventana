@@ -12,6 +12,7 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
     public Vector3 scaleMultiplier;
     public Vector3 placementPosition;
     public int ControllerID;
+    public string prefabName;
 
     #endregion //PUBLIC_MEMBERS
 
