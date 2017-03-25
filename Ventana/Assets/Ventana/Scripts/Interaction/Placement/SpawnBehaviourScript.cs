@@ -109,11 +109,24 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
             prefabObjectClone.transform.localScale = new Vector3( scaleMultiplier.x, scaleMultiplier.y, scaleMultiplier.y);
             prefabObjectClone.transform.rotation = gameObject.transform.rotation;
             TapToPlace ttp = prefabObjectClone.AddComponent<TapToPlace>();
-            Debug.Log(DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString());
-            ttp.SavedAnchorFriendlyName = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
+            //Debug.Log(DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString());
+            //ttp.SavedAnchorFriendlyName = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
             ttp.layerMask = SpatialMappingManager.Instance.LayerMask;
-            prefabObjectClone.gameObject.AddComponent<HandDraggable>();
-
+            prefabName = prefabObjectClone.ToString();
+            char[] delimiterChars = { ' ', '(' };
+            string[] prefabCloneName = prefabName.Split(delimiterChars);
+            Debug.Log("<color=yellow>Name: </color>" + prefabCloneName[0]);
+            //ttp.SavedAnchorFriendlyName = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
+            // Saved Anchor Friendly Name should save all the properties of asset (besides location) each delimited by a space
+            ttp.SavedAnchorFriendlyName = prefabCloneName[0] + ' ' + DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
+            Debug.Log("<color=yellow>Anchor Name: </color>" + ttp.SavedAnchorFriendlyName);
+            /*
+            string[] ugh = ttp.SavedAnchorFriendlyName.Split(delimiterChars);
+            if (ugh[0].Equals("MusicController"))
+                Debug.Log("<color=yellow>U=MC</color>");
+            else
+                Debug.Log("color=red>NOPE</color");
+                */
             var spb =  prefabObjectClone.GetComponent<SpawnBehaviourScript>();
             spb.shouldSpawn = false;
             shouldSpawn = false;
