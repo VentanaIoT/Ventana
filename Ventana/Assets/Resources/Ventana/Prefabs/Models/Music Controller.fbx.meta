@@ -1,39 +1,54 @@
 fileFormatVersion: 2
-guid: 1d920cf34a6327e4daebf694fed1c254
-timeCreated: 1487103510
+guid: 716fa50fee34255429fb36cf328fcd1d
+timeCreated: 1490550790
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
-    100000: Controls panel
-    100002: Cube
-    100004: Curve
+    100000: Album Artwork
+    100002: Control Panel
+    100004: Fast Forward
     100006: Lamp
     100008: //RootNode
-    100010: Volume nub
-    100012: Volume rail
-    400000: Controls panel
-    400002: Cube
-    400004: Curve
+    100010: Pause Button
+    100012: Play Button
+    100014: Rewind
+    100016: Volume nub
+    100018: Volume rail
+    400000: Album Artwork
+    400002: Control Panel
+    400004: Fast Forward
     400006: Lamp
     400008: //RootNode
-    400010: Volume nub
-    400012: Volume rail
-    2300000: Controls panel
-    2300002: Cube
-    2300004: Curve
-    2300006: Volume nub
-    2300008: Volume rail
-    3300000: Controls panel
-    3300002: Cube
-    3300004: Curve
-    3300006: Volume nub
-    3300008: Volume rail
-    4300000: Curve
-    4300002: Controls panel
-    4300004: Cube
-    4300006: Volume nub
-    4300008: Volume rail
+    400010: Pause Button
+    400012: Play Button
+    400014: Rewind
+    400016: Volume nub
+    400018: Volume rail
+    2300000: Album Artwork
+    2300002: Control Panel
+    2300004: Fast Forward
+    2300006: Pause Button
+    2300008: Play Button
+    2300010: Rewind
+    2300012: Volume nub
+    2300014: Volume rail
+    3300000: Album Artwork
+    3300002: Control Panel
+    3300004: Fast Forward
+    3300006: Pause Button
+    3300008: Play Button
+    3300010: Rewind
+    3300012: Volume nub
+    3300014: Volume rail
+    4300000: Control Panel
+    4300002: Fast Forward
+    4300004: Pause Button
+    4300006: Play Button
+    4300008: Rewind
+    4300010: Volume nub
+    4300012: Volume rail
+    4300014: Album Artwork
   materials:
     importMaterials: 1
     materialName: 0
