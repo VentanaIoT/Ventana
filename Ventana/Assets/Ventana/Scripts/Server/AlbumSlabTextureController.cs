@@ -28,8 +28,9 @@ public class AlbumSlabTextureController : MonoBehaviour {
             } else {
                 gameObject.SendMessageUpwards("SetPlayState");
             }
+
+            OnURLSent(myVentana);
         }
-        OnURLSent(myVentana);
     }
 
     IEnumerator ChangeAlbumTexture(WWW www) {

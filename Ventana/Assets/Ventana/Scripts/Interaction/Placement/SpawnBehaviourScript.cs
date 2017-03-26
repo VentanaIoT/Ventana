@@ -118,8 +118,7 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
             string currentTime = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
             string savedAnchorName = ControllerID + ":" + currentTime;
             Debug.Log("<color=yellow>Name: </color>" + savedAnchorName );
-
-            // Saved Anchor Friendly Name should save all the properties of asset (besides location) each delimited by a space
+            
             ttp.SavedAnchorFriendlyName = savedAnchorName;
 
             var spb =  prefabObjectClone.GetComponent<SpawnBehaviourScript>();

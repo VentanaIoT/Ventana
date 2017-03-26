@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class VentanaLightController : BaseVentanaController {
 
-    private string poweredCommand = "powered";
+    private string poweredCommand = "change_state";
     private string brightCommand = "brightness";
     private string colorCommand = "color";
     private string statusCommand = "status";
@@ -29,7 +29,7 @@ public class VentanaLightController : BaseVentanaController {
         VentanaRequestFactory requestFactory = VentanaRequestFactory.Instance;
         switch ( child ) {
             case "light":
-                //StartCoroutine(requestFactory.PostToLightAPIEndpoint(poweredCommand, VentanaID, )
+            StartCoroutine(requestFactory.PostToLightAPIEndpoint(poweredCommand, VentanaID, ""));
             break;
             default:
             break;

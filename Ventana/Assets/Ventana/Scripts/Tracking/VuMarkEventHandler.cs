@@ -87,7 +87,7 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
                 
             }
             control.transform.SetParent(mTrackableBehaviour.gameObject.transform);
-            control.transform.position = gameObject.transform.position;
+            control.transform.localPosition = new Vector3(0f, 0f, .1f);
             
             control.layer = 9;
 

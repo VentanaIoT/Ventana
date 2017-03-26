@@ -96,10 +96,13 @@ public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
         url.Append(LightEndpoint);
         url.Append(action + "/");
         url.Append(id.ToString() + "/");
-        url.Append(data);
+        // url.Append(data);
 
         Debug.Log("ACTION: " + action + " URL: " + url.ToString());
-        UnityWebRequest holoHubRequest = UnityWebRequest.Get(url.ToString());
+        Dictionary<string, string> request = new Dictionary<string, string>();
+        request.Add("value", data);
+
+        UnityWebRequest holoHubRequest = UnityWebRequest.Post(url.ToString(), request);
         yield return holoHubRequest.Send();
 
         if ( !holoHubRequest.isError ) {
