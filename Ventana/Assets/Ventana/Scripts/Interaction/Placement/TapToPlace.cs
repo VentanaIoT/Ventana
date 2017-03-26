@@ -42,7 +42,7 @@ namespace HoloToolkit.Unity.SpatialMapping
         /// <summary>
         /// Manages persisted anchors.
         /// </summary>
-        protected WorldAnchorManager anchorManager;
+        public WorldAnchorManager anchorManager;
 
         /// <summary>
         /// Controls spatial mapping.  In this script we access spatialMappingManager
