@@ -88,7 +88,6 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
             }
             control.transform.SetParent(mTrackableBehaviour.gameObject.transform);
             control.transform.position = gameObject.transform.position;
-            control.transform.localRotation = Quaternion.identity * Quaternion.Euler(new Vector3(90.0f, 0.0f, 0.0f));
             
             control.layer = 9;
 
