@@ -24,6 +24,10 @@
         "id": "0x04",
         "name": "Wanda",
         "path": "Ventana/Prefabs/LightController"
+    },{
+        "id": "0x05",
+        "name": "PowerStrp",
+        "path": "Ventana/Prefabs/PowerStripController"
     }
   ]
 }

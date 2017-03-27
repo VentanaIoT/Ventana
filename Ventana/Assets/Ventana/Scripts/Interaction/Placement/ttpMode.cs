@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using HoloToolkit.Unity.InputModule;
 using HoloToolkit.Unity.SpatialMapping;
+using UnityEngine.VR.WSA;
+using HoloToolkit.Unity;
 
+[ExecuteInEditMode]
 public class ttpMode : MonoBehaviour {
 
     public Transform moreButtons;
     public Transform deleteDone;
     public Transform scaleHandles;
     public bool scaleEnabled = false;
+    public bool scaleModeTriggered = false;
+
     public Vector3 lastScale;
 
     [Tooltip("Speed at which the object is resized.")]
@@ -43,7 +48,15 @@ public class ttpMode : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if ( scaleModeTriggered ) {
+            moreButtons.gameObject.SetActive(false);
+            deleteDone.gameObject.SetActive(true);
+            scaleHandles.gameObject.SetActive(true);
+        } else {
+            moreButtons.gameObject.SetActive(true);
+            deleteDone.gameObject.SetActive(false);
+            scaleHandles.gameObject.SetActive(false);
+        }
 	}
 
     void MoreButtonClicked()
@@ -53,6 +66,7 @@ public class ttpMode : MonoBehaviour {
         moreButtons.gameObject.SetActive(false);
         deleteDone.gameObject.SetActive(true);
         scaleHandles.gameObject.SetActive(true);
+        scaleModeTriggered = true;
     }
 
     void ddButtonClicked(string child)
@@ -64,6 +78,7 @@ public class ttpMode : MonoBehaviour {
             moreButtons.gameObject.SetActive(true);
             deleteDone.gameObject.SetActive(false);
             scaleHandles.gameObject.SetActive(false);
+            scaleModeTriggered = false;
         }
 
         if (child.Equals("Delete Button"))
@@ -74,9 +89,14 @@ public class ttpMode : MonoBehaviour {
             if (ttp != null)
             {
                 // had to make anchorManager public instead of protected in ttp
-                ttp.anchorManager.RemoveAnchor(gameObject);
+                WorldAnchor wa = gameObject.GetComponent<WorldAnchor>();
+
+                ttp.anchorManager.AnchorStore.Delete(wa.name);
+
+                Destroy(gameObject);
+
             }
-            Destroy(gameObject);
+            scaleModeTriggered = false;
         }
     }
 

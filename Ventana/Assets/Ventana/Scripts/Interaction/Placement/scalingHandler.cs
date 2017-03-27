@@ -1,8 +1,11 @@
-﻿using HoloToolkit.Unity.InputModule;
+﻿using System;
+using HoloToolkit.Unity.InputModule;
 using UnityEngine;
 
-public class scalingHandler : MonoBehaviour, IManipulationHandler
+public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
 {
+    public Material highlightButtonMaterial;
+    public Material normalButtonMaterial;
 
     [SerializeField]
     bool resizingEnabled = true;
@@ -49,5 +52,13 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler
         // send data to ttpMode.cs once the manipulation gesture is updated
         Debug.Log("bubbling to scalebuttonclicked" + newScale);
         gameObject.SendMessageUpwards("scaleButtonClicked", newScale);
+    }
+
+    public void OnFocusEnter() {
+        gameObject.GetComponent<Renderer>().material = highlightButtonMaterial;
+    }
+
+    public void OnFocusExit() {
+        gameObject.GetComponent<Renderer>().material = normalButtonMaterial;
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.VR.WSA.Persistence;
 using UnityEngine.VR.WSA;
+using System;
 
 namespace HoloToolkit.Unity
 {
@@ -26,6 +27,7 @@ namespace HoloToolkit.Unity
             public string AnchorName { get; set; }
             public AnchorOperation Operation { get; set; }
         }
+        
 
         private enum AnchorOperation
         {
@@ -135,6 +137,8 @@ namespace HoloToolkit.Unity
                 });
         }
 
+
+
         /// <summary>
         /// Function that actually adds the anchor to the game object.
         /// </summary>
@@ -179,11 +183,13 @@ namespace HoloToolkit.Unity
 
                     GameObject gameObjectToUnanchor = anchorAttachmentInfo.GameObjectToAnchor;
                     var anchor = gameObjectToUnanchor.GetComponent<WorldAnchor>();
+                    
 
                     if (anchor != null)
                     {
                         AnchorStore.Delete(anchor.name);
                         DestroyImmediate(anchor);
+
                     }
                     else
                     {
