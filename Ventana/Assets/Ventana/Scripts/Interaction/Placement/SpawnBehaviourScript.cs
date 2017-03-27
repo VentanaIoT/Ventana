@@ -110,20 +110,23 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
             prefabObjectClone.transform.localScale = scaleMultiplier;
             prefabObjectClone.transform.rotation = gameObject.transform.rotation;
 
-            //Adding Tap To Place...
-            TapToPlace ttp = prefabObjectClone.AddComponent<TapToPlace>();
-            ttp.layerMask = SpatialMappingManager.Instance.LayerMask;
+            var spb = prefabObjectClone.GetComponent<SpawnBehaviourScript>();
+            spb.shouldSpawn = false;
+            shouldSpawn = false;
+
+            //Adding Tap To Place... [Depricated]
+            //TapToPlace ttp = prefabObjectClone.AddComponent<TapToPlace>();
+            //ttp.layerMask = SpatialMappingManager.Instance.LayerMask;
 
             //Setting Name
+            /*
             string currentTime = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
             string savedAnchorName = ControllerID + ":" + currentTime;
             Debug.Log("<color=yellow>Name: </color>" + savedAnchorName );
-            
-            ttp.SavedAnchorFriendlyName = savedAnchorName;
+            */
 
-            var spb =  prefabObjectClone.GetComponent<SpawnBehaviourScript>();
-            spb.shouldSpawn = false;
-            shouldSpawn = false;
+            //ttp.SavedAnchorFriendlyName = savedAnchorName;
+
         }
     }
 

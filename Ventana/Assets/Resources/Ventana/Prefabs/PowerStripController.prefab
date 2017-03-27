@@ -43,7 +43,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1012752846905734
 GameObject:
   m_ObjectHideFlags: 1
@@ -226,6 +226,7 @@ GameObject:
   - component: {fileID: 4213768129924512}
   - component: {fileID: 114816120052669578}
   - component: {fileID: 114308782402634202}
+  - component: {fileID: 114411380678704726}
   m_Layer: 0
   m_Name: PowerStripController
   m_TagString: Untagged
@@ -285,7 +286,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1449223918849146
 GameObject:
   m_ObjectHideFlags: 1
@@ -317,7 +318,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1515129558879058
 GameObject:
   m_ObjectHideFlags: 1
@@ -1328,7 +1329,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 2cbf6f071fc75a84db52a353f306af08, type: 2}
+  - {fileID: 2100000, guid: 19c12cdbc8964804ebde5023b0fc8a1b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1359,14 +1360,14 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1094764286935686}
-  m_Mesh: {fileID: 4300004, guid: 70a630d70ed20884eb495044e86e9f23, type: 3}
+  m_Mesh: {fileID: 4300004, guid: 5ec95fe6479daef4d82b38ab7b7201e5, type: 3}
 --- !u!33 &33056681876090996
 MeshFilter:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1288918992534510}
-  m_Mesh: {fileID: 4300006, guid: 70a630d70ed20884eb495044e86e9f23, type: 3}
+  m_Mesh: {fileID: 4300006, guid: 5ec95fe6479daef4d82b38ab7b7201e5, type: 3}
 --- !u!33 &33093644977819524
 MeshFilter:
   m_ObjectHideFlags: 1
@@ -1422,7 +1423,7 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1583803989127192}
-  m_Mesh: {fileID: 4300000, guid: 70a630d70ed20884eb495044e86e9f23, type: 3}
+  m_Mesh: {fileID: 4300000, guid: 5ec95fe6479daef4d82b38ab7b7201e5, type: 3}
 --- !u!33 &33593429025467170
 MeshFilter:
   m_ObjectHideFlags: 1
@@ -1464,7 +1465,7 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1184895410133916}
-  m_Mesh: {fileID: 4300002, guid: 70a630d70ed20884eb495044e86e9f23, type: 3}
+  m_Mesh: {fileID: 4300002, guid: 5ec95fe6479daef4d82b38ab7b7201e5, type: 3}
 --- !u!33 &33982052592352240
 MeshFilter:
   m_ObjectHideFlags: 1
@@ -1710,14 +1711,14 @@ MonoBehaviour:
   moreButtons: {fileID: 4915086384675744}
   deleteDone: {fileID: 4676366594014534}
   scaleHandles: {fileID: 4024751981939690}
-  scaleEnabled: 0
-  scaleModeTriggered: 0
+  scaleEnabled: 1
+  scaleModeTriggered: 1
   lastScale: {x: 0, y: 0, z: 0}
   ResizeSpeedFactor: 1
   ResizeScaleFactor: 0.75
   AllowResizeWarp: 0
-  MinScale: 0.1
-  MaxScale: 0.3
+  MinScale: 0.05
+  MaxScale: 0.7
 --- !u!114 &114387114533683968
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1734,6 +1735,22 @@ MonoBehaviour:
   normalButtonMaterial: {fileID: 2100000, guid: a772cb29754fdc6408270b8b9cca42f9,
     type: 2}
   resizingEnabled: 1
+--- !u!114 &114411380678704726
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1120861239473326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d5a0a60fbe897549ad0bfe2039f12b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HostTransform: {fileID: 0}
+  DistanceScale: 2
+  IsKeepUpright: 1
+  IsOrientTowardsUser: 0
+  IsDraggingEnabled: 1
 --- !u!114 &114423106993551288
 MonoBehaviour:
   m_ObjectHideFlags: 1

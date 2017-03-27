@@ -25,11 +25,7 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
 
     public void OnManipulationStarted(ManipulationEventData eventData)
     {
-        
-        InputManager.Instance.PushModalInputHandler(gameObject);
 
-        // send message to ttpMode.cs
-        gameObject.SendMessageUpwards("scaleStarted");
     }
 
     public void OnManipulationUpdated(ManipulationEventData eventData)
@@ -40,12 +36,12 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
 
     public void OnManipulationCompleted(ManipulationEventData eventData)
     {
-        InputManager.Instance.PopModalInputHandler();
+        
     }
 
     public void OnManipulationCanceled(ManipulationEventData eventData)
     {
-        InputManager.Instance.PopModalInputHandler();
+
     }
     void Resize(Vector3 newScale)
     {
@@ -55,10 +51,12 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
     }
 
     public void OnFocusEnter() {
+        gameObject.SendMessageUpwards("DisableHandDraggable");
         gameObject.GetComponent<Renderer>().material = highlightButtonMaterial;
     }
 
     public void OnFocusExit() {
+        gameObject.SendMessageUpwards("EnableHandDraggable");
         gameObject.GetComponent<Renderer>().material = normalButtonMaterial;
     }
 }

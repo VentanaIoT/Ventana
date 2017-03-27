@@ -117,26 +117,15 @@ namespace HoloToolkit.Unity.SpatialMapping
                         Vector3 currentMovement = hitInfo.point - gameObject.transform.position;
                         ParentGameObjectToPlace.transform.position += currentMovement + new Vector3(0,0,1);
                         ParentGameObjectToPlace.transform.rotation = toQuat;
-                        
-                        RaycastHit gameobjectHit;
-                        if ( Physics.Raycast(ParentGameObjectToPlace.transform.position, new Vector3(0,-1,0), out gameobjectHit, 0.35f, layerMask) ) {
-                            Debug.Log("Something Beneath Me");
-                            //move this object up until it doesn't intersect.
-                           
-                        }
+
                     }
                     else
                     {
-                        
                         Vector3 bufferDirection = -gazeDirection.normalized;
                         bufferDirection.Scale(new Vector3(0.2f, 0.2f, 0.2f));
 
                         gameObject.transform.position = hitInfo.point + bufferDirection;
                         gameObject.transform.rotation = toQuat;
-                        RaycastHit gameobjectHit;
-                        if ( Physics.Raycast(gameObject.transform.position, new Vector3(0, -1, 0), out gameobjectHit, 1.0f, layerMask) ) {
-                            Debug.Log("Something Beneath Me");
-                        }
                     }
                 }
             }

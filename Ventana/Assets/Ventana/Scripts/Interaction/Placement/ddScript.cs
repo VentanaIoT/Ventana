@@ -29,10 +29,12 @@ public class ddScript : MonoBehaviour, IInputClickHandler,IFocusable {
     }
 
     public void OnFocusEnter() {
+        gameObject.SendMessageUpwards("DisableHandDraggable");
         gameObject.GetComponent<Renderer>().material = highlightButtonMaterial;
     }
 
     public void OnFocusExit() {
+        gameObject.SendMessageUpwards("EnableHandDraggable");
         gameObject.GetComponent<Renderer>().material = normalButtonMaterial;
     }
 }

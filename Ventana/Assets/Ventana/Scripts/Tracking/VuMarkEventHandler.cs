@@ -88,10 +88,9 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
             }
             control.transform.SetParent(mTrackableBehaviour.gameObject.transform);
             control.transform.localPosition = new Vector3(0f, 0f, .1f);
-            
             control.layer = 9;
-
             control.transform.localScale = new Vector3(.35f, .35f, .35f);
+
             SpawnBehaviourScript spb = control.gameObject.AddComponent<SpawnBehaviourScript>();
             spb.ControllerID = vuMarkId;
             spb.shouldSpawn = true;

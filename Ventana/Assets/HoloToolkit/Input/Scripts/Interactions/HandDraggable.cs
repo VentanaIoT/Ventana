@@ -3,6 +3,7 @@
 
 using UnityEngine;
 using System;
+using HoloToolkit.Unity.SpatialMapping;
 
 namespace HoloToolkit.Unity.InputModule
 {
@@ -101,6 +102,10 @@ namespace HoloToolkit.Unity.InputModule
                 return;
             }
 
+            SpatialMappingManager.Instance.DrawVisualMeshes = true;
+            Debug.Log(gameObject.name + " : Removing existing world anchor if any.");
+            WorldAnchorManager.Instance.RemoveAnchor(gameObject);
+
             // Add self as a modal input handler, to get all inputs during the manipulation
             InputManager.Instance.PushModalInputHandler(gameObject);
 
@@ -133,6 +138,7 @@ namespace HoloToolkit.Unity.InputModule
             // Store the initial offset between the hand and the object, so that we can consider it when dragging
             gazeAngularOffset = Quaternion.FromToRotation(handDirection, objDirection);
             draggingPosition = gazeHitPosition;
+            
 
             StartedDragging.RaiseEvent();
         }
@@ -226,6 +232,18 @@ namespace HoloToolkit.Unity.InputModule
 
             isDragging = false;
             currentInputSource = null;
+            SpatialMappingManager.Instance.DrawVisualMeshes = false;
+
+            // Add world anchor when object placement is done.
+            BaseVentanaController bvc = gameObject.GetComponent<BaseVentanaController>();
+            if ( bvc ) {
+                string currentTime = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
+                string savedAnchorName = bvc.VentanaID + ":" + currentTime;
+                Debug.Log("<color=yellow>Name: </color>" + savedAnchorName);
+
+                WorldAnchorManager.Instance.AttachAnchor(gameObject, savedAnchorName);
+            }
+
             StoppedDragging.RaiseEvent();
         }
 

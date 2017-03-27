@@ -14,6 +14,7 @@ public class ttpMode : MonoBehaviour {
     public Transform scaleHandles;
     public bool scaleEnabled = false;
     public bool scaleModeTriggered = false;
+    private HandDraggable handDraggable;
 
     public Vector3 lastScale;
 
@@ -30,11 +31,11 @@ public class ttpMode : MonoBehaviour {
 
     [Tooltip("Minimum resize scale allowed.")]
     [SerializeField]
-    float MinScale = 0.1f;
+    float MinScale = 0.05f;
 
     [Tooltip("Maximum resize scale allowed.")]
     [SerializeField]
-    float MaxScale = 0.3f;
+    float MaxScale = 0.7f;
 
     // Use this for initialization
     void Start () {
@@ -43,6 +44,12 @@ public class ttpMode : MonoBehaviour {
         moreButtons.gameObject.SetActive(true);
         deleteDone.gameObject.SetActive(false);
         scaleHandles.gameObject.SetActive(false);
+
+        handDraggable = gameObject.GetComponent<HandDraggable>();
+
+        if (handDraggable != null ) {
+            handDraggable.enabled = false;
+        }
 
     }
 	
@@ -66,6 +73,12 @@ public class ttpMode : MonoBehaviour {
         moreButtons.gameObject.SetActive(false);
         deleteDone.gameObject.SetActive(true);
         scaleHandles.gameObject.SetActive(true);
+        //Enable Tap To Place and Hand Dragable here.
+        
+        if ( handDraggable != null ) {
+            handDraggable.enabled = true;
+        }
+
         scaleModeTriggered = true;
     }
 
@@ -79,19 +92,24 @@ public class ttpMode : MonoBehaviour {
             deleteDone.gameObject.SetActive(false);
             scaleHandles.gameObject.SetActive(false);
             scaleModeTriggered = false;
+            
+            if ( handDraggable != null ) {
+                handDraggable.enabled = false;
+            }
+
         }
 
         if (child.Equals("Delete Button"))
         {
             //Debug.Log("Delete button clicked");
             // gonna have to remove world anchor here
-            TapToPlace ttp = gameObject.GetComponent<TapToPlace>();
-            if (ttp != null)
+            if (handDraggable != null)
             {
                 // had to make anchorManager public instead of protected in ttp
                 WorldAnchor wa = gameObject.GetComponent<WorldAnchor>();
-
-                ttp.anchorManager.AnchorStore.Delete(wa.name);
+                if ( wa ) {
+                    WorldAnchorManager.Instance.AnchorStore.Delete(wa.name);
+                }
 
                 Destroy(gameObject);
 
@@ -103,8 +121,20 @@ public class ttpMode : MonoBehaviour {
     void scaleStarted()
     {
         // manipulation gesture started so get the current scale
+        //turn off draggable behaviours
+        Debug.Log("Here");
         lastScale = gameObject.GetComponent<Transform>().localScale;
+
     }
+
+    void EnableHandDraggable() {
+        handDraggable.enabled = true;
+    }
+
+    void DisableHandDraggable() {
+        handDraggable.enabled = false;
+    }
+    
     void scaleButtonClicked(Vector3 newScale)
     {
         // manipulation gesture ended, calculate and set the new scale 
