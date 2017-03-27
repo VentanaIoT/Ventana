@@ -40,9 +40,8 @@ namespace SocketIO {
     public class SocketIOComponent : MonoBehaviour
 	{
 #region Public Properties
-
-        [Tooltip("In the form of ws://yourholohubip:port")]
-        public string HoloHubWS = Args.HOLOHUB_WEBSOCKET_ADDRESS;
+        
+        private string HoloHubWS = Args.HOLOHUB_WEBSOCKET_ADDRESS;
         public bool autoConnect = true;
 		public int reconnectDelay = 5;
 		public float ackExpirationTime = 1800f;
@@ -438,7 +437,7 @@ using System.Text.RegularExpressions;
 namespace SocketIO {
     public class SocketIOComponent : MonoBehaviour {
         private Dictionary<string, List<Action<SocketIOEvent>>> handlers;
-        public string HoloHubWS = Args.HOLOHUB_WEBSOCKET_ADDRESS;
+        private string HoloHubWS = Args.HOLOHUB_WEBSOCKET_ADDRESS;
         public MessageWebSocket websocket;
         public DataWriter writer;
         private bool isConnected = false;

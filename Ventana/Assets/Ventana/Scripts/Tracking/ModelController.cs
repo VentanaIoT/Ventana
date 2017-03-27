@@ -54,13 +54,22 @@ public class ModelController  {
             if ( possiblePrefab ) {
                 if ( !(prefab = GameObject.Instantiate(possiblePrefab) as GameObject )) {
                     Debug.Log("<color=red>Error: the prefab at " + value + " does not exist</color>");
+                    throw new ModelControllerException("prefab not found");
                 }
             }
 
         } else {
             Debug.Log("<color=red>Error: Key in Ventana Config does not exists in ModelController</color>");
+            throw new ModelControllerException("Key not found");
         }
        
         return prefab;
+    }
+}
+
+public class ModelControllerException : Exception {
+    string message;
+    public ModelControllerException(string message) {
+        this.message = message;
     }
 }

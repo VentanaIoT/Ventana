@@ -1,26 +1,56 @@
 fileFormatVersion: 2
-guid: c35ec8112ca03e04e904b72932bc97c5
-timeCreated: 1470171783
-licenseType: Pro
+guid: bad447bfd09a3e44fad577628aeaaad1
+timeCreated: 1490553698
+licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
-    100000: default
-    100002: default_MeshPart0
-    100004: default_MeshPart1
-    100006: //RootNode
-    400000: default
-    400002: default_MeshPart0
-    400004: default_MeshPart1
-    400006: //RootNode
-    2300000: default_MeshPart0
-    2300002: default_MeshPart1
-    3300000: default_MeshPart0
-    3300002: default_MeshPart1
-    4300000: default_MeshPart0
-    4300002: default_MeshPart1
+    100000: Album Artwork
+    100002: Controls panel
+    100004: Fast Forward
+    100006: Lamp
+    100008: //RootNode
+    100010: Pause Button
+    100012: Play Button
+    100014: Rewind
+    100016: Volume nub
+    100018: Volume rail
+    400000: Album Artwork
+    400002: Controls panel
+    400004: Fast Forward
+    400006: Lamp
+    400008: //RootNode
+    400010: Pause Button
+    400012: Play Button
+    400014: Rewind
+    400016: Volume nub
+    400018: Volume rail
+    2300000: Album Artwork
+    2300002: Controls panel
+    2300004: Fast Forward
+    2300006: Pause Button
+    2300008: Play Button
+    2300010: Rewind
+    2300012: Volume nub
+    2300014: Volume rail
+    3300000: Album Artwork
+    3300002: Controls panel
+    3300004: Fast Forward
+    3300006: Pause Button
+    3300008: Play Button
+    3300010: Rewind
+    3300012: Volume nub
+    3300014: Volume rail
+    4300000: Album Artwork
+    4300002: Controls panel
+    4300004: Volume rail
+    4300006: Volume nub
+    4300008: Fast Forward
+    4300010: Pause Button
+    4300012: Play Button
+    4300014: Rewind
   materials:
-    importMaterials: 0
+    importMaterials: 1
     materialName: 0
     materialSearch: 1
   animations:
@@ -79,7 +109,7 @@ ModelImporter:
     rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
     hasTranslationDoF: 0
     hasExtraRoot: 0
-    skeletonHasParents: 0
+    skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   animationType: 0
   humanoidOversampling: 1
