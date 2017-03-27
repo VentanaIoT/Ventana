@@ -5,7 +5,7 @@ using HoloToolkit.Unity.InputModule;
 using System;
 using HoloToolkit.Unity.SpatialMapping;
 
-public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
+public class SpawnBehaviourScript : MonoBehaviour, IHoldHandler {
     #region PUBLIC_MEMBERS
     public GameObject prefabObject;
     public bool shouldSpawn = false;
@@ -134,6 +134,7 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
         }
     }
 
+    /*
     public void OnInputClicked(InputClickedEventData eventData)
     {
         Debug.Log("<color=yellow>EY BAY BAY</color>");
@@ -142,6 +143,21 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
 
 
     }
+    */
+    // replacing double tap to spawn with click and hold
+    public void OnHoldStarted(HoldEventData eventData)
+    {
 
+    }
+
+    public void OnHoldCompleted(HoldEventData eventData)
+    {
+        OnDoubleTap();
+    }
+
+    public void OnHoldCanceled(HoldEventData eventData)
+    {
+
+    }
     #endregion // PROTECTED_METHODS
 }
