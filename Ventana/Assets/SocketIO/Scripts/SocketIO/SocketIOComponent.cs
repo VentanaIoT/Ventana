@@ -532,7 +532,7 @@ namespace SocketIO {
 
                     try {
                         string read = reader.ReadString(reader.UnconsumedBufferLength);
-                        read = Regex.Unescape(read);
+                        //read = Regex.Unescape(read);
                         VentanaSocketData socc = VentanaSocketData.ParseFromString(read);
                         if (socc != null ) {
                             Debug.Log(socc.ToString());

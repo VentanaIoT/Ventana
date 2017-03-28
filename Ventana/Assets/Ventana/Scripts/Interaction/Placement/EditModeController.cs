@@ -7,7 +7,7 @@ using UnityEngine.VR.WSA;
 using HoloToolkit.Unity;
 
 [ExecuteInEditMode]
-public class ttpMode : MonoBehaviour {
+public class EditModeController : MonoBehaviour {
 
     public Transform moreButtons;
     public Transform deleteDone;

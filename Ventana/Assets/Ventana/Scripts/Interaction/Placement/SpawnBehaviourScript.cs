@@ -110,10 +110,13 @@ public class SpawnBehaviourScript : MonoBehaviour, IHoldHandler {
             prefabObjectClone.transform.localScale = scaleMultiplier;
             prefabObjectClone.transform.rotation = gameObject.transform.rotation;
 
-            var spb = prefabObjectClone.GetComponent<SpawnBehaviourScript>();
-            spb.shouldSpawn = false;
-            shouldSpawn = false;
+            Destroy(prefabObjectClone.GetComponent<SpawnBehaviourScript>());
 
+            HandDraggable hd = prefabObjectClone.AddComponent<HandDraggable>();
+            hd.enabled = true;
+            hd.IsKeepUpright = true;
+            hd.IsDraggingEnabled = true;
+            hd.IsOrientTowardsUser = true;
             //Adding Tap To Place... [Depricated]
             //TapToPlace ttp = prefabObjectClone.AddComponent<TapToPlace>();
             //ttp.layerMask = SpatialMappingManager.Instance.LayerMask;

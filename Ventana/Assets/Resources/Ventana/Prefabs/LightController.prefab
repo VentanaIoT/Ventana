@@ -348,7 +348,6 @@ GameObject:
   - component: {fileID: 4548603884991324}
   - component: {fileID: 114695972823546492}
   - component: {fileID: 114731074271332134}
-  - component: {fileID: 114773364731886472}
   m_Layer: 0
   m_Name: LightController
   m_TagString: Untagged
@@ -1914,22 +1913,6 @@ MonoBehaviour:
     type: 2}
   normalButtonMaterial: {fileID: 2100000, guid: a772cb29754fdc6408270b8b9cca42f9,
     type: 2}
---- !u!114 &114773364731886472
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1727557306833898}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d5a0a60fbe897549ad0bfe2039f12b6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  HostTransform: {fileID: 0}
-  DistanceScale: 2
-  IsKeepUpright: 1
-  IsOrientTowardsUser: 0
-  IsDraggingEnabled: 1
 --- !u!114 &114803185963456462
 MonoBehaviour:
   m_ObjectHideFlags: 1
