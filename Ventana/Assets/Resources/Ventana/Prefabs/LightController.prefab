@@ -148,7 +148,7 @@ GameObject:
   m_IsActive: 1
 --- !u!1 &1337857602128560
 GameObject:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 5
@@ -390,6 +390,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1874142998626792
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4853316447200508}
+  - component: {fileID: 114372831622545592}
+  m_Layer: 0
+  m_Name: BillBoard
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1890926744749394
 GameObject:
   m_ObjectHideFlags: 1
@@ -596,10 +612,10 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1727557306833898}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.93, y: -0.71, z: 5.46}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 4748774801174838}
+  - {fileID: 4853316447200508}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -718,14 +734,14 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1337857602128560}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: -0.7071068}
-  m_LocalPosition: {x: 0, y: 0.01, z: -0}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.3, y: 0.30000013, z: 0.30000013}
   m_Children:
   - {fileID: 4248539849604772}
   - {fileID: 4382210310421628}
   - {fileID: 4655008655821338}
   - {fileID: 4763365358402224}
-  m_Father: {fileID: 4548603884991324}
+  m_Father: {fileID: 4853316447200508}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 270, y: 0, z: 0}
 --- !u!4 &4763365358402224
@@ -755,6 +771,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4655008655821338}
   m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4853316447200508
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1874142998626792}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 4748774801174838}
+  m_Father: {fileID: 4548603884991324}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4901749825771668
 Transform:
@@ -1591,7 +1621,7 @@ MeshCollider:
   m_GameObject: {fileID: 1998065560628508}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Convex: 0
   m_InflateMesh: 0
@@ -1643,7 +1673,7 @@ BoxCollider:
   m_GameObject: {fileID: 1148325843870912}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 0.012, y: 0.034999993, z: 0.0010000002}
   m_Center: {x: 0, y: -1.1920909e-10, z: -2.3283064e-10}
@@ -1830,6 +1860,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb0b7babb2e9b3d44b4cf0555815dd86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114372831622545592
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1874142998626792}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac8d5b128a1d8204fb76c86f47b75912, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PivotAxis: 1
 --- !u!114 &114541261099945112
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1845,6 +1887,12 @@ MonoBehaviour:
     type: 2}
   normalButtonMaterial: {fileID: 2100000, guid: a772cb29754fdc6408270b8b9cca42f9,
     type: 2}
+  parentObject: {fileID: 4548603884991324}
+  ResizeSpeedFactor: 1
+  ResizeScaleFactor: 0.75
+  AllowResizeWarp: 0
+  MinScale: 0
+  MaxScale: 0.7
   resizingEnabled: 1
 --- !u!114 &114577150472155348
 MonoBehaviour:
@@ -1874,7 +1922,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   VentanaID: 3
   ControllerName: 
-  brightnessMultipler: 2
+  brightnessMultipler: 8
 --- !u!114 &114731074271332134
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1928,6 +1976,12 @@ MonoBehaviour:
     type: 2}
   normalButtonMaterial: {fileID: 2100000, guid: a772cb29754fdc6408270b8b9cca42f9,
     type: 2}
+  parentObject: {fileID: 4548603884991324}
+  ResizeSpeedFactor: 1
+  ResizeScaleFactor: 0.75
+  AllowResizeWarp: 0
+  MinScale: 0
+  MaxScale: 0.7
   resizingEnabled: 1
 --- !u!114 &114809762075166828
 MonoBehaviour:
@@ -1949,8 +2003,8 @@ MonoBehaviour:
   allowY: 0
   allowZ: 0
   containerObject: {fileID: 1388515033905582}
-  bounds: {x: 0.00089969585, y: 0.049826507, z: 0.014823705}
-  period: 1.5
+  bounds: {x: 0.00089969585, y: 0.04982653, z: 0.014823711}
+  period: 0.9
   clickSound: {fileID: 8300000, guid: 19f89c6e740e7447f9e12a8310d3e973, type: 3}
   highlightButtonMaterial: {fileID: 2100000, guid: a32c289ddf6bd8140b9ca684e64ecdb5,
     type: 2}
@@ -1987,6 +2041,12 @@ MonoBehaviour:
     type: 2}
   normalButtonMaterial: {fileID: 2100000, guid: a772cb29754fdc6408270b8b9cca42f9,
     type: 2}
+  parentObject: {fileID: 4548603884991324}
+  ResizeSpeedFactor: 1
+  ResizeScaleFactor: 0.75
+  AllowResizeWarp: 0
+  MinScale: 0
+  MaxScale: 0.7
   resizingEnabled: 1
 --- !u!114 &114981377105556070
 MonoBehaviour:
@@ -2003,4 +2063,10 @@ MonoBehaviour:
     type: 2}
   normalButtonMaterial: {fileID: 2100000, guid: a772cb29754fdc6408270b8b9cca42f9,
     type: 2}
+  parentObject: {fileID: 4548603884991324}
+  ResizeSpeedFactor: 1
+  ResizeScaleFactor: 0.75
+  AllowResizeWarp: 0
+  MinScale: 0
+  MaxScale: 0.7
   resizingEnabled: 1
