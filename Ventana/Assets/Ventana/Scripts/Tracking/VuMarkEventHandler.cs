@@ -95,6 +95,7 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
             spb.ControllerID = vuMarkId;
             spb.shouldSpawn = true;
             spb.scaleMultiplier = gameObject.transform.localScale;
+            
         }
 
     }

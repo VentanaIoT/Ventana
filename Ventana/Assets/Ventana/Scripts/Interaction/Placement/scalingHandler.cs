@@ -25,7 +25,8 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
 
     public void OnManipulationStarted(ManipulationEventData eventData)
     {
-
+        InputManager.Instance.PushModalInputHandler(gameObject);
+        gameObject.SendMessageUpwards("scaleStarted");
     }
 
     public void OnManipulationUpdated(ManipulationEventData eventData)
@@ -36,17 +37,16 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
 
     public void OnManipulationCompleted(ManipulationEventData eventData)
     {
-        
+        InputManager.Instance.PopModalInputHandler();
     }
 
     public void OnManipulationCanceled(ManipulationEventData eventData)
     {
-
+        InputManager.Instance.PopModalInputHandler();
     }
     void Resize(Vector3 newScale)
     {
-        // send data to ttpMode.cs once the manipulation gesture is updated
-        Debug.Log("bubbling to scalebuttonclicked" + newScale);
+        // send data to EditModeController.cs once the manipulation gesture is updated
         gameObject.SendMessageUpwards("scaleButtonClicked", newScale);
     }
 

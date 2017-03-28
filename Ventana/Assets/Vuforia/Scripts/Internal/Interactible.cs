@@ -47,7 +47,7 @@ public class Interactible : MonoBehaviour, IInputClickHandler
     {
         //Debug.Log("<color=yellow>EY BAY BAY</color>");
 
-        // Send a more button clicked message to ttpMode script
+        // Send a more button clicked message to EditModeController script
         gameObject.SendMessageUpwards("MoreButtonClicked");
     }
 }
