@@ -317,93 +317,15 @@ public class KnobHandler : HandDraggable, IFocusable {
 
     }
 
+    public void DisableInteraction(bool yes) {
+        if ( yes ) {
+            gameObject.GetComponent<Collider>().enabled = false;
+        } else {
+            gameObject.GetComponent<Collider>().enabled = true;
+        }
+    }
+
     public struct SliderLevels {
         public int XAxisLevel, YAxisLevel, ZAxisLevel;
     }
 }
-
-
-/*var position = gameObject.transform.localPosition;
-
-                //Debug.Log(baseRotation.x);
-                //Debug.Log(baseRotation.y);
-                //Debug.Log(baseRotation.z);
-
-
-                Vector3 origin = baseLocation;
-                var bounds = containerObject.GetComponent<MeshRenderer>().bounds.size.normalized;
-                bounds.Scale(new Vector3(0.001f, 0.001f, 0.001f));
-                //gives x y z values for the size. we want to go .5 times the axis of freedom max.
-                float[] allowedThreshold = new float[3];
-
-                allowedThreshold[0] = bounds.x * 0.5f;
-                allowedThreshold[1] = bounds.y * 0.5f;
-                allowedThreshold[2] = bounds.z * 0.5f;
-
-                Debug.Log("POSITION: " + position.x + " " + position.y + " " + position.z);
-                Debug.Log("BOUNDS: " + bounds.x + " " + bounds.y + " " + bounds.z);
-                Debug.Log("MIDRANGE: " + allowedThreshold[0] + " " + allowedThreshold[1] + " " + allowedThreshold[2]);
-
-
-                if ( !allowX ) {
-                    //change x to be the origin 
-                    position.x = origin.x;
-
-                } else { //allowX
-                    if ( position.x > allowedThreshold[0] + origin.x ) { //positive offset
-                        //just set the position of x to be the max....
-                        position.x = allowedThreshold[0] ;
-
-                    } else if ( position.x < origin.x - allowedThreshold[0] ){
-                        position.x = -allowedThreshold[0] ;
-                    }
-                }
-
-                if ( !allowY ) {
-                    //change y to be the origin
-                    position.y = origin.y;
-                } else { //allowY
-                    if ( position.y > allowedThreshold[1] + origin.y ) { //positive offset
-                        //just set the position of x to be the max....
-                        position.y = allowedThreshold[1] ;
-
-                    } else if ( position.y < origin.y - allowedThreshold[1] ) {
-                        position.y = -allowedThreshold[1] ;
-                    }
-                }
-
-                if ( !allowZ ) {
-                    position.z = origin.z;
-                } else { //allowZ
-                    if ( position.z > allowedThreshold[2] + origin.z ) { //positive offset
-                        //just set the position of x to be the max....
-                        position.z = allowedThreshold[2] ;
-
-                    } else if ( position.z < origin.z - allowedThreshold[2] ) {
-                        position.z = -allowedThreshold[2] ;
-                    }
-                }
-
-                gameObject.transform.localPosition = position;
-                gameObject.transform.localRotation = baseRotation;
-
-
-                //do we want to do this right here? i guess start a CoRoutine to tell sonos to turn the fuck up...
-                //only do it in the x direction cause it seems to not work on others....
-                //only do this calculation about each second...
-
-                // If the next update is reached
-
-                if ( Time.time >= nextActionTime) {
-                    //Debug.Log(Time.time + ">=" + nextActionTime);
-                    // Change the next update (current second+1)
-                    nextActionTime = Mathf.FloorToInt(Time.time) + period;
-                    // Call your fonction
-                    if ( shouldExecute ) { // this is where I perform calculations
-                        performLevelCalculations();
-                        Debug.Log("BOOP");
-                    } else {
-                        shouldExecute = true;
-                    }
-                }
-                */

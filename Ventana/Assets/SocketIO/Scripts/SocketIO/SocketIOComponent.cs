@@ -1,5 +1,4 @@
-﻿
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 #region UnityCode
 #region License
 /*
@@ -41,9 +40,8 @@ namespace SocketIO {
     public class SocketIOComponent : MonoBehaviour
 	{
 #region Public Properties
-
-        [Tooltip("In the form of ws://yourholohubip:port")]
-        public string HoloHubWS = Args.HOLOHUB_WEBSOCKET_ADDRESS;
+        
+        private string HoloHubWS = Args.HOLOHUB_WEBSOCKET_ADDRESS;
         public bool autoConnect = true;
 		public int reconnectDelay = 5;
 		public float ackExpirationTime = 1800f;
@@ -439,7 +437,7 @@ using System.Text.RegularExpressions;
 namespace SocketIO {
     public class SocketIOComponent : MonoBehaviour {
         private Dictionary<string, List<Action<SocketIOEvent>>> handlers;
-        public string HoloHubWS = Args.HOLOHUB_WEBSOCKET_ADDRESS;
+        private string HoloHubWS = Args.HOLOHUB_WEBSOCKET_ADDRESS;
         public MessageWebSocket websocket;
         public DataWriter writer;
         private bool isConnected = false;
@@ -534,7 +532,7 @@ namespace SocketIO {
 
                     try {
                         string read = reader.ReadString(reader.UnconsumedBufferLength);
-                        read = Regex.Unescape(read);
+                        //read = Regex.Unescape(read);
                         VentanaSocketData socc = VentanaSocketData.ParseFromString(read);
                         if (socc != null ) {
                             Debug.Log(socc.ToString());

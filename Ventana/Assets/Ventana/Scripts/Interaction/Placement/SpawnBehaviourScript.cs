@@ -5,13 +5,14 @@ using HoloToolkit.Unity.InputModule;
 using System;
 using HoloToolkit.Unity.SpatialMapping;
 
-public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
+public class SpawnBehaviourScript : MonoBehaviour, IHoldHandler {
     #region PUBLIC_MEMBERS
     public GameObject prefabObject;
     public bool shouldSpawn = false;
     public Vector3 scaleMultiplier;
     public Vector3 placementPosition;
     public int ControllerID;
+    public string prefabName;
 
     #endregion //PUBLIC_MEMBERS
 
@@ -103,23 +104,28 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
         Debug.Log("sb ODT reached");
         if ( shouldSpawn )
         {
-            Debug.Log("Creating new control copy");
+            //Copying Controller...
             GameObject prefabObjectClone = GameObject.Instantiate(gameObject);
-            prefabObjectClone.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z);
-            prefabObjectClone.transform.localScale = new Vector3( scaleMultiplier.x, scaleMultiplier.y, scaleMultiplier.y);
+            Vector3 cam = Camera.main.transform.forward.normalized;
+            Vector3 current = gameObject.transform.position;
+            prefabObjectClone.transform.position = new Vector3(current.x + (cam.x * .05f), current.y + (cam.y * .05f), current.z + (cam.z * .05f));
+            Vector3 globalScale = gameObject.transform.lossyScale;
+            prefabObjectClone.transform.localScale = new Vector3(globalScale.x * 1.35f, globalScale.y * 1.35f, globalScale.z * 1.35f);
             prefabObjectClone.transform.rotation = gameObject.transform.rotation;
-            TapToPlace ttp = prefabObjectClone.AddComponent<TapToPlace>();
-            Debug.Log(DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString());
-            ttp.SavedAnchorFriendlyName = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
-            ttp.layerMask = SpatialMappingManager.Instance.LayerMask;
-            prefabObjectClone.gameObject.AddComponent<HandDraggable>();
+            EditModeController edit = prefabObjectClone.GetComponent<EditModeController>();
+            edit.scaleModeTriggered = true;
 
-            var spb =  prefabObjectClone.GetComponent<SpawnBehaviourScript>();
-            spb.shouldSpawn = false;
-            shouldSpawn = false;
+            Destroy(prefabObjectClone.GetComponent<SpawnBehaviourScript>());
+
+            HandDraggable hd = prefabObjectClone.AddComponent<HandDraggable>();
+            hd.enabled = true;
+            hd.RotationMode = HandDraggable.RotationModeEnum.OrientTowardUserAndKeepUpright;
+            hd.IsDraggingEnabled = true;
+
         }
     }
 
+    /*
     public void OnInputClicked(InputClickedEventData eventData)
     {
         Debug.Log("<color=yellow>EY BAY BAY</color>");
@@ -128,6 +134,21 @@ public class SpawnBehaviourScript : MonoBehaviour, IInputClickHandler {
 
 
     }
+    */
+    // replacing double tap to spawn with click and hold
+    public void OnHoldStarted(HoldEventData eventData)
+    {
 
+    }
+
+    public void OnHoldCompleted(HoldEventData eventData)
+    {
+        OnDoubleTap();
+    }
+
+    public void OnHoldCanceled(HoldEventData eventData)
+    {
+
+    }
     #endregion // PROTECTED_METHODS
 }
