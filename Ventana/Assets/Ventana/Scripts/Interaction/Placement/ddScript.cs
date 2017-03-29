@@ -2,26 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using HoloToolkit.Unity.InputModule;
-<<<<<<< HEAD
 
-public class ddScript : MonoBehaviour, IInputClickHandler {
+public class ddScript : MonoBehaviour, IInputClickHandler, IFocusable {
     public AudioClip clickSound;
     private AudioSource source;
-
-    // Use this for initialization
-    void Start () {
-        source = GetComponent<AudioSource>();
-
-=======
-using System;
-
-public class ddScript : MonoBehaviour, IInputClickHandler,IFocusable {
     public Material highlightButtonMaterial;
     public Material normalButtonMaterial;
 
     // Use this for initialization
     void Start () {
->>>>>>> 79f16e1a5f0c61727daf817f7502a4e1fc7d7afa
+        source = GetComponent<AudioSource>();
         Collider collider = GetComponentInChildren<Collider>();
         if (collider == null)
         {
@@ -38,9 +28,7 @@ public class ddScript : MonoBehaviour, IInputClickHandler,IFocusable {
     {
         Debug.Log("button pressed");
         gameObject.SendMessageUpwards("ddButtonClicked", gameObject.name);
-<<<<<<< HEAD
         source.PlayOneShot(clickSound, 1F);
-=======
     }
 
     public void OnFocusEnter() {
@@ -51,6 +39,5 @@ public class ddScript : MonoBehaviour, IInputClickHandler,IFocusable {
     public void OnFocusExit() {
         gameObject.SendMessageUpwards("EnableHandDraggable");
         gameObject.GetComponent<Renderer>().material = normalButtonMaterial;
->>>>>>> 79f16e1a5f0c61727daf817f7502a4e1fc7d7afa
     }
 }

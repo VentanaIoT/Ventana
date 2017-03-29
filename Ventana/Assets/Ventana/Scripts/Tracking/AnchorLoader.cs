@@ -15,35 +15,51 @@ public class AnchorLoader : MonoBehaviour
         WorldAnchorStore.GetAsync(OnWorldAnchorStoreLoaded);
     }
 
-
     private void OnWorldAnchorStoreLoaded(WorldAnchorStore store) {
-        var ids = store.GetAllIds();
 
-        foreach ( var id in ids ) {
+        var persistentGameObject = GameObject.Find("persistentGameObject");
+        persistentGameObjectScript persistentScript = persistentGameObject.GetComponent<persistentGameObjectScript>();
 
-            char[] delimiterChars = { ':' };
-            string[] anchorInfo = id.ToString().Split(delimiterChars);
-            Debug.Log("<color=yellow>Anchor ID:" + anchorInfo[0] + " Creation Time: " + anchorInfo[1]);
+        if (persistentScript.loadWorldAnchors)
+        {
+            Debug.Log("LOADING WORLD ANCHORS");
+            var ids = store.GetAllIds();
 
-            ModelController mc = ModelController.Instance;
-            int integerID = Convert.ToInt32(anchorInfo[0]);
-            try {
-                GameObject go = mc.GetPrefabWithId(integerID);
-                BaseVentanaController bvc = go.GetComponent<BaseVentanaController>();
-                if ( bvc ) {
-                    bvc.OnVumarkFound();
-                    bvc.VentanaID = Convert.ToInt32(anchorInfo[0]);
+            foreach (var id in ids)
+            {
 
+                char[] delimiterChars = { ':' };
+                string[] anchorInfo = id.ToString().Split(delimiterChars);
+                Debug.Log("<color=yellow>Anchor ID:" + anchorInfo[0] + " Creation Time: " + anchorInfo[1]);
+
+                ModelController mc = ModelController.Instance;
+                int integerID = Convert.ToInt32(anchorInfo[0]);
+                try
+                {
+                    GameObject go = mc.GetPrefabWithId(integerID);
+                    BaseVentanaController bvc = go.GetComponent<BaseVentanaController>();
+                    if (bvc)
+                    {
+                        bvc.OnVumarkFound();
+                        bvc.VentanaID = Convert.ToInt32(anchorInfo[0]);
+
+                    }
+                    TapToPlace ttp = go.AddComponent<TapToPlace>();
+                    ttp.SavedAnchorFriendlyName = id;
+                    go.transform.localScale = new Vector3(0.1175234f, 0.1175234f, 0.1175234f);
+                    ttp.layerMask = SpatialMappingManager.Instance.LayerMask;
+                    store.Load(id, go);
                 }
-                TapToPlace ttp = go.AddComponent<TapToPlace>();
-                ttp.SavedAnchorFriendlyName = id;
-                go.transform.localScale = new Vector3(0.1175234f, 0.1175234f, 0.1175234f);
-                ttp.layerMask = SpatialMappingManager.Instance.LayerMask;
-                store.Load(id, go);
+                catch (ModelControllerException ex)
+                {
+                    Debug.Log(ex.Message);
+                }
             }
-            catch ( ModelControllerException ex ) {
-                Debug.Log(ex.Message);
-            }
+        }
+        else
+        {
+                store.Clear();
+                Debug.Log("World Anchor Store CLEARED");
         }
     }
     private void Update()

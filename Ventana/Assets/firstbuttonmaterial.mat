@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Surfing Corgi
+  m_Name: firstbuttonmaterial
   m_Shader: {fileID: 4800000, guid: 06790e211e4a6df409b1e04bc91c4810, type: 3}
   m_ShaderKeywords: _EMISSION _USEMAINTEX_ON
   m_LightmapFlags: 1
@@ -48,8 +48,8 @@ Material:
     - first:
         name: _MainTex
       second:
-        m_Texture: {fileID: 2800000, guid: 7d880471fc1b65d4d874b98231de94c6, type: 3}
-        m_Scale: {x: 0.7, y: 1}
+        m_Texture: {fileID: 2800000, guid: cf16f25dfe78d054cbb8af699babcd63, type: 3}
+        m_Scale: {x: 0.8, y: 0.6}
         m_Offset: {x: 0, y: 0}
     - first:
         name: _MetallicGlossMap
@@ -73,9 +73,6 @@ Material:
     - first:
         name: _BumpScale
       second: 1
-    - first:
-        name: _ColorMask
-      second: 15
     - first:
         name: _ColorWriteMask
       second: 15
@@ -101,12 +98,6 @@ Material:
         name: _GlossyReflections
       second: 1
     - first:
-        name: _LineScale
-      second: 0.1
-    - first:
-        name: _LinesPerMeter
-      second: 4
-    - first:
         name: _Metallic
       second: 0
     - first:
@@ -128,21 +119,6 @@ Material:
         name: _SrcBlend
       second: 1
     - first:
-        name: _Stencil
-      second: 0
-    - first:
-        name: _StencilComp
-      second: 8
-    - first:
-        name: _StencilOp
-      second: 0
-    - first:
-        name: _StencilReadMask
-      second: 255
-    - first:
-        name: _StencilWriteMask
-      second: 255
-    - first:
         name: _UVSec
       second: 0
     - first:
@@ -151,9 +127,6 @@ Material:
     - first:
         name: _UseMainTex
       second: 1
-    - first:
-        name: _UseUIAlphaClip
-      second: 0
     - first:
         name: _ZTest
       second: 4
