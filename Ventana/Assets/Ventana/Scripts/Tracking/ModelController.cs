@@ -10,10 +10,12 @@ public class ModelController  {
     //This is gonna control what model goes with what Image Target
 
     private static ModelController instance;
-    private VentanaModelDictionary modelDictionary; 
+    private VentanaModelDictionary modelDictionary;
+    private VentanaUser user;
+    private bool shouldWrite = true;
 
     private ModelController() {
-        modelDictionary = initializeModelMapping();
+        user = initializeUser();
     }
 
     public static ModelController Instance {
@@ -25,12 +27,33 @@ public class ModelController  {
         }
     }
 
+    private VentanaUser initializeUser() {
+        VentanaUser user = null;
+        VentanaModelDictionary vmDictionary = new VentanaModelDictionary();
+
+        string json = ReadFromConfig();
+        user = JsonUtility.FromJson<VentanaUser>(json);
+
+        if ( user == null ) {
+            Debug.Log("<color=yellow>Warning: Missing or malformed Ventana configuration file");
+            return null;
+        }
+
+        foreach ( VentanaMarkObject vmo in user.VentanaMarks ) {
+            vmDictionary.Add(Convert.ToInt32(vmo.id, 16), vmo.path);
+        }
+
+        modelDictionary = vmDictionary;
+        
+        return user;
+    }
+
     private VentanaModelDictionary initializeModelMapping() {
         VentanaModelDictionary vmDictionary = new VentanaModelDictionary();
         VentanaUser jsonObject = null;
 
-        TextAsset jsonFile = Resources.Load<TextAsset>(Args.VENTANA_MARK_CONFIG_FILE_LOCATION.Replace(".json", ""));
-        string json = jsonFile.text;
+        
+        string json = ReadFromConfig();
         jsonObject = JsonUtility.FromJson<VentanaUser>(json);
         
         if ( jsonObject == null ) {
@@ -65,7 +88,17 @@ public class ModelController  {
        
         return prefab;
     }
+    public string ReadFromConfig() {
+        TextAsset jsonFile = Resources.Load<TextAsset>(Args.VENTANA_MARK_CONFIG_FILE_LOCATION.Replace(".json", ""));
+        return jsonFile.text;
+    }
+
+    public bool WriteToConfig(bool write) {
+        return true;
+    }
 }
+
+
 
 public class ModelControllerException : Exception {
     string message;

@@ -5,6 +5,7 @@ using UnityEngine.VR.WSA.Persistence;
 using HoloToolkit.Unity.SpatialMapping;
 using System.Collections.Generic;
 using System;
+using System.Globalization;
 
 public class AnchorLoader : MonoBehaviour
 {
@@ -30,7 +31,7 @@ public class AnchorLoader : MonoBehaviour
 
                 char[] delimiterChars = { ':' };
                 string[] anchorInfo = id.ToString().Split(delimiterChars);
-                Debug.Log("<color=yellow>Anchor ID:" + anchorInfo[0] + " Creation Time: " + anchorInfo[1]);
+                Debug.Log("<color=yellow>Anchor ID:" + anchorInfo[0] + " Lossy Scale: " + anchorInfo[1] + " Creation Time: " + anchorInfo[2]);
 
                 ModelController mc = ModelController.Instance;
                 int integerID = Convert.ToInt32(anchorInfo[0]);
@@ -41,13 +42,16 @@ public class AnchorLoader : MonoBehaviour
                     if (bvc)
                     {
                         bvc.OnVumarkFound();
-                        bvc.VentanaID = Convert.ToInt32(anchorInfo[0]);
-
+                        bvc.VentanaID = integerID;
                     }
-                    TapToPlace ttp = go.AddComponent<TapToPlace>();
-                    ttp.SavedAnchorFriendlyName = id;
-                    go.transform.localScale = new Vector3(0.1175234f, 0.1175234f, 0.1175234f);
-                    ttp.layerMask = SpatialMappingManager.Instance.LayerMask;
+                    HandDraggable hd = go.AddComponent<HandDraggable>();
+                    hd.enabled = true;
+                    hd.IsKeepUpright = true;
+                    hd.IsDraggingEnabled = true;
+                    hd.IsOrientTowardsUser = true;
+                    float scaleVal = float.Parse(anchorInfo[1], CultureInfo.InvariantCulture.NumberFormat);
+
+                    go.transform.localScale = new Vector3(scaleVal, scaleVal, scaleVal);
                     store.Load(id, go);
                 }
                 catch (ModelControllerException ex)
@@ -55,11 +59,11 @@ public class AnchorLoader : MonoBehaviour
                     Debug.Log(ex.Message);
                 }
             }
-        }
+        } 
         else
         {
-                store.Clear();
-                Debug.Log("World Anchor Store CLEARED");
+            store.Clear();
+            Debug.Log("World Anchor Store CLEARED");
         }
     }
     private void Update()

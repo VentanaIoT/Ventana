@@ -5,6 +5,7 @@ using HoloToolkit.Unity.InputModule;
 using HoloToolkit.Unity.SpatialMapping;
 using UnityEngine.VR.WSA;
 using HoloToolkit.Unity;
+using System;
 
 [ExecuteInEditMode]
 public class EditModeController : MonoBehaviour {
@@ -44,25 +45,53 @@ public class EditModeController : MonoBehaviour {
         moreButtons.gameObject.SetActive(true);
         deleteDone.gameObject.SetActive(false);
         scaleHandles.gameObject.SetActive(false);
+        scaleModeTriggered = true;
 
+       
         handDraggable = gameObject.GetComponent<HandDraggable>();
 
         if (handDraggable != null ) {
-            handDraggable.enabled = false;
+            handDraggable.enabled = true;
+            handDraggable.StoppedDragging += HandDraggable_StoppedDragging;
+            handDraggable.StartedDragging += HandDraggable_StartedDragging;
         }
 
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    private void HandDraggable_StartedDragging() {
+        SpatialMappingManager.Instance.DrawVisualMeshes = true;
+        Debug.Log(gameObject.name + " : Removing existing world anchor if any.");
+        WorldAnchorManager.Instance.RemoveAnchor(gameObject);
+    }
+
+    private void HandDraggable_StoppedDragging() {
+        SpatialMappingManager.Instance.DrawVisualMeshes = false;
+
+        // Add world anchor when object placement is done.
+        BaseVentanaController bvc = gameObject.GetComponent<BaseVentanaController>();
+        if ( bvc ) {
+            string currentTime = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
+            string savedAnchorName = bvc.VentanaID + ":" + gameObject.transform.lossyScale.x.ToString()+ ":" + currentTime;
+            Debug.Log("<color=yellow>Name: </color>" + savedAnchorName);
+
+            WorldAnchorManager.Instance.AttachAnchor(gameObject, savedAnchorName);
+        }
+    }
+
+
+
+    // Update is called once per frame
+    void Update () {
 		if ( scaleModeTriggered ) {
             moreButtons.gameObject.SetActive(false);
             deleteDone.gameObject.SetActive(true);
             scaleHandles.gameObject.SetActive(true);
+            gameObject.BroadcastMessage("DisableInteraction", true);
         } else {
             moreButtons.gameObject.SetActive(true);
             deleteDone.gameObject.SetActive(false);
             scaleHandles.gameObject.SetActive(false);
+            gameObject.BroadcastMessage("DisableInteraction", false);
         }
 	}
 
@@ -122,17 +151,28 @@ public class EditModeController : MonoBehaviour {
     {
         // manipulation gesture started so get the current scale
         //turn off draggable behaviours
-        Debug.Log("Here");
-        lastScale = gameObject.GetComponent<Transform>().localScale;
+        
+    }
 
+    void scaleEnded() {
+        BaseVentanaController bvc = gameObject.GetComponent<BaseVentanaController>();
+        if ( bvc ) {
+            Debug.Log(gameObject.name + " : Removing existing world anchor if any after scaling");
+            WorldAnchorManager.Instance.RemoveAnchor(gameObject);
+            string currentTime = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
+            string savedAnchorName = bvc.VentanaID + ":" + gameObject.transform.lossyScale.x.ToString() + ":" + currentTime;
+            Debug.Log("<color=yellow>Name: </color>" + savedAnchorName);
+
+            WorldAnchorManager.Instance.AttachAnchor(gameObject, savedAnchorName);
+        }
     }
 
     void EnableHandDraggable() {
-        handDraggable.enabled = true;
+        if ( handDraggable ) { handDraggable.enabled = true; }
     }
 
     void DisableHandDraggable() {
-        handDraggable.enabled = false;
+        if ( handDraggable ) { handDraggable.enabled = false; }
     }
     
     void scaleButtonClicked(Vector3 newScale)
