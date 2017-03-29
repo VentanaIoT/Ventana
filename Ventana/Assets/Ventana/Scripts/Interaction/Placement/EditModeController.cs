@@ -15,9 +15,11 @@ public class EditModeController : MonoBehaviour {
     public Transform scaleHandles;
     public bool scaleEnabled = false;
     public bool scaleModeTriggered = false;
-    private HandDraggable handDraggable;
-
+    public AudioClip clickSound;
     public Vector3 lastScale;
+    private HandDraggable handDraggable;
+    private AudioSource source;
+
 
     [Tooltip("Speed at which the object is resized.")]
     [SerializeField]
@@ -40,12 +42,11 @@ public class EditModeController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-
+        source = gameObject.GetComponent<AudioSource>();
         // initialize to regular mode, with tap to place controls inactive
         moreButtons.gameObject.SetActive(true);
         deleteDone.gameObject.SetActive(false);
         scaleHandles.gameObject.SetActive(false);
-        scaleModeTriggered = true;
 
        
         handDraggable = gameObject.GetComponent<HandDraggable>();
@@ -76,6 +77,7 @@ public class EditModeController : MonoBehaviour {
 
             WorldAnchorManager.Instance.AttachAnchor(gameObject, savedAnchorName);
         }
+        source.PlayOneShot(clickSound, 1F);
     }
 
 
@@ -109,6 +111,7 @@ public class EditModeController : MonoBehaviour {
         }
 
         scaleModeTriggered = true;
+        source.PlayOneShot(clickSound, 1F);
     }
 
     void ddButtonClicked(string child)
@@ -139,12 +142,13 @@ public class EditModeController : MonoBehaviour {
                 if ( wa ) {
                     WorldAnchorManager.Instance.AnchorStore.Delete(wa.name);
                 }
-
-                Destroy(gameObject);
-
+               
             }
             scaleModeTriggered = false;
+            Destroy(gameObject);
         }
+
+        source.PlayOneShot(clickSound, 1F);
     }
 
     void scaleStarted()

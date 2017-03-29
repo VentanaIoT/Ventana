@@ -1,0 +1,33 @@
+{
+  "User": "VentanaUser",
+  "VentanaMarks": [
+    {
+      "id": "0x00",
+      "name": "Living Room",
+      "path": "Ventana/Prefabs/MusicController"
+    },
+    {
+      "id": "0x01",
+      "name": "Living Room",
+      "path": "Ventana/Prefabs/MusicController"
+    },
+    {
+        "id": "0x02",
+        "name": "Dining Room",
+        "path": "Ventana/Prefabs/MusicController"
+    },
+    {
+        "id": "0x03",
+        "name": "Cosmo",
+        "path": "Ventana/Prefabs/LightController"
+    },{
+        "id": "0x04",
+        "name": "Wanda",
+        "path": "Ventana/Prefabs/LightController"
+    },{
+        "id": "0x05",
+        "name": "PowerStrp",
+        "path": "Ventana/Prefabs/PowerStripController"
+    }
+  ]
+}

@@ -3,6 +3,11 @@ using UnityEngine;
 using VentanaModelDictionary = System.Collections.Generic.Dictionary<int, string>;
 using System.IO;
 using System;
+using System.Text;
+#if !UNITY_EDITOR
+using System.Threading.Tasks;
+using Windows.Storage;
+#endif
 
 public class ModelController  {
     
@@ -13,12 +18,18 @@ public class ModelController  {
     private VentanaModelDictionary modelDictionary;
     private VentanaUser user;
     private bool shouldWrite = true;
+    private bool deployed = false;
+
 
     private ModelController() {
-        user = initializeUser();
-    }
+#if WINDOWS_UWP
+        InitializeConfig();
+#elif UNITY_EDITOR
 
-    public static ModelController Instance {
+#endif
+        initializeUser();
+    }
+public static ModelController Instance {
         get {
             if (instance == null ) {
                 instance = new ModelController();
@@ -27,8 +38,8 @@ public class ModelController  {
         }
     }
 
-    private VentanaUser initializeUser() {
-        VentanaUser user = null;
+    private void initializeUser() {
+        user = null;
         VentanaModelDictionary vmDictionary = new VentanaModelDictionary();
 
         string json = ReadFromConfig();
@@ -36,7 +47,6 @@ public class ModelController  {
 
         if ( user == null ) {
             Debug.Log("<color=yellow>Warning: Missing or malformed Ventana configuration file");
-            return null;
         }
 
         foreach ( VentanaMarkObject vmo in user.VentanaMarks ) {
@@ -44,10 +54,8 @@ public class ModelController  {
         }
 
         modelDictionary = vmDictionary;
-        
-        return user;
     }
-
+  
     private VentanaModelDictionary initializeModelMapping() {
         VentanaModelDictionary vmDictionary = new VentanaModelDictionary();
         VentanaUser jsonObject = null;
@@ -67,6 +75,7 @@ public class ModelController  {
 
         return vmDictionary;
     }
+    
 
     public GameObject GetPrefabWithId(int id) {
         GameObject prefab = null;
@@ -89,13 +98,87 @@ public class ModelController  {
         return prefab;
     }
     public string ReadFromConfig() {
-        TextAsset jsonFile = Resources.Load<TextAsset>(Args.VENTANA_MARK_CONFIG_FILE_LOCATION.Replace(".json", ""));
-        return jsonFile.text;
+        string fileData = "";
+#if UNITY_EDITOR
+        string fileName = GetFilePath("Ventana/VentanaConfig.json"); //for unity
+#elif WINDOWS_UWP
+        string fileName = ApplicationData.Current.LocalFolder.Path + "/VentanaConfig.json";//for hololens
+#endif
+        Debug.Log(fileName);
+        byte[] bytes = UnityEngine.Windows.File.ReadAllBytes(fileName);
+        fileData = System.Text.Encoding.ASCII.GetString(bytes);
+        Debug.Log("READ MODIFIED: " + fileData);
+        //This works on both platforms
+        return fileData;
     }
 
-    public bool WriteToConfig(bool write) {
-        return true;
+#if UNITY_EDITOR
+    public void WriteToConfig(VentanaUser newUser) {
+        //string fileData = "";
+        string fileName = GetFilePath("Ventana/VentanaConfig.json");
+        UnityEngine.Windows.File.WriteAllBytes(fileName, Encoding.ASCII.GetBytes(JsonUtility.ToJson(newUser, true)));
+        //This works in UNITY but not HOLOLENS
+#elif WINDOWS_UWP
+    public void InitializeConfig() {
+        //do some logic to only load from the streaming assets folder if the file doesn't exist in local
+        Task.Run(
+            async () => {
+                try {
+                    //Get local folder
+                    StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+                    //Create file
+                    StorageFile textFileForWrite = await storageFolder.CreateFileAsync("VentanaConfig.json", CreationCollisionOption.FailIfExists);//skip work
+
+                    //Else is fresh install and thus we should copy the template config to the HoloLens Local Folder
+                    StorageFolder dataFolder = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Data");
+                    StorageFolder streamingAssetsFolder = await dataFolder.GetFolderAsync("StreamingAssets");
+                    StorageFolder ventana = await streamingAssetsFolder.GetFolderAsync("Ventana");
+                    StorageFile file = await ventana.GetFileAsync("VentanaConfig.json"); //Template Config so that the user can have some feedback
+                    string contents = await FileIO.ReadTextAsync(file);
+                    //Write to file
+                    await FileIO.WriteTextAsync(textFileForWrite, contents);
+                    /*
+                    //Get file
+                    StorageFile textFileForRead = await storageFolder.GetFileAsync("VentanaConfig.json");
+                    //Read file
+                    string plainText = "";
+                    plainText = await FileIO.ReadTextAsync(textFileForRead);
+                    Debug.Log(plainText);
+                    */
+                } catch (Exception ex ) {
+                    Debug.Log(ex.Message);
+                }
+            }).Wait();
     }
+
+    public void WriteToConfig(VentanaUser newUser) {
+        Task.Run(
+            async () => {
+            string newFile = JsonUtility.ToJson(newUser, true);
+            Debug.Log("NEW: " + newFile);
+            try {
+                    //Get local folder
+                    StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+                    //Create file
+                    StorageFile textFileForWrite = await storageFolder.CreateFileAsync("VentanaConfig.json", CreationCollisionOption.ReplaceExisting);
+                    //Write to file
+                    await FileIO.WriteTextAsync(textFileForWrite, newFile);
+                    //Get file
+                    StorageFile textFileForRead = await storageFolder.GetFileAsync("VentanaConfig.json");
+                    //Read file
+                    string plainText = "";
+                    plainText = await FileIO.ReadTextAsync(textFileForRead);
+                    Debug.Log("New file written: " + plainText);
+                } catch ( Exception ex ) {
+                    Debug.Log(ex.Message);
+            }
+        }).Wait();
+#endif
+    }
+    string GetFilePath(string fileName) {
+        return Application.streamingAssetsPath + "/" + fileName ;
+    }
+
 }
 
 

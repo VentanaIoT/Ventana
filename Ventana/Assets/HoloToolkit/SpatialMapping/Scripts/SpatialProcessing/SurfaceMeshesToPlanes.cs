@@ -30,9 +30,6 @@ namespace HoloToolkit.Unity.SpatialMapping
 
         [Tooltip("Minimum area required for a plane to be created.")]
         public float MinArea = 0.025f;
-        
-        [Tooltip("Layer to use for RayCasting")]
-        public int layer;
 
         /// <summary>
         /// Determines which plane types should be rendered.
@@ -277,9 +274,8 @@ namespace HoloToolkit.Unity.SpatialMapping
                 }
                 else
                 {
-                   
                     // Set the plane to use the same layer as the SpatialMapping mesh.
-                    destPlane.layer = layer; //SpatialMappingManager.Instance.PhysicsLayer;
+                    destPlane.layer = SpatialMappingManager.Instance.PhysicsLayer;
                     ActivePlanes.Add(destPlane);
                 }
 

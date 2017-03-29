@@ -106,29 +106,21 @@ public class SpawnBehaviourScript : MonoBehaviour, IHoldHandler {
         {
             //Copying Controller...
             GameObject prefabObjectClone = GameObject.Instantiate(gameObject);
-            prefabObjectClone.transform.position = gameObject.transform.position;
-            prefabObjectClone.transform.localScale = scaleMultiplier;
+            Vector3 cam = Camera.main.transform.forward.normalized;
+            Vector3 current = gameObject.transform.position;
+            prefabObjectClone.transform.position = new Vector3(current.x + (cam.x * .05f), current.y + (cam.y * .05f), current.z + (cam.z * .05f));
+            Vector3 globalScale = gameObject.transform.lossyScale;
+            prefabObjectClone.transform.localScale = new Vector3(globalScale.x * 1.35f, globalScale.y * 1.35f, globalScale.z * 1.35f);
             prefabObjectClone.transform.rotation = gameObject.transform.rotation;
+            EditModeController edit = prefabObjectClone.GetComponent<EditModeController>();
+            edit.scaleModeTriggered = true;
 
             Destroy(prefabObjectClone.GetComponent<SpawnBehaviourScript>());
 
             HandDraggable hd = prefabObjectClone.AddComponent<HandDraggable>();
             hd.enabled = true;
-            hd.IsKeepUpright = true;
+            hd.RotationMode = HandDraggable.RotationModeEnum.OrientTowardUserAndKeepUpright;
             hd.IsDraggingEnabled = true;
-            hd.IsOrientTowardsUser = true;
-            //Adding Tap To Place... [Depricated]
-            //TapToPlace ttp = prefabObjectClone.AddComponent<TapToPlace>();
-            //ttp.layerMask = SpatialMappingManager.Instance.LayerMask;
-
-            //Setting Name
-            /*
-            string currentTime = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
-            string savedAnchorName = ControllerID + ":" + currentTime;
-            Debug.Log("<color=yellow>Name: </color>" + savedAnchorName );
-            */
-
-            //ttp.SavedAnchorFriendlyName = savedAnchorName;
 
         }
     }

@@ -45,18 +45,18 @@ public class AnchorLoader : MonoBehaviour
                         bvc.VentanaID = integerID;
                     }
                     HandDraggable hd = go.AddComponent<HandDraggable>();
-                    hd.enabled = true;
-                    hd.IsKeepUpright = true;
+                    hd.enabled = false;
+                    hd.RotationMode = HandDraggable.RotationModeEnum.OrientTowardUserAndKeepUpright;
                     hd.IsDraggingEnabled = true;
-                    hd.IsOrientTowardsUser = true;
+
                     float scaleVal = float.Parse(anchorInfo[1], CultureInfo.InvariantCulture.NumberFormat);
 
                     go.transform.localScale = new Vector3(scaleVal, scaleVal, scaleVal);
                     store.Load(id, go);
                 }
-                catch (ModelControllerException ex)
+                catch (Exception ex )
                 {
-                    Debug.Log(ex.Message);
+                    Debug.Log("[Anchor Loader] "+ ex.Message);
                 }
             }
         } 

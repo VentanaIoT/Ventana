@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using HoloToolkit.Unity.InputModule;
+using System;
 
 public class ddScript : MonoBehaviour, IInputClickHandler, IFocusable {
-    public AudioClip clickSound;
-    private AudioSource source;
     public Material highlightButtonMaterial;
     public Material normalButtonMaterial;
 
     // Use this for initialization
     void Start () {
-        source = GetComponent<AudioSource>();
         Collider collider = GetComponentInChildren<Collider>();
         if (collider == null)
         {
@@ -28,7 +26,6 @@ public class ddScript : MonoBehaviour, IInputClickHandler, IFocusable {
     {
         Debug.Log("button pressed");
         gameObject.SendMessageUpwards("ddButtonClicked", gameObject.name);
-        source.PlayOneShot(clickSound, 1F);
     }
 
     public void OnFocusEnter() {

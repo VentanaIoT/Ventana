@@ -28,9 +28,6 @@ namespace HoloToolkit.Unity.SpatialMapping
         [Tooltip("Specify the parent game object to be moved on tap, if the immediate parent is not desired.")]
         public GameObject ParentGameObjectToPlace;
 
-        [Tooltip("Layer Mask this script will scan to.")]
-        public LayerMask layerMask;
-
         /// <summary>
         /// Keeps track of if the user is moving the object or not.
         /// Setting this to true will enable the user to move and place the object in the scene.
@@ -42,7 +39,7 @@ namespace HoloToolkit.Unity.SpatialMapping
         /// <summary>
         /// Manages persisted anchors.
         /// </summary>
-        public WorldAnchorManager anchorManager;
+        protected WorldAnchorManager anchorManager;
 
         /// <summary>
         /// Controls spatial mapping.  In this script we access spatialMappingManager
@@ -92,12 +89,12 @@ namespace HoloToolkit.Unity.SpatialMapping
             // update the placement to match the user's gaze.
             if (IsBeingPlaced)
             {
-                // Do a raycast into the world that will only hit the proccessed planes mesh.
+                // Do a raycast into the world that will only hit the Spatial Mapping mesh.
                 Vector3 headPosition = Camera.main.transform.position;
                 Vector3 gazeDirection = Camera.main.transform.forward;
 
                 RaycastHit hitInfo;
-                if (Physics.Raycast(headPosition, gazeDirection, out hitInfo, 30.0f, layerMask/*spatialMappingManager.LayerMask*/))
+                if (Physics.Raycast(headPosition, gazeDirection, out hitInfo, 30.0f, spatialMappingManager.LayerMask))
                 {
                     // Rotate this object to face the user.
                     Quaternion toQuat = Camera.main.transform.localRotation;
@@ -110,21 +107,16 @@ namespace HoloToolkit.Unity.SpatialMapping
                     // to how the object is placed.  For example, consider
                     // placing based on the bottom of the object's
                     // collider so it sits properly on surfaces.
-                    Debug.DrawRay(gameObject.transform.position, new Vector3(0, -1, 0) * 0.32f, Color.blue, 0, false);
                     if (PlaceParentOnTap)
                     {
                         // Place the parent object as well but keep the focus on the current game object
                         Vector3 currentMovement = hitInfo.point - gameObject.transform.position;
-                        ParentGameObjectToPlace.transform.position += currentMovement + new Vector3(0,0,1);
+                        ParentGameObjectToPlace.transform.position += currentMovement;
                         ParentGameObjectToPlace.transform.rotation = toQuat;
-
                     }
                     else
                     {
-                        Vector3 bufferDirection = -gazeDirection.normalized;
-                        bufferDirection.Scale(new Vector3(0.2f, 0.2f, 0.2f));
-
-                        gameObject.transform.position = hitInfo.point + bufferDirection;
+                        gameObject.transform.position = hitInfo.point;
                         gameObject.transform.rotation = toQuat;
                     }
                 }
@@ -145,6 +137,7 @@ namespace HoloToolkit.Unity.SpatialMapping
 
                 anchorManager.RemoveAnchor(gameObject);
             }
+            // If the user is not in placing mode, hide the spatial mapping mesh.
             else
             {
                 spatialMappingManager.DrawVisualMeshes = false;
