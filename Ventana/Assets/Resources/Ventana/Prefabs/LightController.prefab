@@ -2593,7 +2593,7 @@ MonoBehaviour:
   ResizeSpeedFactor: 1
   ResizeScaleFactor: 0.75
   AllowResizeWarp: 0
-  MinScale: 0.3
+  MinScale: 0.05
   MaxScale: 1.2
   resizingEnabled: 1
 --- !u!114 &114642198589595450
@@ -2644,7 +2644,7 @@ MonoBehaviour:
   ResizeSpeedFactor: 1
   ResizeScaleFactor: 0.75
   AllowResizeWarp: 0
-  MinScale: 0.3
+  MinScale: 0.05
   MaxScale: 1.2
   resizingEnabled: 1
 --- !u!114 &114731074271332134
@@ -2732,7 +2732,7 @@ MonoBehaviour:
   ResizeSpeedFactor: 1
   ResizeScaleFactor: 0.75
   AllowResizeWarp: 0
-  MinScale: 0.3
+  MinScale: 0.05
   MaxScale: 1.2
   resizingEnabled: 1
 --- !u!114 &114907762372985418
@@ -2754,6 +2754,6 @@ MonoBehaviour:
   ResizeSpeedFactor: 1
   ResizeScaleFactor: 0.75
   AllowResizeWarp: 0
-  MinScale: 0.3
+  MinScale: 0.05
   MaxScale: 1.2
   resizingEnabled: 1

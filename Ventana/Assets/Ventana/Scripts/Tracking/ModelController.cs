@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 #endif
 
-public class ModelController  {
+public class ModelController {
     
     //Make Singleton that feeds the initializer the models it needs. 
     //This is gonna control what model goes with what Image Target
@@ -38,8 +38,9 @@ public static ModelController Instance {
         }
     }
 
-    private void initializeUser() {
+    public void initializeUser() {
         user = null;
+        modelDictionary = null;
         VentanaModelDictionary vmDictionary = new VentanaModelDictionary();
 
         string json = ReadFromConfig();
@@ -107,7 +108,6 @@ public static ModelController Instance {
         Debug.Log(fileName);
         byte[] bytes = UnityEngine.Windows.File.ReadAllBytes(fileName);
         fileData = System.Text.Encoding.ASCII.GetString(bytes);
-        Debug.Log("READ MODIFIED: " + fileData);
         //This works on both platforms
         return fileData;
     }
