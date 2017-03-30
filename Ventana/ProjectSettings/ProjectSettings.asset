@@ -457,10 +457,12 @@ PlayerSettings:
   metroCertificatePassword: 
   metroCertificateSubject: DefaultCompany
   metroCertificateIssuer: DefaultCompany
-  metroCertificateNotAfter: 807afdf8379dd301
+  metroCertificateNotAfter: 806f7f17d7c7d301
   metroApplicationDescription: Ventana
-  wsaImages: {}
-  metroTileShortName: 
+  wsaImages:
+    720996: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall.png
+    2162788: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall.png
+  metroTileShortName: Ventana
   metroCommandLineArgsFile: 
   metroTileShowName: 0
   metroMediumTileShowName: 0
@@ -468,10 +470,9 @@ PlayerSettings:
   metroWideTileShowName: 0
   metroDefaultTileSize: 1
   metroTileForegroundText: 1
-  metroTileBackgroundColor: {r: 0.13333334, g: 0.17254902, b: 0.21568628, a: 0}
-  metroSplashScreenBackgroundColor: {r: 0.12941177, g: 0.17254902, b: 0.21568628,
-    a: 1}
-  metroSplashScreenUseBackgroundColor: 0
+  metroTileBackgroundColor: {r: 0.76353955, g: 0.5790441, b: 0.9264706, a: 0}
+  metroSplashScreenBackgroundColor: {r: 0.7058824, g: 0.5669643, b: 0.9338235, a: 0}
+  metroSplashScreenUseBackgroundColor: 1
   platformCapabilities:
     WindowsStoreApps:
       AllJoyn: False
