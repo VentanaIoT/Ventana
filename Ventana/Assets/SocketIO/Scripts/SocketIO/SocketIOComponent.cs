@@ -433,6 +433,7 @@ using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 
 namespace SocketIO {
     public class SocketIOComponent : MonoBehaviour {
@@ -441,6 +442,7 @@ namespace SocketIO {
         public MessageWebSocket websocket;
         public DataWriter writer;
         private bool isConnected = false;
+        private int reconnectCounter = 0;
         public bool autoConnect = true;
         private object eventQueueLock;
         private Queue<SocketIOEvent> eventQueue;
@@ -461,6 +463,14 @@ namespace SocketIO {
             //await SendAsync("beep");
         }
 
+         void Update() {
+            lock ( eventQueueLock ) {
+                while ( eventQueue.Count > 0 ) {
+                    EmitEvent(eventQueue.Dequeue());
+                }
+            }
+        }
+
         private async Task ConnectWebsocket() {
             websocket = new MessageWebSocket();
             Uri server = new Uri(HoloHubWS);
@@ -471,17 +481,21 @@ namespace SocketIO {
             try {
                 await websocket.ConnectAsync(server);
                 isConnected = true;
+                reconnectCounter = 0;
+                writer = new DataWriter(websocket.OutputStream);
             }
             catch ( Exception ex ) // For debugging
             {
                 // Error happened during connect operation.
                 websocket.Dispose();
                 websocket = null;
-
-                Debug.Log(ex.Message);
+                Debug.Log("[SocketIOComponent] " + ex.Message);
+                
+                if ( ex is COMException ) {
+                    Debug.Log("Send Event to User To tell them we are unable to connect to Pi");
+                }
                 return;
             }
-            writer = new DataWriter(websocket.OutputStream);
         }
 
         private void Websocket_Closed(IWebSocket sender, WebSocketClosedEventArgs args) {
@@ -489,6 +503,7 @@ namespace SocketIO {
                 CloseSocket();
             }
             isConnected = false;
+            reconnectCounter = 0;
         }
         private void CloseSocket() {
             if ( writer != null ) {
@@ -513,17 +528,7 @@ namespace SocketIO {
             }
         }
 
-        async void Update() {
-            lock ( eventQueueLock ) {
-                while ( eventQueue.Count > 0 ) {
-                    EmitEvent(eventQueue.Dequeue());
-                }
-            }
-            if ( !isConnected ) {
-                //try connecting again.
-                await ConnectWebsocket();               
-            }
-        }
+        
 
         private void Websocket_MessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args) {
             try {

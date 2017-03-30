@@ -30,6 +30,10 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
         }
     }
 
+    void Update() {
+
+    }
+
     #endregion // UNTIY_MONOBEHAVIOUR_METHODS
 
     #region PUBLIC_METHODS
@@ -87,8 +91,9 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
                     bvc.VentanaID = vuMarkId;
 
                 }
-                control.transform.SetParent(mTrackableBehaviour.gameObject.transform);
+                control.transform.SetParent(gameObject.transform);
                 control.transform.localPosition = new Vector3(0f, -1f, 0f);
+                control.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
                 control.layer = 9;
                 control.transform.localScale = new Vector3(.35f, .35f, .35f);
 
