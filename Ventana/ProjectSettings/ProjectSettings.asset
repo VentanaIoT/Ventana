@@ -44,7 +44,8 @@ PlayerSettings:
   m_SplashScreenBackgroundPortrait: {fileID: 0}
   m_VirtualRealitySplashScreen: {fileID: 2800000, guid: 1b507add909a3b249bfd3aaff7d04a80,
     type: 3}
-  m_HolographicTrackingLossScreen: {fileID: 0}
+  m_HolographicTrackingLossScreen: {fileID: 2800000, guid: 1b507add909a3b249bfd3aaff7d04a80,
+    type: 3}
   defaultScreenWidth: 1024
   defaultScreenHeight: 768
   defaultScreenWidthWeb: 960
@@ -439,6 +440,7 @@ PlayerSettings:
   webGLUseWasm: 0
   webGLCompressionFormat: 1
   scriptingDefineSymbols:
+    1: 
     4: VUFORIA_IOS_SETTINGS
     7: VUFORIA_ANDROID_SETTINGS
     14: VUFORIA_WSA_SETTINGS
@@ -460,8 +462,13 @@ PlayerSettings:
   metroCertificateNotAfter: 806f7f17d7c7d301
   metroApplicationDescription: Ventana
   wsaImages:
+    131272: Assets/Resources/Ventana/Prefabs/Materials/Logo1240x600.png
     720996: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall.png
+    852048: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall24x24.png
+    2031816: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall88x88.png
     2162788: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall.png
+    2293960: Assets/Resources/Ventana/Prefabs/Materials/LogoWide620x300.png
+    2294160: Assets/Resources/Ventana/Prefabs/Materials/Logo1240x600.png
   metroTileShortName: Ventana
   metroCommandLineArgsFile: 
   metroTileShowName: 0

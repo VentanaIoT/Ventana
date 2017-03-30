@@ -52,7 +52,6 @@ public class EditModeController : MonoBehaviour {
         handDraggable = gameObject.GetComponent<HandDraggable>();
 
         if (handDraggable != null ) {
-            handDraggable.enabled = true;
             handDraggable.StoppedDragging += HandDraggable_StoppedDragging;
             handDraggable.StartedDragging += HandDraggable_StartedDragging;
         }

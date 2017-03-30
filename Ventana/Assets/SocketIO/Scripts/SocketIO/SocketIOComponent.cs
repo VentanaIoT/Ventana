@@ -442,7 +442,6 @@ namespace SocketIO {
         public MessageWebSocket websocket;
         public DataWriter writer;
         private bool isConnected = false;
-        private int reconnectCounter = 0;
         public bool autoConnect = true;
         private object eventQueueLock;
         private Queue<SocketIOEvent> eventQueue;
@@ -463,11 +462,14 @@ namespace SocketIO {
             //await SendAsync("beep");
         }
 
-         void Update() {
+         async void Update() {
             lock ( eventQueueLock ) {
                 while ( eventQueue.Count > 0 ) {
                     EmitEvent(eventQueue.Dequeue());
                 }
+            }
+            if ( !isConnected ) {
+                await ConnectWebsocket();
             }
         }
 
@@ -481,7 +483,6 @@ namespace SocketIO {
             try {
                 await websocket.ConnectAsync(server);
                 isConnected = true;
-                reconnectCounter = 0;
                 writer = new DataWriter(websocket.OutputStream);
             }
             catch ( Exception ex ) // For debugging
@@ -503,7 +504,6 @@ namespace SocketIO {
                 CloseSocket();
             }
             isConnected = false;
-            reconnectCounter = 0;
         }
         private void CloseSocket() {
             if ( writer != null ) {
