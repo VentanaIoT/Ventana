@@ -30,6 +30,10 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
         }
     }
 
+    void Update() {
+
+    }
+
     #endregion // UNTIY_MONOBEHAVIOUR_METHODS
 
     #region PUBLIC_METHODS
@@ -77,27 +81,32 @@ public class VuMarkEventHandler : MonoBehaviour, ITrackableEventHandler {
         ModelController mc = ModelController.Instance;
         int vuMarkId = Convert.ToInt32(GetVuMarkString(mTrackableBehaviour.VuMarkTarget), 16);
         control = null;
-        control = mc.GetPrefabWithId(vuMarkId); 
-        if ( control ) {
-            mTrackableBehaviour.transform.DestroyChildren();
-            BaseVentanaController bvc = control.GetComponent<BaseVentanaController>();
-            if ( bvc ) {
-                bvc.OnVumarkFound();
-                bvc.VentanaID = vuMarkId;
-                
-            }
-            control.transform.SetParent(mTrackableBehaviour.gameObject.transform);
-            control.transform.position = gameObject.transform.position;
-            control.transform.localRotation = Quaternion.identity * Quaternion.Euler(new Vector3(90.0f, 0.0f, 0.0f));
-            
-            control.layer = 9;
+        try {
+            control = mc.GetPrefabWithId(vuMarkId);
+            if ( control ) {
+                mTrackableBehaviour.transform.DestroyChildren();
+                BaseVentanaController bvc = control.GetComponent<BaseVentanaController>();
+                if ( bvc ) {
+                    bvc.OnVumarkFound();
+                    bvc.VentanaID = vuMarkId;
 
-            control.transform.localScale = new Vector3(.35f, .35f, .35f);
-            SpawnBehaviourScript spb = control.gameObject.AddComponent<SpawnBehaviourScript>();
-            spb.ControllerID = vuMarkId;
-            spb.shouldSpawn = true;
-            spb.scaleMultiplier = gameObject.transform.localScale;
+                }
+                control.transform.SetParent(gameObject.transform);
+                control.transform.localPosition = new Vector3(0f, -1f, 0f);
+                control.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                control.layer = 9;
+                control.transform.localScale = new Vector3(.35f, .35f, .35f);
+
+                SpawnBehaviourScript spb = control.gameObject.AddComponent<SpawnBehaviourScript>();
+                spb.ControllerID = vuMarkId;
+                spb.shouldSpawn = true;
+                spb.scaleMultiplier = gameObject.transform.localScale;
+
+            }
+        } catch (Exception ex ) {
+            Debug.Log("[VuMarkEventHandler]: " + ex.Message);
         }
+        
 
     }
 

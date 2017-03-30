@@ -6,8 +6,12 @@ using System;
 using UnityEngine.SceneManagement;
 
 public class StartButtonController : MonoBehaviour, IInputClickHandler {
+
+    public Transform persistentGO;
     public void OnInputClicked(InputClickedEventData eventData) {
-        //Load the next scene.
+        //Load the next scene
+        persistentGameObjectScript pgo = persistentGO.GetComponent<persistentGameObjectScript>();
+        pgo.loadWorldAnchors = false;
         SceneManager.LoadSceneAsync("Ventana", LoadSceneMode.Single);
         
     }

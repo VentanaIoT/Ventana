@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class VentanaLightController : BaseVentanaController {
 
-    private string poweredCommand = "powered";
-    private string brightCommand = "brightness";
+    private string poweredCommand = "change_power";
+    private string brightCommand = "change_brightness";
     private string colorCommand = "color";
     private string statusCommand = "status";
+
+    public int brightnessMultipler = 2;
     // Use this for initialization
     protected new void Start() {
         base.Start();
@@ -29,7 +31,7 @@ public class VentanaLightController : BaseVentanaController {
         VentanaRequestFactory requestFactory = VentanaRequestFactory.Instance;
         switch ( child ) {
             case "light":
-                //StartCoroutine(requestFactory.PostToLightAPIEndpoint(poweredCommand, VentanaID, )
+            StartCoroutine(requestFactory.PostToLightAPIEndpoint(poweredCommand, VentanaID, ""));
             break;
             default:
             break;
@@ -39,7 +41,7 @@ public class VentanaLightController : BaseVentanaController {
     void OnSliderChangeRequest(KnobHandler.SliderLevels levels) {
         VentanaRequestFactory requestFactory = VentanaRequestFactory.Instance;
         Debug.Log("Requesting a: " + levels.XAxisLevel + (levels.XAxisLevel > 0 ? " increase" : " decrease"));
-        int baseLevel = levels.XAxisLevel * 5;
+        int baseLevel = levels.XAxisLevel * brightnessMultipler;
         StartCoroutine(requestFactory.PostToLightAPIEndpoint(brightCommand, VentanaID, baseLevel.ToString()));
 
     }

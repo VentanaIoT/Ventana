@@ -15,18 +15,19 @@ public class VentanaMusicController : BaseVentanaController  {
     private string statusCommand = "status";
     private string nextCommand = "forward";
     private string previousCommand = "reverse";
+    VentanaRequestFactory requestFactory;
 
 
     // Use this for initialization
     void Start() {
         base.Start();
+        requestFactory = VentanaRequestFactory.Instance;
         requestAlbum();
     }
 
     // Use this for initialization
     void makeAPIRequest(string child) {
-        VentanaRequestFactory requestFactory = VentanaRequestFactory.Instance;
-
+        requestFactory = VentanaRequestFactory.Instance;
         switch ( child ) {
             case "play":
             Debug.Log("Bubbled play");

@@ -1,5 +1,4 @@
-﻿
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 #region UnityCode
 #region License
 /*
@@ -41,9 +40,8 @@ namespace SocketIO {
     public class SocketIOComponent : MonoBehaviour
 	{
 #region Public Properties
-
-        [Tooltip("In the form of ws://yourholohubip:port")]
-        public string HoloHubWS = Args.HOLOHUB_WEBSOCKET_ADDRESS;
+        
+        private string HoloHubWS = Args.HOLOHUB_WEBSOCKET_ADDRESS;
         public bool autoConnect = true;
 		public int reconnectDelay = 5;
 		public float ackExpirationTime = 1800f;
@@ -435,11 +433,12 @@ using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 
 namespace SocketIO {
     public class SocketIOComponent : MonoBehaviour {
         private Dictionary<string, List<Action<SocketIOEvent>>> handlers;
-        public string HoloHubWS = Args.HOLOHUB_WEBSOCKET_ADDRESS;
+        private string HoloHubWS = Args.HOLOHUB_WEBSOCKET_ADDRESS;
         public MessageWebSocket websocket;
         public DataWriter writer;
         private bool isConnected = false;
@@ -463,6 +462,17 @@ namespace SocketIO {
             //await SendAsync("beep");
         }
 
+         async void Update() {
+            lock ( eventQueueLock ) {
+                while ( eventQueue.Count > 0 ) {
+                    EmitEvent(eventQueue.Dequeue());
+                }
+            }
+            if ( !isConnected ) {
+                await ConnectWebsocket();
+            }
+        }
+
         private async Task ConnectWebsocket() {
             websocket = new MessageWebSocket();
             Uri server = new Uri(HoloHubWS);
@@ -473,17 +483,20 @@ namespace SocketIO {
             try {
                 await websocket.ConnectAsync(server);
                 isConnected = true;
+                writer = new DataWriter(websocket.OutputStream);
             }
             catch ( Exception ex ) // For debugging
             {
                 // Error happened during connect operation.
                 websocket.Dispose();
                 websocket = null;
-
-                Debug.Log(ex.Message);
+                Debug.Log("[SocketIOComponent] " + ex.Message);
+                
+                if ( ex is COMException ) {
+                    Debug.Log("Send Event to User To tell them we are unable to connect to Pi");
+                }
                 return;
             }
-            writer = new DataWriter(websocket.OutputStream);
         }
 
         private void Websocket_Closed(IWebSocket sender, WebSocketClosedEventArgs args) {
@@ -515,17 +528,7 @@ namespace SocketIO {
             }
         }
 
-        async void Update() {
-            lock ( eventQueueLock ) {
-                while ( eventQueue.Count > 0 ) {
-                    EmitEvent(eventQueue.Dequeue());
-                }
-            }
-            if ( !isConnected ) {
-                //try connecting again.
-                await ConnectWebsocket();               
-            }
-        }
+        
 
         private void Websocket_MessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args) {
             try {
@@ -534,7 +537,7 @@ namespace SocketIO {
 
                     try {
                         string read = reader.ReadString(reader.UnconsumedBufferLength);
-                        read = Regex.Unescape(read);
+                        //read = Regex.Unescape(read);
                         VentanaSocketData socc = VentanaSocketData.ParseFromString(read);
                         if (socc != null ) {
                             Debug.Log(socc.ToString());

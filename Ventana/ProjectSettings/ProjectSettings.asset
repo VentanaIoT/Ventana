@@ -14,7 +14,7 @@ PlayerSettings:
   productName: Ventana
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
-  m_SplashScreenBackgroundColor: {r: 0.13333334, g: 0.17254902, b: 0.21176471, a: 1}
+  m_SplashScreenBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_ShowUnitySplashScreen: 1
   m_ShowUnitySplashLogo: 1
   m_SplashScreenOverlayOpacity: 1
@@ -37,11 +37,15 @@ PlayerSettings:
     y: 0
     width: 1
     height: 1
-  m_SplashScreenLogos: []
+  m_SplashScreenLogos:
+  - logo: {fileID: 0}
+    duration: 2
   m_SplashScreenBackgroundLandscape: {fileID: 0}
   m_SplashScreenBackgroundPortrait: {fileID: 0}
-  m_VirtualRealitySplashScreen: {fileID: 0}
-  m_HolographicTrackingLossScreen: {fileID: 0}
+  m_VirtualRealitySplashScreen: {fileID: 2800000, guid: 1b507add909a3b249bfd3aaff7d04a80,
+    type: 3}
+  m_HolographicTrackingLossScreen: {fileID: 2800000, guid: 1b507add909a3b249bfd3aaff7d04a80,
+    type: 3}
   defaultScreenWidth: 1024
   defaultScreenHeight: 768
   defaultScreenWidthWeb: 960
@@ -205,7 +209,13 @@ PlayerSettings:
     banner: {fileID: 0}
   androidGamepadSupportLevel: 0
   resolutionDialogBanner: {fileID: 0}
-  m_BuildTargetIcons: []
+  m_BuildTargetIcons:
+  - m_BuildTarget: 
+    m_Icons:
+    - serializedVersion: 2
+      m_Icon: {fileID: 2800000, guid: 1b507add909a3b249bfd3aaff7d04a80, type: 3}
+      m_Width: 128
+      m_Height: 128
   m_BuildTargetBatching: []
   m_BuildTargetGraphicsAPIs:
   - m_BuildTarget: AndroidPlayer
@@ -430,6 +440,7 @@ PlayerSettings:
   webGLUseWasm: 0
   webGLCompressionFormat: 1
   scriptingDefineSymbols:
+    1: 
     4: VUFORIA_IOS_SETTINGS
     7: VUFORIA_ANDROID_SETTINGS
     14: VUFORIA_WSA_SETTINGS
@@ -448,10 +459,17 @@ PlayerSettings:
   metroCertificatePassword: 
   metroCertificateSubject: DefaultCompany
   metroCertificateIssuer: DefaultCompany
-  metroCertificateNotAfter: 807afdf8379dd301
+  metroCertificateNotAfter: 806f7f17d7c7d301
   metroApplicationDescription: Ventana
-  wsaImages: {}
-  metroTileShortName: 
+  wsaImages:
+    131272: Assets/Resources/Ventana/Prefabs/Materials/Logo1240x600.png
+    720996: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall.png
+    852048: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall24x24.png
+    2031816: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall88x88.png
+    2162788: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall.png
+    2293960: Assets/Resources/Ventana/Prefabs/Materials/LogoWide620x300.png
+    2294160: Assets/Resources/Ventana/Prefabs/Materials/Logo1240x600.png
+  metroTileShortName: Ventana
   metroCommandLineArgsFile: 
   metroTileShowName: 0
   metroMediumTileShowName: 0
@@ -459,10 +477,9 @@ PlayerSettings:
   metroWideTileShowName: 0
   metroDefaultTileSize: 1
   metroTileForegroundText: 1
-  metroTileBackgroundColor: {r: 0.13333334, g: 0.17254902, b: 0.21568628, a: 0}
-  metroSplashScreenBackgroundColor: {r: 0.12941177, g: 0.17254902, b: 0.21568628,
-    a: 1}
-  metroSplashScreenUseBackgroundColor: 0
+  metroTileBackgroundColor: {r: 0.76353955, g: 0.5790441, b: 0.9264706, a: 0}
+  metroSplashScreenBackgroundColor: {r: 0.7058824, g: 0.5669643, b: 0.9338235, a: 0}
+  metroSplashScreenUseBackgroundColor: 1
   platformCapabilities:
     WindowsStoreApps:
       AllJoyn: False
