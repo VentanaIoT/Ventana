@@ -21,16 +21,16 @@ There are two ways to interact with Ventana. The Holographic Interface, where th
 ### Ventana - Running on HoloLens
 Within the Ventana HoloLens application all of the interactions are based on the controllers placed in the users home. These Controllers can be extended, but the controllers built for the project include the following.
 #### Music Controller
-![Music Controller Screenshot](https://raw.githubusercontent.com/VentanaIoT/Ventana/master/images/Music%20Controller%20Screenshot.png =300x)
+![Music Controller Screenshot](https://raw.githubusercontent.com/VentanaIoT/Ventana/master/images/Music%20Controller%20Screenshot.png)
 The Music controller has a similar set of controls to any popular music player. The Top slab of the controller displays album artwork and the bottom slab is the control panel. This layout is consistant across all of the controllers in this project.
 
 The bottom panel contains play, pause (only displays when music is playing), skip, previous, Title, Artist, and the volume slider. Each are operated by airtapping, which is consistant accross all types of controllers.
 #### Light Controller
-![Light Controller Screenshot](https://raw.githubusercontent.com/VentanaIoT/Ventana/master/images/Light%20Controller%20Screenshot.png =300x)
+![Light Controller Screenshot](https://raw.githubusercontent.com/VentanaIoT/Ventana/master/images/Light%20Controller%20Screenshot.png)
 The Light Controller has a simple set of controls and the same two piece layout of the music controller. The top slab is the non-functional representation of a light bulb conveying that it is a light controller while the bottom is the control panel. The control panel consists of a toggle on/off switch and a brightness slider.
 
 #### Power Strip Controller
-![Power Strip Controller Screenshot](https://raw.githubusercontent.com/VentanaIoT/Ventana/master/images/Power%20Strip%20Controller%20Screenshot.png =300x)
+![Power Strip Controller Screenshot](https://raw.githubusercontent.com/VentanaIoT/Ventana/master/images/Power%20Strip%20Controller%20Screenshot.png)
 The power strip controller has the same layout as the above two, but the only controls for the power strip are two toggle buttons on the control panel.
 
 
@@ -1585,8 +1585,6 @@ Johan is a student advisor in the College of Engineering, where he's worked hard
 _Santiago_ 
 Following my passion for technology and innovation, I have worked to take advantage of every opportunity, and maximize the impact of turning ideas into actions in both nonprofit and for-profit ventures. Santiago will be joining Accenture Security team as a Security Consulting Senior Analyst in Boston, MA.
 
-
-## Appendix 
 
 # Appendix 
 
@@ -3698,6 +3696,738 @@ public class SonosInfo : VentanaInteractable {
 public class VentanaInteractable {
 
 }
+```
+
+### VentanaMarkObject.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using System;
+
+[Serializable]
+public class VentanaMarkObject {
+    public string name;
+    public string id; //tbd
+    public string path;
+}
+```
+
+### VentanaUser.cs
+```C#
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[Serializable]
+public class VentanaUser {
+    public string User;
+    public List<VentanaMarkObject> VentanaMarks;
+
+    public override string ToString() {
+        string result = "";
+        result += "User: " + User + "\n";
+        result += "--Image Target Locations--\n";
+        foreach(VentanaMarkObject vmo in VentanaMarks ) {
+            result += vmo.name + ": " + vmo.id + " " + vmo.path + "\n";
+        }
+        return result;
+    }
+}
+```
+
+### AlbumSlabTextureController.cs
+```C#
+using UnityEngine;
+using System.Collections;
+using SocketIO;
+using UnityEngine.UI;
+
+public class AlbumSlabTextureController : MonoBehaviour {
+    public string newURL;
+    public Texture oldTexture;
+    public SocketIOComponent socket;
+    public Text songText;
+    public Text albumText;
+    private VentanaMusicController vmc;
+    
+
+    void Start() {
+        socket = VentanaRequestFactory.Instance.socket;
+        newURL = "http://is5.mzstatic.com/image/thumb/Music3/v4/47/97/af/4797af7e-24c9-7428-ac64-5b5f35eba51e/source/100000x100000-999.jpg";
+        socket.On("push", HandlePush);
+        vmc = GetComponentInParent<VentanaMusicController>();
+    }
+    public void HandlePush(SocketIOEvent e) {
+        Debug.Log("[SocketIO]" + e.data);
+        VentanaInteractable myVentana = SonosInfo.CreateFromJSON(e.data.GetField(vmc.VentanaID.ToString()).ToString());
+        if ( myVentana as SonosInfo != null ) {
+            SonosInfo ventana = (SonosInfo)myVentana;
+            if ( ventana.isPaused ) {
+                gameObject.SendMessageUpwards("SetPauseState");
+            } else {
+                gameObject.SendMessageUpwards("SetPlayState");
+            }
+
+            OnURLSent(myVentana);
+        }
+    }
+
+    IEnumerator ChangeAlbumTexture(WWW www) {
+        yield return www;
+        if ( www.error == null ) {
+            var materials = gameObject.GetComponent<Renderer>().materials;
+            materials[1].mainTexture = www.texture;
+            gameObject.GetComponent<Renderer>().materials = materials;
+        } else {
+            //Debug.Log("Not changing texture");
+        }
+    }
+
+    void OnURLSent(VentanaInteractable venta) {
+        //album art contains the URL
+        SonosInfo info = venta as SonosInfo;
+        //Debug.Log(info.album_art);
+        if ( newURL != info.album_art ) {
+            Debug.Log("Im getting changed");
+            WWW www = new WWW(info.album_art);
+            newURL = info.album_art;
+            songText.text = info.title;
+            albumText.text = info.artist;
+            StartCoroutine(ChangeAlbumTexture(www));
+
+        }
+    }
+
+
+    private void OnDestroy() {
+        //free socket resources...
+        socket.Off("push", HandlePush);
+    }
+}
+```
+
+### VentanaRequestFactory.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using HoloToolkit.Unity;
+using System.Text;
+using System;
+using UnityEngine.Networking;
+using SocketIO;
+
+public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
+    
+
+    [Tooltip("In the form of http://yourholohubip:port")]
+    private string HoloHubURI = Args.HOLOHUB_ADDRESS;
+    private string MusicEndpoint = "/sonos/";
+    private string LightEndpoint = "/wink/";
+    private string PowerEndpoint = "/wink/";
+    public SocketIOComponent socket;
+    // Use this for initialization
+    void Start () {
+		
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+    
+
+    //this will do web requests...
+    /* MUSIC */
+
+
+    public IEnumerator PostToMusicAPIEndpoint(string action, int id, string data) {
+        StringBuilder url = new StringBuilder(HoloHubURI);
+        url.Append(MusicEndpoint);
+        url.Append(action + "/");
+        //url.Append(id.ToString());
+        //post data is not needed for this endpoint
+        //Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+        url.Append(id.ToString());
+        url.Append("/");
+
+        Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+        Dictionary<string, string> request = new Dictionary<string, string>();
+        request.Add("value", data);
+        UnityWebRequest holoHubRequest = UnityWebRequest.Post(url.ToString(), request);
+        yield return holoHubRequest.Send();
+        if ( !holoHubRequest.isError ) {
+            //Debug.Log("WWW Ok!: " + responseString);
+        } else {
+            Debug.Log("WWW Error: " + holoHubRequest.error);
+        }
+    }
+
+    public IEnumerator GetFromMusicAPIEndpoint(string action, int id, Action<VentanaInteractable> callback) {
+        StringBuilder url = new StringBuilder(HoloHubURI);
+        url.Append(MusicEndpoint);
+        url.Append(action + "/");
+        //url.Append(id.ToString());
+        //realistically its only for status...
+        
+        url.Append(id.ToString());
+
+        url.Append("/");
+        Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+        UnityWebRequest holoHubRequest = UnityWebRequest.Get(url.ToString());
+        yield return holoHubRequest.Send();
+
+        if ( !holoHubRequest.isError ) {
+            //Debug.Log("WWW Ok!: " + responseString);
+            if ( action == "status" && callback != null ) {
+                try {
+                    VentanaInteractable myVentana = SonosInfo.CreateFromJSON(holoHubRequest.downloadHandler.text);
+                    if ( myVentana != null ) {
+                        callback(myVentana);
+                    }
+                } catch (ArgumentException e ) {
+                    Debug.LogWarning(e.Message + " \nHoloHub Response Val: " + holoHubRequest.downloadHandler.text);
+                }
+            }
+
+        } else {
+            Debug.Log("WWW Error: " + holoHubRequest.error);
+        }
+    }
+
+
+    /* LIGHT */
+
+    public IEnumerator PostToLightAPIEndpoint(string action, int id, string data) {
+        StringBuilder url = new StringBuilder(HoloHubURI);
+        url.Append(LightEndpoint);
+        url.Append(action + "/");
+        url.Append(id.ToString() + "/");
+        // url.Append(data);
+
+        Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+        Dictionary<string, string> request = new Dictionary<string, string>();
+        request.Add("value", data);
+
+        UnityWebRequest holoHubRequest = UnityWebRequest.Post(url.ToString(), request);
+        yield return holoHubRequest.Send();
+
+        if ( !holoHubRequest.isError ) {
+            //Debug.Log("WWW Ok!: " + responseString);
+        } else {
+            Debug.Log("WWW Error: " + holoHubRequest.error);
+        }
+
+    }
+
+    public IEnumerator GetFromLightAPIEndpoint(string action, int id, Action<string, VentanaInteractable> callback) {
+        StringBuilder url = new StringBuilder(HoloHubURI);
+        url.Append(LightEndpoint);
+        url.Append(action + "/");
+        url.Append(id.ToString() + "/");
+
+        Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+        UnityWebRequest holoHubRequest = UnityWebRequest.Get(url.ToString());
+        yield return holoHubRequest.Send();
+
+        if ( !holoHubRequest.isError ) {
+            //Debug.Log("WWW Ok!: " + responseString);
+            if ( action == "status" ) {
+                //VentanaInteractable myVentana = SonosInfo.CreateFromJSON(holoHubRequest.downloadHandler.text);
+                //callback("OnURLSent", myVentana);
+            }
+
+        } else {
+            Debug.Log("WWW Error: " + holoHubRequest.error);
+        }
+    }
+
+    /* POWER */
+
+    public IEnumerator PostToPowerAPIEndpoint(string action, int id, string data) {
+        StringBuilder url = new StringBuilder(HoloHubURI);
+        url.Append(PowerEndpoint);
+        url.Append(action + "/");
+        url.Append(id.ToString() + "/");
+
+        Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+        Dictionary<string, string> request = new Dictionary<string, string>();
+        request.Add("value", data);
+
+        UnityWebRequest holoHubRequest = UnityWebRequest.Post(url.ToString(), request);
+        yield return holoHubRequest.Send();
+
+        if ( !holoHubRequest.isError ) {
+            //Debug.Log("WWW Ok!: " + responseString);
+        } else {
+            Debug.Log("WWW Error: " + holoHubRequest.error);
+        }
+
+
+    }
+
+    public IEnumerator GetFromPowerAPIEndpoint(string action, int id) {
+        StringBuilder url = new StringBuilder(HoloHubURI);
+        url.Append(PowerEndpoint);
+        url.Append(action + "/");
+        url.Append(id.ToString() + "/");
+
+        Debug.Log("ACTION: " + action + " URL: " + url.ToString());
+        UnityWebRequest holoHubRequest = UnityWebRequest.Get(url.ToString());
+        yield return holoHubRequest.Send();
+
+        if ( !holoHubRequest.isError ) {
+            //Debug.Log("WWW Ok!: " + responseString);
+            if ( action == "status" ) {
+                //VentanaInteractable myVentana = SonosInfo.CreateFromJSON(holoHubRequest.downloadHandler.text);
+                //callback("OnURLSent", myVentana);
+            }
+
+        } else {
+            Debug.Log("WWW Error: " + holoHubRequest.error);
+        }
+
+    }
+
+}
+```
+
+### VentanaSocketParser.cs
+```C#
+using System;
+using UnityEngine;
+
+public class VentanaSocketData  {
+    public string socketCode;
+    public string channel;
+    public string jsonPayload;
+
+    public static VentanaSocketData ParseFromString(string str) {
+        VentanaSocketData socc = new VentanaSocketData();
+
+        int firstBracketIndex = str.IndexOf('[');
+        int firstCommaIndex = str.IndexOf(',');
+        int firstSquiggle = str.IndexOf('{');
+        try {
+            string code = (firstBracketIndex == -1) ? "" : str.Substring(0, firstBracketIndex);
+            socc.socketCode = code;
+            //Debug.Log("CODE: " + code);
+            if (code == "42"  &&
+                ((firstBracketIndex < firstSquiggle) && ( firstCommaIndex < firstSquiggle )) ){ // the message you want to listen to
+                string channel = str.Substring(firstBracketIndex + 2, (firstCommaIndex - firstBracketIndex) - 3);
+                string JSON = str.Substring(firstCommaIndex + 2, (str.Length - firstCommaIndex) - 3);
+                socc.channel = channel;
+                socc.jsonPayload = "{" + JSON + "}";
+                //Debug.Log("CHANNEL: " + channel);
+                //Debug.Log("JSON: " + JSON);
+            } else {
+                socc = null;
+                Debug.Log("Socket Message Not Listned To: " + str);
+            }
+
+        } catch ( Exception ex ) {
+            Debug.Log(ex.Message);
+            socc = null; //if null not a request we can handle
+        }
+
+        return socc;
+    }
+
+    public override string ToString() {
+        return "Channel: " + channel + " :: PayLoad: " + jsonPayload;
+    }
+}
+```
+
+### AnchorLoader.cs
+```C#
+using HoloToolkit.Unity;
+using HoloToolkit.Unity.InputModule;
+using UnityEngine;
+using UnityEngine.VR.WSA.Persistence;
+using HoloToolkit.Unity.SpatialMapping;
+using System.Collections.Generic;
+using System;
+using System.Globalization;
+
+public class AnchorLoader : MonoBehaviour
+{
+    bool loaded;
+
+    private void Start()
+    {
+        WorldAnchorStore.GetAsync(OnWorldAnchorStoreLoaded);
+    }
+
+    private void OnWorldAnchorStoreLoaded(WorldAnchorStore store) {
+
+        var persistentGameObject = GameObject.Find("persistentGameObject");
+        persistentGameObjectScript persistentScript = persistentGameObject.GetComponent<persistentGameObjectScript>();
+
+        if (persistentScript.loadWorldAnchors)
+        {
+            Debug.Log("LOADING WORLD ANCHORS");
+            var ids = store.GetAllIds();
+
+            foreach (var id in ids)
+            {
+
+                char[] delimiterChars = { ':' };
+                string[] anchorInfo = id.ToString().Split(delimiterChars);
+                Debug.Log("<color=yellow>Anchor ID:" + anchorInfo[0] + " Lossy Scale: " + anchorInfo[1] + " Creation Time: " + anchorInfo[2]);
+
+                ModelController mc = ModelController.Instance;
+                int integerID = Convert.ToInt32(anchorInfo[0]);
+                try
+                {
+                    GameObject go = mc.GetPrefabWithId(integerID);
+                    BaseVentanaController bvc = go.GetComponent<BaseVentanaController>();
+                    if (bvc)
+                    {
+                        bvc.OnVumarkFound();
+                        bvc.VentanaID = integerID;
+                    }
+                    HandDraggable hd = go.AddComponent<HandDraggable>();
+                    hd.enabled = false;
+                    hd.RotationMode = HandDraggable.RotationModeEnum.OrientTowardUserAndKeepUpright;
+                    hd.IsDraggingEnabled = true;
+
+                    float scaleVal = float.Parse(anchorInfo[1], CultureInfo.InvariantCulture.NumberFormat);
+
+                    go.transform.localScale = new Vector3(scaleVal, scaleVal, scaleVal);
+                    store.Load(id, go);
+                }
+                catch (Exception ex )
+                {
+                    Debug.Log("[Anchor Loader] "+ ex.Message);
+                }
+            }
+        } 
+        else
+        {
+            store.Clear();
+            Debug.Log("World Anchor Store CLEARED");
+        }
+    }
+    private void Update()
+    {
+    }
+}
+```
+
+
+
+### IVentanaVuMarkEventHandler.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public interface IVentanaVumarkEventHandler {
+
+    void OnVumarkFound();
+    void OnVumarkLost();
+}
+```
+
+### ModelController.cs
+```C#
+using System.Collections.Generic;
+using UnityEngine;
+using VentanaModelDictionary = System.Collections.Generic.Dictionary<int, string>;
+using System.IO;
+using System;
+using System.Text;
+#if !UNITY_EDITOR
+using System.Threading.Tasks;
+using Windows.Storage;
+#endif
+
+public class ModelController {
+    
+    //Make Singleton that feeds the initializer the models it needs. 
+    //This is gonna control what model goes with what Image Target
+
+    private static ModelController instance;
+    private VentanaModelDictionary modelDictionary;
+    private VentanaUser user;
+    private bool shouldWrite = true;
+    private bool deployed = false;
+
+
+    private ModelController() {
+#if WINDOWS_UWP
+        InitializeConfig();
+#elif UNITY_EDITOR
+
+#endif
+        initializeUser();
+    }
+public static ModelController Instance {
+        get {
+            if (instance == null ) {
+                instance = new ModelController();
+            }
+            return instance;
+        }
+    }
+
+    public void initializeUser() {
+        user = null;
+        modelDictionary = null;
+        VentanaModelDictionary vmDictionary = new VentanaModelDictionary();
+
+        string json = ReadFromConfig();
+        user = JsonUtility.FromJson<VentanaUser>(json);
+
+        if ( user == null ) {
+            Debug.Log("<color=yellow>Warning: Missing or malformed Ventana configuration file");
+        }
+
+        foreach ( VentanaMarkObject vmo in user.VentanaMarks ) {
+            vmDictionary.Add(Convert.ToInt32(vmo.id, 16), vmo.path);
+        }
+
+        modelDictionary = vmDictionary;
+    }
+  
+    private VentanaModelDictionary initializeModelMapping() {
+        VentanaModelDictionary vmDictionary = new VentanaModelDictionary();
+        VentanaUser jsonObject = null;
+
+        
+        string json = ReadFromConfig();
+        jsonObject = JsonUtility.FromJson<VentanaUser>(json);
+        
+        if ( jsonObject == null ) {
+            Debug.Log("<color=yellow>Warning: Missing or malformed Ventana configuration file");
+            return null;
+        }
+
+        foreach (VentanaMarkObject vmo in jsonObject.VentanaMarks ) {
+            vmDictionary.Add(Convert.ToInt32(vmo.id, 16), vmo.path);
+        }
+
+        return vmDictionary;
+    }
+    
+
+    public GameObject GetPrefabWithId(int id) {
+        GameObject prefab = null;
+        string value = "";
+        if ( modelDictionary.TryGetValue(id, out value) ) { //key exists
+            //now check if a prefab exists...
+            UnityEngine.Object possiblePrefab = Resources.Load(value);
+            if ( possiblePrefab ) {
+                if ( !(prefab = GameObject.Instantiate(possiblePrefab) as GameObject )) {
+                    Debug.Log("<color=red>Error: the prefab at " + value + " does not exist</color>");
+                    throw new ModelControllerException("prefab not found");
+                }
+            }
+
+        } else {
+            Debug.Log("<color=red>Error: Key in Ventana Config does not exists in ModelController</color>");
+            throw new ModelControllerException("Key not found");
+        }
+       
+        return prefab;
+    }
+    public string ReadFromConfig() {
+        string fileData = "";
+#if UNITY_EDITOR
+        string fileName = GetFilePath("Ventana/VentanaConfig.json"); //for unity
+#elif WINDOWS_UWP
+        string fileName = ApplicationData.Current.LocalFolder.Path + "/VentanaConfig.json";//for hololens
+#endif
+        Debug.Log(fileName);
+        byte[] bytes = UnityEngine.Windows.File.ReadAllBytes(fileName);
+        fileData = System.Text.Encoding.ASCII.GetString(bytes);
+        //This works on both platforms
+        return fileData;
+    }
+
+#if UNITY_EDITOR
+    public void WriteToConfig(VentanaUser newUser) {
+        //string fileData = "";
+        string fileName = GetFilePath("Ventana/VentanaConfig.json");
+        UnityEngine.Windows.File.WriteAllBytes(fileName, Encoding.ASCII.GetBytes(JsonUtility.ToJson(newUser, true)));
+        //This works in UNITY but not HOLOLENS
+#elif WINDOWS_UWP
+    public void InitializeConfig() {
+        //do some logic to only load from the streaming assets folder if the file doesn't exist in local
+        Task.Run(
+            async () => {
+                try {
+                    //Get local folder
+                    StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+                    //Create file
+                    StorageFile textFileForWrite = await storageFolder.CreateFileAsync("VentanaConfig.json", CreationCollisionOption.FailIfExists);//skip work
+
+                    //Else is fresh install and thus we should copy the template config to the HoloLens Local Folder
+                    StorageFolder dataFolder = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Data");
+                    StorageFolder streamingAssetsFolder = await dataFolder.GetFolderAsync("StreamingAssets");
+                    StorageFolder ventana = await streamingAssetsFolder.GetFolderAsync("Ventana");
+                    StorageFile file = await ventana.GetFileAsync("VentanaConfig.json"); //Template Config so that the user can have some feedback
+                    string contents = await FileIO.ReadTextAsync(file);
+                    //Write to file
+                    await FileIO.WriteTextAsync(textFileForWrite, contents);
+                    /*
+                    //Get file
+                    StorageFile textFileForRead = await storageFolder.GetFileAsync("VentanaConfig.json");
+                    //Read file
+                    string plainText = "";
+                    plainText = await FileIO.ReadTextAsync(textFileForRead);
+                    Debug.Log(plainText);
+                    */
+                } catch (Exception ex ) {
+                    Debug.Log(ex.Message);
+                }
+            }).Wait();
+    }
+
+    public void WriteToConfig(VentanaUser newUser) {
+        Task.Run(
+            async () => {
+            string newFile = JsonUtility.ToJson(newUser, true);
+            Debug.Log("NEW: " + newFile);
+            try {
+                    //Get local folder
+                    StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
+                    //Create file
+                    StorageFile textFileForWrite = await storageFolder.CreateFileAsync("VentanaConfig.json", CreationCollisionOption.ReplaceExisting);
+                    //Write to file
+                    await FileIO.WriteTextAsync(textFileForWrite, newFile);
+                    //Get file
+                    StorageFile textFileForRead = await storageFolder.GetFileAsync("VentanaConfig.json");
+                    //Read file
+                    string plainText = "";
+                    plainText = await FileIO.ReadTextAsync(textFileForRead);
+                    Debug.Log("New file written: " + plainText);
+                } catch ( Exception ex ) {
+                    Debug.Log(ex.Message);
+            }
+        }).Wait();
+#endif
+    }
+    string GetFilePath(string fileName) {
+        return Application.streamingAssetsPath + "/" + fileName ;
+    }
+
+}
+
+
+
+public class ModelControllerException : Exception {
+    string message;
+    public ModelControllerException(string message) {
+        this.message = message;
+    }
+}
+```
+### ModelControllerInitializer.cs
+```C#
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
+using UnityEngine.Networking;
+
+public class ModelControllerInitializer : MonoBehaviour {
+
+	// Use this for initialization
+	IEnumerator Start () {
+        StringBuilder url = new StringBuilder(Args.HOLOHUB_ADDRESS);
+        url.Append("/holoconfig/");
+        UnityWebRequest holoHubRequest = UnityWebRequest.Get(url.ToString());
+        yield return holoHubRequest.Send();
+
+        if ( !holoHubRequest.isError ) {
+            try {
+                ModelController mc = ModelController.Instance;
+                Debug.Log(holoHubRequest.downloadHandler.text);
+                VentanaUser user = JsonUtility.FromJson<VentanaUser>(holoHubRequest.downloadHandler.text);
+                mc.WriteToConfig(user);
+                mc.initializeUser();
+                    
+            }
+            catch ( Exception e ) {
+                Debug.LogWarning(e.Message + " \nHoloHub Response Val: " + holoHubRequest.downloadHandler.text);
+            }
+
+        } else {
+            Debug.Log("WWW Error: " + holoHubRequest.error);
+        }
+    }
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+}
+```
+
+
+
+### VentanaSpeakerEventHandler.cs
+```C#
+using System.Collections;
+using Vuforia;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class VentanaSpeakerEventHandler : DefaultTrackableEventHandler {
+    override public void OnTrackingFound() {
+        VentanaMusicController musicController = GetComponentInChildren<VentanaMusicController>();
+        if ( musicController ) {
+            musicController.isModelShowing = true;
+        }
+        base.OnTrackingFound();
+    }
+
+    public override void OnTrackingLost() {
+        VentanaMusicController musicController = GetComponentInChildren<VentanaMusicController>();
+        if ( musicController ) {
+            musicController.isModelShowing = false;
+        }
+        base.OnTrackingLost();
+    }
+}
+```
+
+### StartButtonController.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using HoloToolkit.Unity.InputModule;
+using System;
+using UnityEngine.SceneManagement;
+
+public class StartButtonController : MonoBehaviour, IInputClickHandler {
+
+    public Transform persistentGO;
+    public void OnInputClicked(InputClickedEventData eventData) {
+        //Load the next scene
+        persistentGameObjectScript pgo = persistentGO.GetComponent<persistentGameObjectScript>();
+        pgo.loadWorldAnchors = false;
+        SceneManager.LoadSceneAsync("Ventana", LoadSceneMode.Single);
+        
+    }
+
+    // Use this for initialization
+    void Start () {
+		
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+}
+
 ```
 
 ## HoloHub Reference Assets
