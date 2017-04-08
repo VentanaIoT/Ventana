@@ -1587,5 +1587,3852 @@ Following my passion for technology and innovation, I have worked to take advant
 
 
 ## Appendix 
-[Appendix Link](https://hackmd.io/s/HJ9LvAHTl)
 
+# Appendix 
+
+## Ventana Reference Assets
+
+The HandDraggable.cs script, shown below, allows the user to move the hologram to a new location. 
+#### HandDraggable.cs
+
+```C#
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using UnityEngine;
+using System;
+
+namespace HoloToolkit.Unity.InputModule
+{
+    /// <summary>
+    /// Component that allows dragging an object with your hand on HoloLens.
+    /// Dragging is done by calculating the angular delta and z-delta between the current and previous hand positions,
+    /// and then repositioning the object based on that.
+    /// </summary>
+    public class HandDraggable : MonoBehaviour,
+                                 IFocusable,
+                                 IInputHandler,
+                                 ISourceStateHandler
+    {
+        /// <summary>
+        /// Event triggered when dragging starts.
+        /// </summary>
+        public event Action StartedDragging;
+
+        /// <summary>
+        /// Event triggered when dragging stops.
+        /// </summary>
+        public event Action StoppedDragging;
+
+        [Tooltip("Transform that will be dragged. Defaults to the object of the component.")]
+        public Transform HostTransform;
+
+        [Tooltip("Scale by which hand movement in z is multipled to move the dragged object.")]
+        public float DistanceScale = 2f;
+        
+        public enum RotationModeEnum
+        {
+            Default,
+            LockObjectRotation,
+            OrientTowardUser,
+            OrientTowardUserAndKeepUpright
+        }
+
+        public RotationModeEnum RotationMode = RotationModeEnum.Default;
+
+        public bool IsDraggingEnabled = true;
+
+        private Camera mainCamera;
+        protected bool isDragging;
+        private bool isGazed;
+        private Vector3 objRefForward;
+        private Vector3 objRefUp;
+        private float objRefDistance;
+        private Quaternion gazeAngularOffset;
+        private float handRefDistance;
+        private Vector3 objRefGrabPoint;
+
+        private Vector3 draggingPosition;
+        private Quaternion draggingRotation;
+
+        private IInputSource currentInputSource = null;
+        private uint currentInputSourceId;
+
+        public virtual void Start()
+        {
+            if (HostTransform == null)
+            {
+                HostTransform = transform;
+            }
+
+            mainCamera = Camera.main;
+        }
+
+        private void OnDestroy()
+        {
+            if (isDragging)
+            {
+                StopDragging();
+            }
+
+            if (isGazed)
+            {
+                OnFocusExit();
+            }
+        }
+
+        public virtual void Update()
+        {
+            if (IsDraggingEnabled && isDragging)
+            {
+                UpdateDragging();
+            }
+        }
+
+        /// <summary>
+        /// Starts dragging the object.
+        /// </summary>
+        public virtual void StartDragging()
+        {
+            if (!IsDraggingEnabled)
+            {
+                return;
+            }
+
+            if (isDragging)
+            {
+                return;
+            }
+
+            // Add self as a modal input handler, to get all inputs during the manipulation
+            InputManager.Instance.PushModalInputHandler(gameObject);
+
+            isDragging = true;
+            //GazeCursor.Instance.SetState(GazeCursor.State.Move);
+            //GazeCursor.Instance.SetTargetObject(HostTransform);
+
+            Vector3 gazeHitPosition = GazeManager.Instance.HitInfo.point;
+            Vector3 handPosition;
+            currentInputSource.TryGetPosition(currentInputSourceId, out handPosition);
+
+            Vector3 pivotPosition = GetHandPivotPosition();
+            handRefDistance = Vector3.Magnitude(handPosition - pivotPosition);
+            objRefDistance = Vector3.Magnitude(gazeHitPosition - pivotPosition);
+
+            Vector3 objForward = HostTransform.forward;
+            Vector3 objUp = HostTransform.up;
+
+            // Store where the object was grabbed from
+            objRefGrabPoint = mainCamera.transform.InverseTransformDirection(HostTransform.position - gazeHitPosition);
+
+            Vector3 objDirection = Vector3.Normalize(gazeHitPosition - pivotPosition);
+            Vector3 handDirection = Vector3.Normalize(handPosition - pivotPosition);
+
+            objForward = mainCamera.transform.InverseTransformDirection(objForward);       // in camera space
+            objUp = mainCamera.transform.InverseTransformDirection(objUp);       		   // in camera space
+            objDirection = mainCamera.transform.InverseTransformDirection(objDirection);   // in camera space
+            handDirection = mainCamera.transform.InverseTransformDirection(handDirection); // in camera space
+
+            objRefForward = objForward;
+            objRefUp = objUp;
+
+            // Store the initial offset between the hand and the object, so that we can consider it when dragging
+            gazeAngularOffset = Quaternion.FromToRotation(handDirection, objDirection);
+            draggingPosition = gazeHitPosition;
+
+            StartedDragging.RaiseEvent();
+        }
+
+        /// <summary>
+        /// Gets the pivot position for the hand, which is approximated to the base of the neck.
+        /// </summary>
+        /// <returns>Pivot position for the hand.</returns>
+        private Vector3 GetHandPivotPosition()
+        {
+            Vector3 pivot = Camera.main.transform.position + new Vector3(0, -0.2f, 0) - Camera.main.transform.forward * 0.2f; // a bit lower and behind
+            return pivot;
+        }
+
+        /// <summary>
+        /// Enables or disables dragging.
+        /// </summary>
+        /// <param name="isEnabled">Indicates whether dragging shoudl be enabled or disabled.</param>
+        public void SetDragging(bool isEnabled)
+        {
+            if (IsDraggingEnabled == isEnabled)
+            {
+                return;
+            }
+
+            IsDraggingEnabled = isEnabled;
+
+            if (isDragging)
+            {
+                StopDragging();
+            }
+        }
+
+        /// <summary>
+        /// Update the position of the object being dragged.
+        /// </summary>
+        private void UpdateDragging()
+        {
+            Vector3 newHandPosition;
+            currentInputSource.TryGetPosition(currentInputSourceId, out newHandPosition);
+
+            Vector3 pivotPosition = GetHandPivotPosition();
+
+            Vector3 newHandDirection = Vector3.Normalize(newHandPosition - pivotPosition);
+
+            newHandDirection = mainCamera.transform.InverseTransformDirection(newHandDirection); // in camera space
+            Vector3 targetDirection = Vector3.Normalize(gazeAngularOffset * newHandDirection);
+            targetDirection = mainCamera.transform.TransformDirection(targetDirection); // back to world space
+
+            float currenthandDistance = Vector3.Magnitude(newHandPosition - pivotPosition);
+
+            float distanceRatio = currenthandDistance / handRefDistance;
+            float distanceOffset = distanceRatio > 0 ? (distanceRatio - 1f) * DistanceScale : 0;
+            float targetDistance = objRefDistance + distanceOffset;
+
+            draggingPosition = pivotPosition + (targetDirection * targetDistance);
+
+            if (RotationMode == RotationModeEnum.OrientTowardUser || RotationMode == RotationModeEnum.OrientTowardUserAndKeepUpright) 
+            {
+                draggingRotation = Quaternion.LookRotation(HostTransform.position - pivotPosition);
+            }
+            else if (RotationMode == RotationModeEnum.LockObjectRotation)
+            {
+                draggingRotation = HostTransform.rotation;
+            }
+            else // RotationModeEnum.Default
+            {
+                Vector3 objForward = mainCamera.transform.TransformDirection(objRefForward); // in world space
+                Vector3 objUp = mainCamera.transform.TransformDirection(objRefUp);   // in world space
+                draggingRotation = Quaternion.LookRotation(objForward, objUp);
+            }
+
+            // Apply Final Position
+            HostTransform.position = draggingPosition + mainCamera.transform.TransformDirection(objRefGrabPoint);
+            // Apply Final Rotation
+            HostTransform.rotation = draggingRotation;
+            if (RotationMode == RotationModeEnum.OrientTowardUserAndKeepUpright)		
+            {		
+                Quaternion upRotation = Quaternion.FromToRotation(HostTransform.up, Vector3.up);		
+                HostTransform.rotation = upRotation * HostTransform.rotation;		
+            }
+        }
+
+        /// <summary>
+        /// Stops dragging the object.
+        /// </summary>
+        public virtual void StopDragging()
+        {
+            if (!isDragging)
+            {
+                return;
+            }
+
+            // Remove self as a modal input handler
+            InputManager.Instance.PopModalInputHandler();
+
+            isDragging = false;
+            currentInputSource = null;
+            StoppedDragging.RaiseEvent();
+        }
+
+        public void OnFocusEnter()
+        {
+            if (!IsDraggingEnabled)
+            {
+                return;
+            }
+
+            if (isGazed)
+            {
+                return;
+            }
+
+            isGazed = true;
+        }
+
+        public void OnFocusExit()
+        {
+            if (!IsDraggingEnabled)
+            {
+                return;
+            }
+
+            if (!isGazed)
+            {
+                return;
+            }
+
+            isGazed = false;
+        }
+
+        public void OnInputUp(InputEventData eventData)
+        {
+            if (currentInputSource != null &&
+                eventData.SourceId == currentInputSourceId)
+            {
+                StopDragging();
+            }
+        }
+
+        public void OnInputDown(InputEventData eventData)
+        {
+            if (isDragging)
+            {
+                // We're already handling drag input, so we can't start a new drag operation.
+                return;
+            }
+
+            if (!eventData.InputSource.SupportsInputInfo(eventData.SourceId, SupportedInputInfo.Position))
+            {
+                // The input source must provide positional data for this script to be usable
+                return;
+            }
+
+            currentInputSource = eventData.InputSource;
+            currentInputSourceId = eventData.SourceId;
+            StartDragging();
+        }
+
+        public void OnSourceDetected(SourceStateEventData eventData)
+        {
+            // Nothing to do
+        }
+
+        public void OnSourceLost(SourceStateEventData eventData)
+        {
+            if (currentInputSource != null && eventData.SourceId == currentInputSourceId)
+            {
+                StopDragging();
+            }
+        }
+    }
+}
+```
+### HandResize.cs
+```C#
+using HoloToolkit.Unity.InputModule;
+using UnityEngine;
+
+public class HandResize : MonoBehaviour, IManipulationHandler
+{
+    [Tooltip("Speed at which the object is resized.")]
+    [SerializeField]
+    float ResizeSpeedFactor = 1.5f;
+
+    [SerializeField]
+    float ResizeScaleFactor = 1.5f;
+
+    [Tooltip("When warp is checked, we allow resizing of all three scale axes - otherwise we scale each axis by the same amount.")]
+    [SerializeField]
+    bool AllowResizeWarp = false;
+
+    [Tooltip("Minimum resize scale allowed.")]
+    [SerializeField]
+    float MinScale = 0.5f;
+
+    [Tooltip("Maximum resize scale allowed.")]
+    [SerializeField]
+    float MaxScale = 4f;
+
+    [SerializeField]
+    bool resizingEnabled = true;
+
+    Vector3 lastScale;
+
+    public void SetResizing(bool enabled)
+    {
+        resizingEnabled = enabled;
+    }
+
+    public void OnManipulationStarted(ManipulationEventData eventData)
+    {
+        InputManager.Instance.PushModalInputHandler(gameObject);
+        lastScale = transform.localScale;
+    }
+
+    public void OnManipulationUpdated(ManipulationEventData eventData)
+    {
+        if (resizingEnabled)
+        {
+            Resize(eventData.CumulativeDelta);
+
+            //sharing & messaging
+            //SharingMessages.Instance.SendResizing(Id, eventData.CumulativeDelta);
+        }
+    }
+
+    public void OnManipulationCompleted(ManipulationEventData eventData)
+    {
+        InputManager.Instance.PopModalInputHandler();
+    }
+
+    public void OnManipulationCanceled(ManipulationEventData eventData)
+    {
+        InputManager.Instance.PopModalInputHandler();
+    }
+    void Resize(Vector3 newScale)
+    {
+        float resizeX, resizeY, resizeZ;
+        //if we are warping, honor axis delta, else take the x
+        if (AllowResizeWarp)
+        {
+            resizeX = newScale.x * ResizeScaleFactor;
+            resizeY = newScale.y * ResizeScaleFactor;
+            resizeZ = newScale.z * ResizeScaleFactor;
+        }
+        else
+        {
+            resizeX = resizeY = resizeZ = newScale.x * ResizeScaleFactor;
+        }
+
+        resizeX = Mathf.Clamp(lastScale.x + resizeX, MinScale, MaxScale);
+        resizeY = Mathf.Clamp(lastScale.y + resizeY, MinScale, MaxScale);
+        resizeZ = Mathf.Clamp(lastScale.z + resizeZ, MinScale, MaxScale);
+
+        transform.localScale = Vector3.Lerp(transform.localScale,
+            new Vector3(resizeX, resizeY, resizeZ),
+            ResizeSpeedFactor);
+    }
+}
+```
+### VentanaExtensions.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public static class VentanaExtensions {
+    public static void DestroyChildren(this Transform root) {
+        int childCount = root.childCount;
+        for ( int i = 0; i < childCount; i++ ) {
+            GameObject.Destroy(root.GetChild(0).gameObject);
+        }
+    }
+}
+```
+
+### BaseVentanaController.cs
+```C# 
+using HoloToolkit.Unity.InputModule;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class BaseVentanaButton : MonoBehaviour, IInputClickHandler, IFocusable {
+    public AudioClip clickSound;
+    protected AudioSource source;
+    public Material highlightButtonMaterial;
+    public Material normalButtonMaterial;
+
+    public void OnFocusEnter() {
+        gameObject.GetComponent<Renderer>().material = highlightButtonMaterial;
+    }
+
+    public void OnFocusExit() {
+        gameObject.GetComponent<Renderer>().material = normalButtonMaterial;
+    }
+
+    public void OnInputClicked(InputClickedEventData eventData) {
+        Debug.Log("Clicked " + gameObject.name);
+        gameObject.SendMessageUpwards("makeAPIRequest", gameObject.name);
+        source.PlayOneShot(clickSound, 1F);
+    }
+
+    public void DisableInteraction(bool yes) {
+        if (yes) {
+            gameObject.GetComponent<Collider>().enabled = false;
+        } else {
+            gameObject.GetComponent<Collider>().enabled = true;
+        }
+    }
+
+    // Use this for initialization
+    void Start() {
+        source = GetComponent<AudioSource>();
+    }
+
+    // Update is called once per frame
+    void Update() {
+
+    }
+}
+```
+### PowerStripButtonHandler.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using HoloToolkit.Unity.InputModule;
+
+public class PowerStripButtonHandler : BaseVentanaButton {
+    
+}
+```
+
+### PowerStripController.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class VentanaPowerStripController : BaseVentanaController {
+
+    private string poweredCommand = "change_power";
+    private string statusCommand = "status";
+    // Use this for initialization
+    protected new void Start() {
+        base.Start();
+    }
+
+    // Update is called once per frame
+    protected new void Update() {
+        base.Update();
+    }
+
+    public override void OnVumarkFound() {
+        base.OnVumarkFound();
+    }
+
+    public override void OnVumarkLost() {
+        base.OnVumarkLost();
+    }
+    void makeAPIRequest(string child) {
+        VentanaRequestFactory requestFactory = VentanaRequestFactory.Instance;
+        switch ( child ) {
+            case "Toggle0":
+            Debug.Log("Toggled 0");
+            StartCoroutine(requestFactory.PostToLightAPIEndpoint(poweredCommand, VentanaID, "0"));
+            break;
+            case "Toggle1":
+            Debug.Log("Toggled 1");
+            StartCoroutine(requestFactory.PostToLightAPIEndpoint(poweredCommand, VentanaID, "1"));
+            break;
+            default:
+            break;
+        }
+    }
+}
+```
+
+### ddScript.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using HoloToolkit.Unity.InputModule;
+using System;
+
+public class ddScript : MonoBehaviour, IInputClickHandler, IFocusable {
+    public Material highlightButtonMaterial;
+    public Material normalButtonMaterial;
+
+    // Use this for initialization
+    void Start () {
+        Collider collider = GetComponentInChildren<Collider>();
+        if (collider == null)
+        {
+            gameObject.AddComponent<BoxCollider>();
+        }
+    }
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+
+    public void OnInputClicked(InputClickedEventData eventData)
+    {
+        Debug.Log("button pressed");
+        gameObject.SendMessageUpwards("ddButtonClicked", gameObject.name);
+    }
+
+    public void OnFocusEnter() {
+        gameObject.SendMessageUpwards("DisableHandDraggable");
+        gameObject.GetComponent<Renderer>().material = highlightButtonMaterial;
+    }
+
+    public void OnFocusExit() {
+        gameObject.SendMessageUpwards("EnableHandDraggable");
+        gameObject.GetComponent<Renderer>().material = normalButtonMaterial;
+    }
+}
+```
+
+### EditModeController.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using HoloToolkit.Unity.InputModule;
+using HoloToolkit.Unity.SpatialMapping;
+using UnityEngine.VR.WSA;
+using HoloToolkit.Unity;
+using System;
+
+[ExecuteInEditMode]
+public class EditModeController : MonoBehaviour {
+
+    public Transform moreButtons;
+    public Transform deleteDone;
+    public Transform scaleHandles;
+    public bool scaleEnabled = false;
+    public bool scaleModeTriggered = false;
+    public AudioClip clickSound;
+    public Vector3 lastScale;
+    private HandDraggable handDraggable;
+    private AudioSource source;
+
+
+    [Tooltip("Speed at which the object is resized.")]
+    [SerializeField]
+    float ResizeSpeedFactor = 1.0f;
+
+    [SerializeField]
+    float ResizeScaleFactor = 0.75f;
+
+    [Tooltip("When warp is checked, we allow resizing of all three scale axes - otherwise we scale each axis by the same amount.")]
+    [SerializeField]
+    bool AllowResizeWarp = false;
+
+    [Tooltip("Minimum resize scale allowed.")]
+    [SerializeField]
+    float MinScale = 0.05f;
+
+    [Tooltip("Maximum resize scale allowed.")]
+    [SerializeField]
+    float MaxScale = 0.7f;
+
+    // Use this for initialization
+    void Start () {
+        source = gameObject.GetComponent<AudioSource>();
+        // initialize to regular mode, with tap to place controls inactive
+        moreButtons.gameObject.SetActive(true);
+        deleteDone.gameObject.SetActive(false);
+        scaleHandles.gameObject.SetActive(false);
+
+       
+        handDraggable = gameObject.GetComponent<HandDraggable>();
+
+        if (handDraggable != null ) {
+            handDraggable.StoppedDragging += HandDraggable_StoppedDragging;
+            handDraggable.StartedDragging += HandDraggable_StartedDragging;
+        }
+
+    }
+
+    private void HandDraggable_StartedDragging() {
+        SpatialMappingManager.Instance.DrawVisualMeshes = true;
+        Debug.Log(gameObject.name + " : Removing existing world anchor if any.");
+        WorldAnchorManager.Instance.RemoveAnchor(gameObject);
+    }
+
+    private void HandDraggable_StoppedDragging() {
+        SpatialMappingManager.Instance.DrawVisualMeshes = false;
+
+        // Add world anchor when object placement is done.
+        BaseVentanaController bvc = gameObject.GetComponent<BaseVentanaController>();
+        if ( bvc ) {
+            string currentTime = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
+            string savedAnchorName = bvc.VentanaID + ":" + gameObject.transform.lossyScale.x.ToString()+ ":" + currentTime;
+            Debug.Log("<color=yellow>Name: </color>" + savedAnchorName);
+
+            WorldAnchorManager.Instance.AttachAnchor(gameObject, savedAnchorName);
+        }
+        source.PlayOneShot(clickSound, 1F);
+    }
+
+
+
+    // Update is called once per frame
+    void Update () {
+		if ( scaleModeTriggered ) {
+            moreButtons.gameObject.SetActive(false);
+            deleteDone.gameObject.SetActive(true);
+            scaleHandles.gameObject.SetActive(true);
+            gameObject.BroadcastMessage("DisableInteraction", true);
+        } else {
+            moreButtons.gameObject.SetActive(true);
+            deleteDone.gameObject.SetActive(false);
+            scaleHandles.gameObject.SetActive(false);
+            gameObject.BroadcastMessage("DisableInteraction", false);
+        }
+	}
+
+    void MoreButtonClicked()
+    {
+        //Debug.Log("More button clicked");
+        // More button clicked so tap to place mode should be active
+        moreButtons.gameObject.SetActive(false);
+        deleteDone.gameObject.SetActive(true);
+        scaleHandles.gameObject.SetActive(true);
+        //Enable Tap To Place and Hand Dragable here.
+        
+        if ( handDraggable != null ) {
+            handDraggable.enabled = true;
+        }
+
+        scaleModeTriggered = true;
+        source.PlayOneShot(clickSound, 1F);
+    }
+
+    void ddButtonClicked(string child)
+    {
+        if (child.Equals("Done Button"))
+        {
+           // Debug.Log("Done button clicked");
+           // Done button clicked so regular mode should be active
+            moreButtons.gameObject.SetActive(true);
+            deleteDone.gameObject.SetActive(false);
+            scaleHandles.gameObject.SetActive(false);
+            scaleModeTriggered = false;
+            
+            if ( handDraggable != null ) {
+                handDraggable.enabled = false;
+            }
+
+        }
+
+        if (child.Equals("Delete Button"))
+        {
+            //Debug.Log("Delete button clicked");
+            // gonna have to remove world anchor here
+            if (handDraggable != null)
+            {
+                // had to make anchorManager public instead of protected in ttp
+                WorldAnchor wa = gameObject.GetComponent<WorldAnchor>();
+                if ( wa ) {
+                    WorldAnchorManager.Instance.AnchorStore.Delete(wa.name);
+                }
+               
+            }
+            scaleModeTriggered = false;
+            Destroy(gameObject);
+        }
+
+        source.PlayOneShot(clickSound, 1F);
+    }
+
+    void scaleStarted()
+    {
+        // manipulation gesture started so get the current scale
+        //turn off draggable behaviours
+        
+    }
+
+    void scaleEnded() {
+        BaseVentanaController bvc = gameObject.GetComponent<BaseVentanaController>();
+        if ( bvc ) {
+            Debug.Log(gameObject.name + " : Removing existing world anchor if any after scaling");
+            WorldAnchorManager.Instance.RemoveAnchor(gameObject);
+            string currentTime = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
+            string savedAnchorName = bvc.VentanaID + ":" + gameObject.transform.lossyScale.x.ToString() + ":" + currentTime;
+            Debug.Log("<color=yellow>Name: </color>" + savedAnchorName);
+
+            WorldAnchorManager.Instance.AttachAnchor(gameObject, savedAnchorName);
+        }
+    }
+
+    void EnableHandDraggable() {
+        if ( handDraggable ) { handDraggable.enabled = true; }
+    }
+
+    void DisableHandDraggable() {
+        if ( handDraggable ) { handDraggable.enabled = false; }
+    }
+    
+    void scaleButtonClicked(Vector3 newScale)
+    {
+        // manipulation gesture ended, calculate and set the new scale 
+        /* https://www.billmccrary.com/holotoolkit-simple-dragresizerotate/ modified from HandResize.cs */
+
+        float resizeX, resizeY, resizeZ;
+        //if we are warping, honor axis delta, else take the x
+        if (AllowResizeWarp)
+        {
+            resizeX = newScale.x * ResizeScaleFactor;
+            resizeY = newScale.y * ResizeScaleFactor;
+            resizeZ = newScale.z * ResizeScaleFactor;
+        }
+        else
+        {
+            resizeX = resizeY = resizeZ = newScale.x * ResizeScaleFactor;
+        }
+
+        resizeX = Mathf.Clamp(lastScale.x + resizeX, MinScale, MaxScale);
+        resizeY = Mathf.Clamp(lastScale.y + resizeY, MinScale, MaxScale);
+        resizeZ = Mathf.Clamp(lastScale.z + resizeZ, MinScale, MaxScale);
+
+        Vector3 newTransform = new Vector3(resizeX, resizeY, resizeZ);
+
+        Transform currentTransform = gameObject.GetComponent<Transform>();
+        //Debug.Log("before scale" + currentTransform);
+        currentTransform.localScale = Vector3.Lerp(transform.localScale, newTransform, ResizeSpeedFactor);
+        //Debug.Log("scale:" + currentTransform.localScale);
+    }
+}
+
+```
+
+### scalingHandler.cs
+```C#
+using System;
+using HoloToolkit.Unity.InputModule;
+using UnityEngine;
+
+public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
+{
+    public Material highlightButtonMaterial;
+    public Material normalButtonMaterial;
+    public Transform parentObject;
+    [Tooltip("Speed at which the object is resized.")]
+    [SerializeField]
+    float ResizeSpeedFactor = 1.0f;
+
+    [SerializeField]
+    float ResizeScaleFactor = 0.75f;
+
+    [Tooltip("When warp is checked, we allow resizing of all three scale axes - otherwise we scale each axis by the same amount.")]
+    [SerializeField]
+    bool AllowResizeWarp = false;
+
+    [Tooltip("Minimum resize scale allowed.")]
+    [SerializeField]
+    float MinScale = 0.0f;
+
+    [Tooltip("Maximum resize scale allowed.")]
+    [SerializeField]
+    float MaxScale = 0.7f;
+
+    private Vector3 lastScale;
+
+    private Vector3 lastManipulationPosition;
+
+    private bool shouldRespond = false;
+
+
+    [SerializeField]
+    bool resizingEnabled = true;
+    void Start()
+    {
+        Collider collider = GetComponentInChildren<Collider>();
+        if (collider == null)
+        {
+            gameObject.AddComponent<BoxCollider>();
+        }
+    }
+
+    public void SetResizing(bool enabled)
+    {
+        resizingEnabled = enabled;
+    }
+
+    public void OnManipulationStarted(ManipulationEventData eventData)
+    {
+        gameObject.SendMessageUpwards("scaleStarted");
+        lastScale = parentObject.localScale;
+        InputManager.Instance.PushModalInputHandler(gameObject);
+    }
+
+    public void OnManipulationUpdated(ManipulationEventData eventData)
+    {
+        if ( resizingEnabled ) {
+            Resize(eventData.CumulativeDelta);
+        }
+    }
+
+    public void OnManipulationCompleted(ManipulationEventData eventData)
+    {
+        gameObject.SendMessageUpwards("scaleEnded");
+        InputManager.Instance.PopModalInputHandler();
+    }
+
+    public void OnManipulationCanceled(ManipulationEventData eventData)
+    {
+        InputManager.Instance.PopModalInputHandler();
+    }
+    void Resize(Vector3 newScale)
+    {
+        
+        Vector3 camHandDelta = Camera.main.transform.InverseTransformDirection(newScale);
+        // send data to EditModeController.cs once the manipulation gesture is updated
+        //gameObject.SendMessageUpwards("scaleButtonClicked", newScale);
+        float resizeX, resizeY, resizeZ;
+        //if we are warping, honor axis delta, else take the x
+
+        resizeX = resizeY = resizeZ = camHandDelta.x * ResizeScaleFactor;
+        resizeX = Mathf.Clamp(lastScale.x + resizeX, MinScale, MaxScale);
+        resizeY = Mathf.Clamp(lastScale.y + resizeY, MinScale, MaxScale);
+        resizeZ = Mathf.Clamp(lastScale.z + resizeZ, MinScale, MaxScale);
+        parentObject.localScale = Vector3.Lerp(parentObject.localScale,
+            new Vector3(resizeX, resizeY, resizeZ),
+            ResizeSpeedFactor);
+
+    }
+
+    public void OnFocusEnter() {
+        gameObject.SendMessageUpwards("DisableHandDraggable");
+        shouldRespond = true;
+        gameObject.GetComponent<Renderer>().material = highlightButtonMaterial;
+    }
+
+    public void OnFocusExit() {
+        gameObject.SendMessageUpwards("EnableHandDraggable");
+        shouldRespond = false;
+        gameObject.GetComponent<Renderer>().material = normalButtonMaterial;
+    }
+}
+```
+
+### SpawnBehaviourScript.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using HoloToolkit.Unity.InputModule;
+using System;
+using HoloToolkit.Unity.SpatialMapping;
+
+public class SpawnBehaviourScript : MonoBehaviour, IHoldHandler {
+    #region PUBLIC_MEMBERS
+    public GameObject prefabObject;
+    public bool shouldSpawn = false;
+    public Vector3 scaleMultiplier;
+    public Vector3 placementPosition;
+    public int ControllerID;
+    public string prefabName;
+
+    #endregion //PUBLIC_MEMBERS
+
+    #region PRIVATE_MEMBERS
+
+    private const float DOUBLE_TAP_MAX_DELAY = 0.5f;
+    //seconds
+    private float mTimeSinceLastTap = 0;
+
+    #endregion //PRIVATE_MEMBERS
+
+
+    #region PROTECTED_MEMBERS
+
+    protected int mTapCount = 0;
+    protected int spawnCount = 0;
+
+    #endregion //PROTECTED_MEMBERS
+
+
+    #region MONOBEHAVIOUR_METHODS
+
+    void Start()
+    {
+        mTapCount = 0;
+        mTimeSinceLastTap = 0;
+    }
+
+    void Update()
+    {
+        //Debug.Log("sb update reached");
+    }
+
+    #endregion //MONOBEHAVIOUR_METHODS
+
+
+    #region PRIVATE_METHODS
+
+    private void HandleTap()
+    {
+        if (mTapCount == 1)
+        {
+            mTimeSinceLastTap += Time.deltaTime;
+            if (mTimeSinceLastTap > DOUBLE_TAP_MAX_DELAY)
+            {
+                // too late for double tap, 
+                // we confirm it was a single tap
+                OnSingleTapConfirmed();
+
+                // reset touch count and timer
+                mTapCount = 0;
+                mTimeSinceLastTap = 0;
+            }
+        }
+        else if (mTapCount == 2)
+        {
+            // we got a double tap
+            OnDoubleTap();
+
+            // reset touch count and timer
+            mTimeSinceLastTap = 0;
+            mTapCount = 0;
+        }
+
+        
+    }
+
+    #endregion // PRIVATE_METHODS
+
+
+    #region PROTECTED_METHODS
+
+    /// <summary>
+    /// This method can be overridden by custom (derived) TapHandler implementations,
+    /// to perform special actions upon single tap.
+    /// </summary>
+    protected virtual void OnSingleTap()
+    {
+        Debug.Log("sb OST reached");
+    }
+
+    protected virtual void OnSingleTapConfirmed()
+    {
+        Debug.Log("sb OSTC reached");
+    }
+
+    protected virtual void OnDoubleTap()
+    {
+        Debug.Log("sb ODT reached");
+        if ( shouldSpawn )
+        {
+            //Copying Controller...
+            GameObject prefabObjectClone = GameObject.Instantiate(gameObject);
+            Vector3 cam = Camera.main.transform.forward.normalized;
+            Vector3 current = gameObject.transform.position;
+            prefabObjectClone.transform.position = new Vector3(current.x + (cam.x * .05f), current.y + (cam.y * .05f), current.z + (cam.z * .05f));
+            Vector3 globalScale = gameObject.transform.lossyScale;
+            prefabObjectClone.transform.localScale = new Vector3(globalScale.x * 1.35f, globalScale.y * 1.35f, globalScale.z * 1.35f);
+            prefabObjectClone.transform.rotation = gameObject.transform.rotation;
+            EditModeController edit = prefabObjectClone.GetComponent<EditModeController>();
+            edit.scaleModeTriggered = true;
+
+            Destroy(prefabObjectClone.GetComponent<SpawnBehaviourScript>());
+
+            HandDraggable hd = prefabObjectClone.AddComponent<HandDraggable>();
+            hd.enabled = true;
+            hd.RotationMode = HandDraggable.RotationModeEnum.OrientTowardUserAndKeepUpright;
+            hd.IsDraggingEnabled = true;
+
+        }
+    }
+
+    /*
+    public void OnInputClicked(InputClickedEventData eventData)
+    {
+        Debug.Log("<color=yellow>EY BAY BAY</color>");
+        mTapCount++;
+        HandleTap();
+
+
+    }
+    */
+    // replacing double tap to spawn with click and hold
+    public void OnHoldStarted(HoldEventData eventData)
+    {
+
+    }
+
+    public void OnHoldCompleted(HoldEventData eventData)
+    {
+        OnDoubleTap();
+    }
+
+    public void OnHoldCanceled(HoldEventData eventData)
+    {
+
+    }
+    #endregion // PROTECTED_METHODS
+}
+```
+
+### TapToPlace.cs
+```C#
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using HoloToolkit.Unity.InputModule;
+using UnityEngine;
+
+namespace HoloToolkit.Unity.SpatialMapping
+{
+    /// <summary>
+    /// The TapToPlace class is a basic way to enable users to move objects 
+    /// and place them on real world surfaces.
+    /// Put this script on the object you want to be able to move. 
+    /// Users will be able to tap objects, gaze elsewhere, and perform the
+    /// tap gesture again to place.
+    /// This script is used in conjunction with GazeManager, GestureManager,
+    /// and SpatialMappingManager.
+    /// TapToPlace also adds a WorldAnchor component to enable persistence.
+    /// </summary>
+
+    public class TapToPlace : MonoBehaviour, IInputClickHandler
+    {
+        [Tooltip("Supply a friendly name for the anchor as the key name for the WorldAnchorStore.")]
+        public string SavedAnchorFriendlyName = "SavedAnchorFriendlyName";
+
+        [Tooltip("Place parent on tap instead of current game object.")]
+        public bool PlaceParentOnTap;
+
+        [Tooltip("Specify the parent game object to be moved on tap, if the immediate parent is not desired.")]
+        public GameObject ParentGameObjectToPlace;
+
+        /// <summary>
+        /// Keeps track of if the user is moving the object or not.
+        /// Setting this to true will enable the user to move and place the object in the scene.
+        /// Useful when you want to place an object immediately.
+        /// </summary>
+        [Tooltip("Setting this to true will enable the user to move and place the object in the scene without needing to tap on the object. Useful when you want to place an object immediately.")]
+        public bool IsBeingPlaced;
+
+        /// <summary>
+        /// Manages persisted anchors.
+        /// </summary>
+        protected WorldAnchorManager anchorManager;
+
+        /// <summary>
+        /// Controls spatial mapping.  In this script we access spatialMappingManager
+        /// to control rendering and to access the physics layer mask.
+        /// </summary>
+        protected SpatialMappingManager spatialMappingManager;
+
+        protected virtual void Start()
+        {
+            // Make sure we have all the components in the scene we need.
+            anchorManager = WorldAnchorManager.Instance;
+            if (anchorManager == null)
+            {
+                Debug.LogError("This script expects that you have a WorldAnchorManager component in your scene.");
+            }
+
+            spatialMappingManager = SpatialMappingManager.Instance;
+            if (spatialMappingManager == null)
+            {
+                Debug.LogError("This script expects that you have a SpatialMappingManager component in your scene.");
+            }
+
+            if (anchorManager != null && spatialMappingManager != null)
+            {
+                anchorManager.AttachAnchor(gameObject, SavedAnchorFriendlyName);
+            }
+            else
+            {
+                // If we don't have what we need to proceed, we may as well remove ourselves.
+                Destroy(this);
+            }
+
+            if (PlaceParentOnTap)
+            {
+                if (ParentGameObjectToPlace != null && !gameObject.transform.IsChildOf(ParentGameObjectToPlace.transform))
+                {
+                    Debug.LogError("The specified parent object is not a parent of this object.");
+                }
+
+                DetermineParent();
+            }
+        }
+
+        protected virtual void Update()
+        {
+            // If the user is in placing mode,
+            // update the placement to match the user's gaze.
+            if (IsBeingPlaced)
+            {
+                // Do a raycast into the world that will only hit the Spatial Mapping mesh.
+                Vector3 headPosition = Camera.main.transform.position;
+                Vector3 gazeDirection = Camera.main.transform.forward;
+
+                RaycastHit hitInfo;
+                if (Physics.Raycast(headPosition, gazeDirection, out hitInfo, 30.0f, spatialMappingManager.LayerMask))
+                {
+                    // Rotate this object to face the user.
+                    Quaternion toQuat = Camera.main.transform.localRotation;
+                    toQuat.x = 0;
+                    toQuat.z = 0;
+
+                    // Move this object to where the raycast
+                    // hit the Spatial Mapping mesh.
+                    // Here is where you might consider adding intelligence
+                    // to how the object is placed.  For example, consider
+                    // placing based on the bottom of the object's
+                    // collider so it sits properly on surfaces.
+                    if (PlaceParentOnTap)
+                    {
+                        // Place the parent object as well but keep the focus on the current game object
+                        Vector3 currentMovement = hitInfo.point - gameObject.transform.position;
+                        ParentGameObjectToPlace.transform.position += currentMovement;
+                        ParentGameObjectToPlace.transform.rotation = toQuat;
+                    }
+                    else
+                    {
+                        gameObject.transform.position = hitInfo.point;
+                        gameObject.transform.rotation = toQuat;
+                    }
+                }
+            }
+        }
+
+        public virtual void OnInputClicked(InputClickedEventData eventData)
+        {
+            // On each tap gesture, toggle whether the user is in placing mode.
+            IsBeingPlaced = !IsBeingPlaced;
+
+            // If the user is in placing mode, display the spatial mapping mesh.
+            if (IsBeingPlaced)
+            {
+                spatialMappingManager.DrawVisualMeshes = true;
+
+                Debug.Log(gameObject.name + " : Removing existing world anchor if any.");
+
+                anchorManager.RemoveAnchor(gameObject);
+            }
+            // If the user is not in placing mode, hide the spatial mapping mesh.
+            else
+            {
+                spatialMappingManager.DrawVisualMeshes = false;
+                // Add world anchor when object placement is done.
+                anchorManager.AttachAnchor(gameObject, SavedAnchorFriendlyName);
+            }
+        }
+
+        private void DetermineParent()
+        {
+            if (ParentGameObjectToPlace == null)
+            {
+                if (gameObject.transform.parent == null)
+                {
+                    Debug.LogError("The selected GameObject has no parent.");
+                    PlaceParentOnTap = false;
+                }
+                else
+                {
+                    Debug.LogError("No parent specified. Using immediate parent instead: " + gameObject.transform.parent.gameObject.name);
+                    ParentGameObjectToPlace = gameObject.transform.parent.gameObject;
+                }
+            }
+        }
+    }
+}
+```
+### VentanaSpatialProcessor.cs
+```C#
+using System.Collections.Generic;
+using UnityEngine;
+using HoloToolkit.Unity;
+using HoloToolkit.Unity.SpatialMapping;
+
+/// <summary>
+/// The SurfaceManager class allows applications to scan the environment for a specified amount of time 
+/// and then process the Spatial Mapping Mesh (find planes, remove vertices) after that time has expired.
+/// </summary>
+public class VentanaSpacialProcessor : Singleton<VentanaSpacialProcessor> {
+    [Tooltip("When checked, the SurfaceObserver will stop running after a specified amount of time.")]
+    public bool limitScanningByTime = true;
+
+    [Tooltip("How much time (in seconds) that the SurfaceObserver will run after being started; used when 'Limit Scanning By Time' is checked.")]
+    public float scanTime = 30.0f;
+
+    [Tooltip("Material to use when rendering Spatial Mapping meshes while the observer is running.")]
+    public Material defaultMaterial;
+
+    [Tooltip("Optional Material to use when rendering Spatial Mapping meshes after the observer has been stopped.")]
+    public Material secondaryMaterial;
+
+    [Tooltip("Minimum number of floor planes required in order to exit scanning/processing mode.")]
+    public uint minimumFloors = 1;
+
+    [Tooltip("Minimum number of wall planes required in order to exit scanning/processing mode.")]
+    public uint minimumWalls = 1;
+
+    /// <summary>
+    /// Indicates if processing of the surface meshes is complete.
+    /// </summary>
+    private bool meshesProcessed = false;
+
+    /// <summary>
+    /// GameObject initialization.
+    /// </summary>
+    private void Start() {
+        // Update surfaceObserver and storedMeshes to use the same material during scanning.
+        SpatialMappingManager.Instance.SetSurfaceMaterial(defaultMaterial);
+
+        // Register for the MakePlanesComplete event.
+        SurfaceMeshesToPlanes.Instance.MakePlanesComplete += SurfaceMeshesToPlanes_MakePlanesComplete;
+    }
+
+    /// <summary>
+    /// Called once per frame.
+    /// </summary>
+    private void Update() {
+        // Check to see if the spatial mapping data has been processed
+        // and if we are limiting how much time the user can spend scanning.
+        if ( !meshesProcessed && limitScanningByTime ) {
+            // If we have not processed the spatial mapping data
+            // and scanning time is limited...
+
+            // Check to see if enough scanning time has passed
+            // since starting the observer.
+            if ( limitScanningByTime && ((Time.time - SpatialMappingManager.Instance.StartTime) < scanTime) ) {
+                // If we have a limited scanning time, then we should wait until
+                // enough time has passed before processing the mesh.
+            } else {
+                // The user should be done scanning their environment,
+                // so start processing the spatial mapping data...
+
+                /* TODO: 3.a DEVELOPER CODING EXERCISE 3.a */
+
+                // 3.a: Check if IsObserverRunning() is true on the
+                // SpatialMappingManager.Instance.
+                if ( SpatialMappingManager.Instance.IsObserverRunning() ) {
+                    // 3.a: If running, Stop the observer by calling
+                    // StopObserver() on the SpatialMappingManager.Instance.
+                    SpatialMappingManager.Instance.StopObserver();
+                }
+
+                // 3.a: Call CreatePlanes() to generate planes.
+                CreatePlanes();
+
+                // 3.a: Set meshesProcessed to true.
+                meshesProcessed = true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Handler for the SurfaceMeshesToPlanes MakePlanesComplete event.
+    /// </summary>
+    /// <param name="source">Source of the event.</param>
+    /// <param name="args">Args for the event.</param>
+    private void SurfaceMeshesToPlanes_MakePlanesComplete(object source, System.EventArgs args) {
+
+        // Collection of floor and table planes that we can use to set horizontal items on.
+        List<GameObject> horizontal = new List<GameObject>();
+
+        // Collection of wall planes that we can use to set vertical items on.
+        List<GameObject> vertical = new List<GameObject>();
+
+        // Get all floor and table planes by calling
+        // SurfaceMeshesToPlanes.Instance.GetActivePlanes().
+        // Assign the result to the 'horizontal' list.
+        horizontal = SurfaceMeshesToPlanes.Instance.GetActivePlanes(PlaneTypes.Table | PlaneTypes.Floor);
+
+        // Get all wall planes by calling
+        // SurfaceMeshesToPlanes.Instance.GetActivePlanes().
+        // Assign the result to the 'vertical' list.
+        vertical = SurfaceMeshesToPlanes.Instance.GetActivePlanes(PlaneTypes.Wall);
+
+        // Check to see if we have enough horizontal planes (minimumFloors)
+        // and vertical planes (minimumWalls), to set holograms on in the world.
+        if ( horizontal.Count >= minimumFloors && vertical.Count >= minimumWalls ) {
+            // We have enough floors and walls to place our holograms on...
+
+            // Let's reduce our triangle count by removing triangles
+            // from SpatialMapping meshes that intersect with our active planes.
+            // Call RemoveVertices().
+            // Pass in all activePlanes found by SurfaceMeshesToPlanes.Instance.
+            RemoveVertices(SurfaceMeshesToPlanes.Instance.ActivePlanes);
+
+            // We can indicate to the user that scanning is over by
+            // changing the material applied to the Spatial Mapping meshes.
+            // Call SpatialMappingManager.Instance.SetSurfaceMaterial().
+            // Pass in the secondaryMaterial.
+            SpatialMappingManager.Instance.SetSurfaceMaterial(secondaryMaterial);
+
+            // We are all done processing the mesh, so we can now
+            // initialize a collection of Placeable holograms in the world
+
+        } else {
+            // We do not have enough floors/walls to place our holograms on...
+
+            // 3.a: Re-enter scanning mode so the user can find more surfaces by 
+            // calling StartObserver() on the SpatialMappingManager.Instance.
+            SpatialMappingManager.Instance.StartObserver();
+
+            // Re-process spatial data after scanning completes by
+            // re-setting meshesProcessed to false.
+            meshesProcessed = false;
+        }
+    }
+
+    /// <summary>
+    /// Creates planes from the spatial mapping surfaces.
+    /// </summary>
+    private void CreatePlanes() {
+        // Generate planes based on the spatial map.
+        SurfaceMeshesToPlanes surfaceToPlanes = SurfaceMeshesToPlanes.Instance;
+        if ( surfaceToPlanes != null && surfaceToPlanes.enabled ) {
+            surfaceToPlanes.MakePlanes();
+        }
+    }
+
+    /// <summary>
+    /// Removes triangles from the spatial mapping surfaces.
+    /// </summary>
+    /// <param name="boundingObjects"></param>
+    private void RemoveVertices(IEnumerable<GameObject> boundingObjects) {
+        RemoveSurfaceVertices removeVerts = RemoveSurfaceVertices.Instance;
+        if ( removeVerts != null && removeVerts.enabled ) {
+            removeVerts.RemoveSurfaceVerticesWithinBounds(boundingObjects);
+        }
+    }
+
+    /// <summary>
+    /// Called when the GameObject is unloaded.
+    /// </summary>
+    private void OnDestroy() {
+        if ( SurfaceMeshesToPlanes.Instance != null ) {
+            SurfaceMeshesToPlanes.Instance.MakePlanesComplete -= SurfaceMeshesToPlanes_MakePlanesComplete;
+        }
+    }
+}
+```
+
+### DynamicDataSetLoader.cs
+```C#
+using UnityEngine;
+using System.Collections;
+
+using Vuforia;
+using System.Collections.Generic;
+
+
+public class DynamicDataSetLoader : MonoBehaviour {
+    // specify these in Unity Inspector
+    public GameObject augmentationObject = null;  // you can use teapot or other object
+    public string dataSetName = "";  //  in the StreamingAssets folder ... StreamingAssets/QCAR/DataSetName
+
+    // Use this for initialization
+    void Start() {
+        
+        /*VuforiaARController vb = VuforiaARController.Instance;
+        vb.RegisterVuforiaStartedCallback(LoadDataSet);
+       */
+    }
+
+    void LoadDataSet() {
+
+        ObjectTracker objectTracker = TrackerManager.Instance.GetTracker<ObjectTracker>();
+
+        DataSet dataSet = objectTracker.CreateDataSet();
+
+        if ( dataSet.Load(dataSetName, VuforiaUnity.StorageType.STORAGE_APPRESOURCE) ) {
+
+            objectTracker.Stop();  // stop tracker so that we can add new dataset
+
+            if ( !objectTracker.ActivateDataSet(dataSet) ) {
+                // Note: ImageTracker cannot have more than 100 total targets activated
+                Debug.Log("<color=yellow>Failed to Activate DataSet: " + dataSetName + "</color>");
+            }
+
+            if ( !objectTracker.Start() ) {
+                Debug.Log("<color=yellow>Tracker Failed to Start.</color>");
+            }
+
+            int counter = 0;
+
+            IEnumerable<TrackableBehaviour> tbs = TrackerManager.Instance.GetStateManager().GetTrackableBehaviours();
+            foreach ( TrackableBehaviour tb in tbs ) {
+                if ( tb.name == "New Game Object" ) {
+
+                    // change generic name to include trackable name
+                    tb.gameObject.name = ++counter + ":DynamicImageTarget-" + tb.TrackableName;
+
+                    // add additional script components for trackable
+                    tb.gameObject.AddComponent<DefaultTrackableEventHandler>();
+                    tb.gameObject.AddComponent<TurnOffBehaviour>();
+
+                    if ( augmentationObject != null ) {
+                        // instantiate augmentation object and parent to trackable
+                        GameObject augmentation = (GameObject)GameObject.Instantiate(augmentationObject);
+                        augmentation.transform.parent = tb.gameObject.transform;
+                        augmentation.transform.localPosition = new Vector3(0f, 0f, 0f);
+                        augmentation.transform.localRotation = Quaternion.identity;
+                        augmentation.transform.localScale = new Vector3(0.005f, 0.005f, 0.005f);
+                        augmentation.gameObject.SetActive(true);
+                    } else {
+                        Debug.Log("<color=yellow>Warning: No augmentation object specified for: " + tb.TrackableName + "</color>");
+                    }
+                }
+            }
+        } else {
+            Debug.LogError("<color=yellow>Failed to load dataset: '" + dataSetName + "'</color>");
+        }
+    }
+}
+```
+
+### KnobHandler.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using HoloToolkit.Unity.InputModule;
+using System;
+
+[ExecuteInEditMode]
+public class KnobHandler : HandDraggable, IFocusable {
+    //only allow y displacment up to a quarter of the rail's width in either direction... 
+    //then just return to the position it was at. 
+    [Tooltip("Where in the local Coordinate system this object will return to")]
+    private Vector3 baseLocation; //location to return to.
+    private Quaternion baseRotation;
+    public bool allowX, allowY, allowZ;
+    public GameObject containerObject;
+    public Vector3 bounds;
+
+    private float nextActionTime = 1.0f;
+    public float period = 1.0f;
+    private bool shouldExecute = false;
+
+    public AudioClip clickSound;
+    private AudioSource source;
+    public Material highlightButtonMaterial;
+    public Material normalButtonMaterial;
+    public Vector3 scale = new Vector3(0.0009f, 0.0009f, 0.0009f);
+    private Vector3 normalizedVector;
+
+    override public void Start() {
+        base.Start();
+        gameObject.SetActive(false);
+        baseLocation = gameObject.transform.localPosition;
+        baseRotation = gameObject.transform.localRotation;
+        gameObject.transform.localPosition = new Vector3(0, 0, 0);
+        gameObject.transform.localRotation = Quaternion.identity;
+        source = GetComponent<AudioSource>();
+        normalizedVector = gameObject.GetComponentInParent<Renderer>().bounds.size.normalized;
+        bounds = normalizedVector;
+        bounds.Scale(scale);
+        gameObject.transform.localRotation = baseRotation;
+        gameObject.transform.localPosition = baseLocation;
+        gameObject.SetActive(true);
+
+
+    }
+    
+    public void OnFocusEnter() {
+        base.OnFocusEnter();
+        gameObject.GetComponent<Renderer>().material = highlightButtonMaterial;
+    }
+
+    public void OnFocusExit() {
+        base.OnFocusExit();
+        gameObject.GetComponent<Renderer>().material = normalButtonMaterial;
+    }
+
+    public override void Update() {
+        base.Update();
+        //Debug.Log("BOUNDS: " + bounds.x + " " + bounds.y + " " + bounds.z);
+
+        bounds = normalizedVector;
+        bounds.Scale(scale);
+        //Debug.Log(gameObject.transform.parent.localScale);
+        //Debug.Log(gameObject.transform.localPosition.x + gameObject.transform.parent.localPosition.x);
+        //we know we want to keep the x and y position at a certain place, only want the y offset. so lets constantly keep putting this thing there
+        if ( isDragging ) {
+            {
+                var position = gameObject.transform.localPosition;
+
+                //Debug.Log(baseRotation.x);
+                //Debug.Log(baseRotation.y);
+                //Debug.Log(baseRotation.z);
+
+
+                Vector3 origin = baseLocation;
+                
+                //gives x y z values for the size. we want to go .5 times the axis of freedom max.
+                float[] allowedThreshold = new float[3];
+
+                allowedThreshold[0] = bounds.x * 0.5f;
+                allowedThreshold[1] = bounds.y * 0.5f;
+                allowedThreshold[2] = bounds.z * 0.5f;
+                /*Debug.Log("POSITION: " + position.x + " " + position.y + " " + position.z);
+                Debug.Log("BOUNDS: " + bounds.x + " " + bounds.y + " " + bounds.z);
+                Debug.Log("MIDRANGE: " + allowedThreshold[0] + " " + allowedThreshold[1] + " " + allowedThreshold[2]);
+                */
+
+                if ( !allowX ) {
+                    //change x to be the origin 
+                    position.x = origin.x;
+
+                } else { //allowX
+                    if ( position.x > allowedThreshold[0] + origin.x ) { //positive offset
+                        //just set the position of x to be the max....
+                        position.x = allowedThreshold[0];
+
+                    } else if ( position.x < origin.x - allowedThreshold[0] ) {
+                        position.x = -allowedThreshold[0];
+                    }
+                }
+
+                if ( !allowY ) {
+                    //change y to be the origin
+                    position.y = origin.y;
+                } else { //allowY
+                    if ( position.y > allowedThreshold[1] + origin.y ) { //positive offset
+                        //just set the position of x to be the max....
+                        position.y = allowedThreshold[1];
+
+                    } else if ( position.y < origin.y - allowedThreshold[1] ) {
+                        position.y = -allowedThreshold[1];
+                    }
+                }
+
+                if ( !allowZ ) {
+                    position.z = origin.z;
+                } else { //allowZ
+                    if ( position.z > allowedThreshold[2] + origin.z ) { //positive offset
+                        //just set the position of x to be the max....
+                        position.z = allowedThreshold[2];
+
+                    } else if ( position.z < origin.z - allowedThreshold[2] ) {
+                        position.z = -allowedThreshold[2];
+                    }
+                }
+
+                gameObject.transform.localPosition = position;
+                gameObject.transform.localRotation = baseRotation;
+
+
+                //do we want to do this right here? i guess start a CoRoutine to tell sonos to turn the fuck up...
+                //only do it in the x direction cause it seems to not work on others....
+                //only do this calculation about each second...
+
+                // If the next update is reached
+
+                if ( Time.time >= nextActionTime ) {
+                    //Debug.Log(Time.time + ">=" + nextActionTime);
+                    // Change the next update (current second+1)
+                    nextActionTime = Mathf.FloorToInt(Time.time) + period;
+                    // Call your fonction
+                    if ( shouldExecute ) { // this is where I perform calculations
+                        performLevelCalculations();
+                    } else {
+                        shouldExecute = true;
+                    }
+                }
+            }
+
+
+
+    } else {
+            //stuff to do when not dragging...
+            baseLocation = gameObject.transform.localPosition;
+            baseRotation = gameObject.transform.localRotation;
+        }
+    }
+
+
+    override public void StopDragging() {
+        base.StopDragging();
+        gameObject.transform.localRotation = baseRotation;
+        gameObject.transform.localPosition = baseLocation;
+        shouldExecute = false;
+
+
+        source.PlayOneShot(clickSound, 1F);
+
+
+    }
+
+    public override void StartDragging() {
+        base.StartDragging();
+        //wait X seconds before you start doing any calcs;
+        shouldExecute = false;
+        baseLocation = gameObject.transform.localPosition;
+        baseRotation = gameObject.transform.localRotation;
+
+        source.PlayOneShot(clickSound, 1F);
+
+    }
+
+    public void performLevelCalculations() {
+        Vector3 origin = baseLocation;
+        Vector3 currentLocation = gameObject.transform.localPosition;
+        var bounds = containerObject.GetComponent<MeshRenderer>().bounds.size.normalized;
+        bounds.Scale(new Vector3(0.001f, 0.001f, 0.001f));
+        SliderLevels sliders = new SliderLevels();
+        //gives x y z values for the size. we want to go .5 times the axis of freedom max.
+        float[] allowedThreshold = new float[3];
+        allowedThreshold[0] = bounds.x * 0.5f;
+        allowedThreshold[1] = bounds.y * 0.5f;
+        allowedThreshold[2] = bounds.z * 0.5f;
+
+        if ( allowX ) {
+            //calculate what % of the allowed direction im at.
+            //0-30% +1pt 31-60% +2pts 61-100% +3pts if to the right
+            //0-30% -1pt 31-60% -2pts 61-100% -3pts if to the left 
+
+            if (currentLocation.x < origin.x ) { //left side of origin
+                var delta = Mathf.Abs(currentLocation.x - origin.x);
+                if ( delta > (0.61f * allowedThreshold[0]) ) {
+                    Debug.Log("LEVEL 3 DECREASE");
+                    sliders.XAxisLevel = -3;
+                } else if ( delta > (0.31f * allowedThreshold[0]) && delta < (0.60f * allowedThreshold[0]) ) {
+                    Debug.Log("LEVEL 2 DECREASE");
+                    sliders.XAxisLevel = -2;
+                } else if (delta > (0.01f * allowedThreshold[0]) && delta < (0.30f * allowedThreshold[0])) {
+                    Debug.Log("LEVEL 1 DECREASE");
+                    sliders.XAxisLevel = -1;
+                } else {
+                    //do nothing weird numbers....
+                    sliders.XAxisLevel = 0;
+                }
+
+            } else if (currentLocation.x >= origin.x  ) { //right side of origin
+                var delta = Mathf.Abs(currentLocation.x - origin.x);
+                if ( delta > (0.61f * allowedThreshold[0]) ) {
+                    Debug.Log("LEVEL 3 INCREASE");
+                    sliders.XAxisLevel = 3;
+                } else if ( delta > (0.31f * allowedThreshold[0]) && delta < (0.60f * allowedThreshold[0]) ) {
+                    Debug.Log("LEVEL 2 INCREASE");
+                    sliders.XAxisLevel = 2;
+                } else if ( delta > (0.01f * allowedThreshold[0]) && delta < (0.30f * allowedThreshold[0]) ) {
+                    Debug.Log("LEVEL 1 INCREASE");
+                    sliders.XAxisLevel = 1;
+                } else {
+                    //do nothing weird numbers....
+                    sliders.XAxisLevel = 0;
+                }
+            }
+        }
+
+        if ( allowY ) {
+            if ( currentLocation.y < origin.y ) { //left side of origin
+                var delta = Mathf.Abs(currentLocation.y - origin.y);
+                if ( delta > (0.61f * allowedThreshold[1]) ) {
+                    Debug.Log("LEVEL 3 DECREASE");
+                    sliders.YAxisLevel = -3;
+                } else if ( delta > (0.31f * allowedThreshold[1]) && delta < (0.60f * allowedThreshold[1]) ) {
+                    Debug.Log("LEVEL 2 DECREASE");
+                    sliders.YAxisLevel = -2;
+                } else if ( delta > (0.01f * allowedThreshold[1]) && delta < (0.30f * allowedThreshold[1]) ) {
+                    Debug.Log("LEVEL 1 DECREASE");
+                    sliders.YAxisLevel = -1;
+                } else {
+                    //do nothing weird numbers....
+                    sliders.YAxisLevel = 0;
+                }
+            } else if ( currentLocation.y >= origin.y ) { //right side of origin
+                var delta = Mathf.Abs(currentLocation.y - origin.y);
+                if ( delta > (0.61f * allowedThreshold[1]) ) {
+                    Debug.Log("LEVEL 3 INCREASE");
+                    sliders.YAxisLevel = 3;
+                } else if ( delta > (0.31f * allowedThreshold[1]) && delta < (0.60f * allowedThreshold[1]) ) {
+                    Debug.Log("LEVEL 2 INCREASE");
+                    sliders.YAxisLevel = 2;
+                } else if ( delta > (0.01f * allowedThreshold[1]) && delta < (0.30f * allowedThreshold[1]) ) {
+                    Debug.Log("LEVEL 1 INCREASE");
+                    sliders.YAxisLevel = 1;
+                } else {
+                    //do nothing weird numbers....
+                    sliders.YAxisLevel = 0;
+                }
+            }
+
+        } else {
+            //...
+        }
+        
+        if ( allowZ ) {
+            if ( currentLocation.z < origin.z ) { //left side of origin
+                var delta = Mathf.Abs(currentLocation.z - origin.z);
+                if ( delta > (0.61f * allowedThreshold[2]) ) {
+                    Debug.Log("LEVEL 3 DECREASE");
+                    sliders.ZAxisLevel = -3; 
+                } else if ( delta > (0.31f * allowedThreshold[2]) && delta < (0.60f * allowedThreshold[2]) ) {
+                    Debug.Log("LEVEL 2 DECREASE");
+                    sliders.ZAxisLevel = -2;                                                    
+                } else if ( delta > (0.01f * allowedThreshold[2]) && delta < (0.30f * allowedThreshold[2]) ) {
+                    Debug.Log("LEVEL 1 DECREASE");
+                    sliders.ZAxisLevel = -1;
+                } else {
+                    //do nothing weird numbers....
+                    sliders.ZAxisLevel = 0;
+                }
+            } else if ( currentLocation.z >= origin.z ) { //right side of origin
+                var delta = Mathf.Abs(currentLocation.z - origin.z);
+                if ( delta > (0.61f * allowedThreshold[2]) ) {
+                    Debug.Log("LEVEL 3 INCREASE");
+                    sliders.ZAxisLevel = 3;
+                } else if ( delta > (0.31f * allowedThreshold[2]) && delta < (0.60f * allowedThreshold[2]) ) {
+                    Debug.Log("LEVEL 2 INCREASE");
+                    sliders.ZAxisLevel = 2;                                                   
+                } else if ( delta > (0.01f * allowedThreshold[2]) && delta < (0.30f * allowedThreshold[2]) ) {
+                    Debug.Log("LEVEL 1 INCREASE");
+                    sliders.ZAxisLevel = 1;
+                } else {
+                    //do nothing weird numbers....
+                    sliders.ZAxisLevel = 0;
+                }
+            }
+
+        } else {
+
+        }
+
+        if (sliders.XAxisLevel != 0 || sliders.YAxisLevel != 0 || sliders.ZAxisLevel != 0) {
+            HandleSliderChangeRequest(sliders);
+        }
+    }
+
+    protected void HandleSliderChangeRequest(SliderLevels levels) {
+        //pls change state based on slider levels
+        //for this one i'm just going to send a message to the root object...
+        gameObject.SendMessageUpwards("OnSliderChangeRequest", levels);
+    }
+
+    public void DisableInteraction(bool yes) {
+        if ( yes ) {
+            gameObject.GetComponent<Collider>().enabled = false;
+        } else {
+            gameObject.GetComponent<Collider>().enabled = true;
+        }
+    }
+
+    public struct SliderLevels {
+        public int XAxisLevel, YAxisLevel, ZAxisLevel;
+    }
+}
+```
+
+### MusicButtonHandler.cs
+```C#
+using HoloToolkit.Unity.InputModule;
+using UnityEngine;
+using System;
+
+public class MusicButtonHandler : BaseVentanaButton {
+   
+
+}
+```
+
+### VentanaMusicController.cs
+```C#
+using UnityEngine;
+using System.Collections;
+using Vuforia;
+using System;
+[ExecuteInEditMode]
+public class VentanaMusicController : BaseVentanaController  {
+    public GameObject playButton;
+    public GameObject pauseButton;
+    public bool isMusicPlaying = false;
+    public bool isModelShowing = false;
+
+    public int volumeMultiplier = 2;
+
+    private string playCommand = "playtoggle";
+    private string statusCommand = "status";
+    private string nextCommand = "forward";
+    private string previousCommand = "reverse";
+    VentanaRequestFactory requestFactory;
+
+
+    // Use this for initialization
+    void Start() {
+        base.Start();
+        requestFactory = VentanaRequestFactory.Instance;
+        requestAlbum();
+    }
+
+    // Use this for initialization
+    void makeAPIRequest(string child) { //bubbled from child 
+        requestFactory = VentanaRequestFactory.Instance;
+        switch ( child ) {
+            case "play":
+            Debug.Log("Bubbled play");
+            StartCoroutine(requestFactory.GetFromMusicAPIEndpoint(playCommand, VentanaID, null));
+            break;
+            case "pause":
+            Debug.Log("Bubbled pause");
+            StartCoroutine(requestFactory.GetFromMusicAPIEndpoint(playCommand, VentanaID, null));
+            break;
+            case "next":
+            Debug.Log("Bubbled next");
+            StartCoroutine(requestFactory.GetFromMusicAPIEndpoint(nextCommand, VentanaID, null));
+            break;
+            case "previous":
+            Debug.Log("Bubbled previous");
+            StartCoroutine(requestFactory.GetFromMusicAPIEndpoint(previousCommand, VentanaID, null));
+            break;
+            case "status":
+            //Debug.Log("Bubbled albumArt");
+            StartCoroutine(requestFactory.GetFromMusicAPIEndpoint(statusCommand, this.VentanaID, GetRequestCompleted));
+            break;
+            default:
+            Debug.Log("No good bubble called");
+            break;
+        }
+
+    }
+    void requestAlbum() {
+        makeAPIRequest("status");
+    }
+
+    // Update is called once per frame
+    void Update() { 
+        if ( isModelShowing ) {
+            if ( !isMusicPlaying ) {
+                SetPlayButton();
+            } else {
+                SetPauseButton();
+            }
+        }
+    }
+    public void SetPauseState() {
+        isMusicPlaying = false;
+        SetPlayButton();
+    }
+
+    public void SetPlayState() {
+        isMusicPlaying = true;
+        SetPauseButton();
+    }
+    public void SetPauseButton() {
+        playButton.SetActive(false);
+        pauseButton.SetActive(true);
+    }
+
+    public void SetPlayButton() {
+        playButton.SetActive(true);
+        pauseButton.SetActive(false);
+    }
+    
+
+    public void GetRequestCompleted(VentanaInteractable ventana) {
+        SonosInfo info = ventana as SonosInfo;
+        isMusicPlaying = !info.isPaused;
+        BroadcastMessage("OnURLSent", ventana);
+    }
+
+    void OnSliderChangeRequest(KnobHandler.SliderLevels levels) {
+        VentanaRequestFactory requestFactory = VentanaRequestFactory.Instance;
+        Debug.Log("Requesting a: " + levels.XAxisLevel + (levels.XAxisLevel > 0 ? " increase" : " decrease"));
+        int baseLevel = levels.XAxisLevel * volumeMultiplier;
+        StartCoroutine(requestFactory.PostToMusicAPIEndpoint("volume", VentanaID, (levels.XAxisLevel > 0 ? "+" : "") + baseLevel.ToString()));
+
+    }
+
+    public override void OnVumarkFound() {
+        base.OnVumarkFound();
+        isModelShowing = true;
+    }
+
+    public override void OnVumarkLost() {
+        base.OnVumarkLost();
+        isModelShowing = false;
+    }
+
+    
+}
+```
+
+### LightButtonController.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using HoloToolkit.Unity.InputModule;
+
+public class LightButtonHandler : BaseVentanaButton {
+    
+}
+```
+
+### VentanaLightController.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class VentanaLightController : BaseVentanaController {
+
+    private string poweredCommand = "change_power";
+    private string brightCommand = "change_brightness";
+    private string colorCommand = "color";
+    private string statusCommand = "status";
+
+    public int brightnessMultipler = 2;
+    // Use this for initialization
+    protected new void Start() {
+        base.Start();
+    }
+
+    // Update is called once per frame
+    protected new void Update() {
+        base.Update();
+    }
+
+    public override void OnVumarkFound() {
+        base.OnVumarkFound();
+    }
+
+    public override void OnVumarkLost() {
+        base.OnVumarkLost();
+    }
+    void makeAPIRequest(string child) {
+        VentanaRequestFactory requestFactory = VentanaRequestFactory.Instance;
+        switch ( child ) {
+            case "light":
+            StartCoroutine(requestFactory.PostToLightAPIEndpoint(poweredCommand, VentanaID, ""));
+            break;
+            default:
+            break;
+        }
+    }
+
+    void OnSliderChangeRequest(KnobHandler.SliderLevels levels) {
+        VentanaRequestFactory requestFactory = VentanaRequestFactory.Instance;
+        Debug.Log("Requesting a: " + levels.XAxisLevel + (levels.XAxisLevel > 0 ? " increase" : " decrease"));
+        int baseLevel = levels.XAxisLevel * brightnessMultipler;
+        StartCoroutine(requestFactory.PostToLightAPIEndpoint(brightCommand, VentanaID, baseLevel.ToString()));
+
+    }
+}
+```
+### Args.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+//literally for global variables
+
+public class Args : MonoBehaviour {
+    public static string HOLOHUB_IP = "192.168.0.108";
+    public static string PREFAB_LOCATION = "Ventana/Prefabs/"; //in Resources Folder
+    public static string HOLOHUB_ADDRESS = "http://192.168.0.108:8081";
+    public static string HOLOHUB_WEBSOCKET_ADDRESS = "ws://192.168.0.108:4200/socket.io/?EIO=3&transport=websocket";
+    public static string VENTANA_MARK_CONFIG_FILE_LOCATION = "Ventana/VentanaConfig.json";
+    public static string VENTANA_DATA_SET_NAME = "QCAR\\VentanaTargets.xml";
+   
+
+}
+```
+
+### BaseVentanaController.cs
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class BaseVentanaController : MonoBehaviour, IVentanaVumarkEventHandler {
+
+    public int VentanaID = -1;
+    public string ControllerName;
+    
+    // Use this for initialization
+    protected void Start () {
+        Debug.Log("ID: " + VentanaID);
+	}
+	
+	// Update is called once per frame
+	protected void Update () {
+		
+	}
+
+    public virtual void OnVumarkFound() {
+
+    }
+
+    public virtual void OnVumarkLost() {
+
+    }
+}
+```
+
+
+### MusicInfo.cs
+```C#
+using UnityEngine;
+using System.Collections;
+
+[System.Serializable]
+public class SonosInfo : VentanaInteractable {
+    //PLAYING --> playing
+    //PAUSED_PLAYBACK --> paused
+    public bool isPaused {
+        get {
+            switch ( current_transport_state ) {
+                case "PLAYING":
+                return false;
+                case "PAUSED_PLAYBACK":
+                return true;
+                default:
+                return true;
+            }
+        }
+    }
+    public string album;
+    public string artist;
+    public string title;
+    public string uri;
+    public int playlist_position;
+    public string duration;
+    public string position;
+    public string album_art;
+    public string current_transport_state = "";
+    public string metadata;
+
+    public static SonosInfo CreateFromJSON(string jsonString) {
+        return JsonUtility.FromJson<SonosInfo>(jsonString);
+    }
+
+    public override string ToString() {
+        return "Album: " + album + " Artist: " + artist + " Title: " + title +
+                " URI: " + uri + " Playlist Position: " + playlist_position + " Duration " +
+                duration + " Position: " + position + " Album Art URL: " + album_art + " Metadata: " + metadata + " Paused: " + isPaused;
+    }
+
+    // Given JSON input:
+    // {"name":"Dr Charles","lives":3,"health":0.8}
+    // this example will return a PlayerInfo object with
+    // name == "Dr Charles", lives == 3, and health == 0.8f.
+
+}
+
+
+
+public class VentanaInteractable {
+
+}
+```
+
+## HoloHub Reference Assets
+
+### Routing Modules 
+
+#### Sonos Routing Module
+```JS
+var express = require('express');
+var router = express.Router();
+var request = require('request');
+var SonosDM = require('../app/models/sonosController');
+
+
+var SONOS_HTTP_SERVER = BASESERVER + ":5005"
+// var SONOS_HTTP_SERVER = 'http://192.168.0.108' + ":5005"
+
+
+// Convert Sonos response into Sonos HoloHub Object friendly response
+function responseSummary(body, callback){
+  sonosRequestData = body;
+  var sonosSendData = {}
+
+  sonosSendData["album"] = sonosRequestData.currentTrack.album;
+  sonosSendData["artist"] = sonosRequestData.currentTrack.artist;
+  sonosSendData["title"] = sonosRequestData.currentTrack.title;
+  sonosSendData["current_transport_state"] = sonosRequestData.playbackState;
+  sonosSendData["uri"] = sonosRequestData.currentTrack.uri;
+  sonosSendData["playlist_position"] = sonosRequestData.trackNo;
+  sonosSendData["duration"] = sonosRequestData.currentTrack.duration;
+  sonosSendData["position"] = sonosRequestData.elapsedTimeFormatted;
+  sonosSendData["metadata"] = sonosRequestData.elapsedTime;
+  sonosSendData["album_art"] = sonosRequestData.currentTrack.absoluteAlbumArtUri;
+
+  return callback(sonosSendData);
+}
+
+//Convert a Vumark ID to a Sonos Device ID (the group/device name)
+function getDeviceIDbyVumarkID(vumark_id, callback){
+  
+  //Get a sonos object. If not found return null, otherwise return name
+  SonosDM.findById(vumark_id, function(err, sonos){
+      if (err){
+        console.log(err);
+        return callback(null);
+      }
+      if (sonos){
+        return callback(sonos.device_id);
+      }
+      else{
+        return callback(null);
+      }
+    });
+};
+
+//Convert a Device ID (the group/device name) to a Vumark ID
+function getVumakIDbyDeviceID(device_id, callback){
+  // Get Sonos object by device_id, if found return id (VuMark) otherwise null
+  SonosDM.findOne({"device_id": device_id}, function(err, sonos){
+    if (err){
+      console.log(err);
+      return callback(null);
+    }
+    if (sonos){
+      return callback(sonos._id);
+    }
+    else{
+      return callback(null);
+    }
+  });
+};
+
+// Get all sonos objects and Create a new Sonos Music Object
+router.route('/')
+
+  .get(function(req, res) {   //GET all paired sonos device.
+
+    SonosDM.find(function(err, sonos) {
+              if (err)
+                  res.send(err);
+              
+              res.json(sonos);
+          });
+  })
+
+  .post(function(req, res){ 
+    
+    /* 
+      Process new sonos object POST request. This
+      will include the device_id (VuMark ID) and the
+      device_name (Sonos API ID "in this case a string")
+    */
+
+    // TODO: ######## CHECK TO SEE IF DEVICE ALREADY EXISTS IN RECORD!!!!! ##############
+    
+    var sonos = new SonosDM();  // Create new instance of a sonos object
+
+    if("_id" in req.body)
+      sonos._id = req.body._id
+    if("device_id" in req.body) {
+      sonos.device_id = req.body.device_id;
+      sonos.device_name = req.body.device_id;
+    }
+    if("vendor_logo" in req.body)
+      sonos.vendor_logo = req.body.vendor_logo
+    
+    //if("controller" in req.body)
+    sonos.controller = "Ventana/Prefabs/MusicController";
+    sonos.vendor = "1" ; //specific for sonos devices
+    // For sonos. save device state
+    sonos.device_type = 'Sonos Speaker';
+
+    // Lookup sonos state data calling device_id. Verify that the connection can be made.
+    request(BASESERVER + ":" + port + '/sonos/status/' + sonos.device_id + '?skiplookup=true', function (error, response, body) {
+      if (!error && response.statusCode == 200 && response.body != 'Not Started or Connected') {
+          sonos.save(function(err) {
+              if (err){
+                res.send(err);
+              }
+              else{
+                res.json({ message: 'SonosDM object created!' });
+              };
+          });     
+      }
+      else {
+            res.send(statusCode=500, "Not Started or Connected");
+      };
+    });
+  });
+
+  //Need to add a PUT for the HoloLens to update the JSON file reference so that controller String is saved.
+
+//Update Device or Get Device by Vuforia ID
+router.route('/byId/:vumark_id')
+
+  .get(function(req, res){
+    //Get the Sonos Object by ID
+    SonosDM.findById(parseInt(req.params.vumark_id), function(err, sonos){
+      if (err){
+        res.send(err);
+      }
+      res.json(sonos);
+    });
+  })
+
+  .put(function(req, res){
+    SonosDM.findByIdAndUpdate(parseInt(req.params.vumark_id), req.body, function(err,sonos){
+      if (err){
+        res.send(err);
+      }
+      res.json(sonos);
+    });
+  });
+
+
+// GET Status by Vumark ID
+router.get('/status/:vumark_id', function(req, res) {
+  // Toggle Playback
+  var sonosRequestData;
+
+  //Initial device setup query to get sonos state data (Special case where vumark_id == device_id when skiplookup flag is set)
+  if(req.query.skiplookup){
+     request(SONOS_HTTP_SERVER + "/" + req.params.vumark_id + '/state', function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            console.log(body); // Print the response page.
+            
+            responseSummary(JSON.parse(body), function(responseJson){
+                res.json(responseJson);
+            });
+        }
+        else {
+            res.send(500, "Not Started or Connected")
+        }
+      });
+  }
+  // Get sonos state data based on a vumark ID (needs to get converted to device_id)
+  else
+  {
+    getDeviceIDbyVumarkID(req.params.vumark_id, function(device_id){
+      request(SONOS_HTTP_SERVER + "/" + device_id + '/state', function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            /* DEBUG CONSOLE */
+            console.log(body); // Print the response page.
+            responseSummary(JSON.parse(body), function(responseJson){
+                res.json(responseJson);
+            });
+        }
+        else {
+            res.send(500, "Not Started or Connected")
+        }
+      });
+    });
+  }
+});
+
+// Toggle playback (Automatically loggles as needed)
+router.get('/playtoggle/:vumark_id', function(req, res) {
+  
+  // Toggle Playback
+  getDeviceIDbyVumarkID(req.params.vumark_id, function(device_id){
+    // Call the status endpoint to see the current playback state of the sonos device. Set skiplookup flag to true to avoid double vumark lookup.
+    request(BASESERVER + ':' +  port + '/sonos/status/' + device_id + '?skiplookup=true', function (error, response, body) {
+      if (!error && response.statusCode == 200 && response.body != 'Not Started or Connected') {
+        sonosRequestData = JSON.parse(body);
+        if (sonosRequestData["current_transport_state"] == 'PAUSED_PLAYBACK'){
+          request(SONOS_HTTP_SERVER + '/' + device_id + '/play', function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                console.log(body) // Print the response page.
+            }
+          });
+          res.send(body);
+        }
+        else{
+          request(SONOS_HTTP_SERVER + '/' + device_id + '/pause', function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                console.log(body) // Print the response page.
+            }
+          });
+          res.send(body)
+        }
+      }
+      else {
+        res.send(500, "Not Started or Connected");
+      }
+    });
+  });
+});
+
+// Skip current song
+router.get('/forward/:vumark_id', function(req,res) {
+  getDeviceIDbyVumarkID(req.params.vumark_id, function(device_id){
+    request(SONOS_HTTP_SERVER + '/' + device_id + '/next', function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+          console.log(body) // Print the response page.
+      }
+      res.send(body)
+    });
+  });
+});
+
+// Rewind Song/playlist
+router.get('/reverse/:vumark_id', function(req, res){
+  getDeviceIDbyVumarkID(req.params.vumark_id, function(device_id){
+    request(SONOS_HTTP_SERVER + '/' + device_id + '/previous', function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+          console.log(body) // Print the response page.
+      }
+      res.send(body)
+    });
+  });
+});
+
+// Volume Control
+router.post('/volume/:vumark_id', function(req, res){
+  getDeviceIDbyVumarkID(req.params.vumark_id, function(device_id){
+    request(SONOS_HTTP_SERVER + '/' + device_id + '/volume/' + req.body.value, function(error, response, body){
+      if (!error && response.statusCode == 200) {
+          console.log(body) // Print the response page.
+          res.send(body);
+      }
+      else{
+        res.send("Error", statusCode=500);
+      };
+    });
+  });
+});
+
+
+/******  TODO FIX THIS TO USE THE CORRECT CALLBACK REQUEST FUNCTION ******/
+// Get all sonos devices on the network -- SONOS CALL
+router.get('/devices', function(req, res){
+  var sonosDevices = {'paired_devices': [], 'unpaired_devices': []} 
+  var connectedDevices = {}
+  
+  // Retrieve all devices paired with the HoloHub, place into a dictionary {device_id: _id}
+  request(BASESERVER + ':' +  port + '/sonos/', {timeout: 500}, function(error, response, body){
+    if(!error && response.statusCode == 200) {
+      var temp1 = JSON.parse(body);
+      temp1.forEach(function(arrayItem){
+        connectedDevices[arrayItem.device_id] = arrayItem;
+      });
+
+      // Discover all sonos devices on the network
+      request(SONOS_HTTP_SERVER + '/' + 'zones', {timeout: 500}, function (error1, response, body) {
+        if (!error1 && response.statusCode == 200) {
+            var sonosRequestData = JSON.parse(body);
+
+            sonosRequestData.forEach( function(arrayItem) {
+              //If device name is in connectedDevices, then device is paired -- show w/ it's vumark ID
+              if(arrayItem.coordinator.roomName in connectedDevices){
+                sonosDevices.paired_devices.push(connectedDevices[arrayItem.coordinator.roomName]);
+              }        
+              else
+              {
+                var temp1 = {
+                  "device_id": arrayItem.coordinator.roomName,
+                  "device_type": "Sonos Speaker",
+                  "device_name": arrayItem.coordinator.roomName,
+                  "controller": "Ventana/Prefabs/MusicController",
+                  "vendor": '1',
+                  "vendor_logo": 'https://lh6.googleusercontent.com/-Px2Steg_XRM/AAAAAAAAAAI/AAAAAAAAFa4/kpB3EVdNHGw/s0-c-k-no-ns/photo.jpg'
+                }
+                sonosDevices.unpaired_devices.push(temp1);
+              }
+            });
+            res.json(sonosDevices);       
+        }
+        else{
+          console.log(error1);
+          res.send("Error", statusCode=500);
+        };
+      });
+    }
+    else{
+      console.log(error);
+      res.send("Error " + error, statusCode=500);
+    };
+  });
+});
+
+
+/** SONOS Socket.IO Push notification service **/
+
+//Server endpoint that recieves state changes from Sonos HTTP Server (Push Notifications)
+router.post('/pushnotification', function(req,res){
+  //Send state change to Socket.IO connected clients
+  var sonosResponse = {};
+  // Filter out notification requests such that only song-state changes take place. 
+  if(req.body.type == 'transport-state') {
+    //Retrieve standardized sonos object value
+    getVumakIDbyDeviceID(req.body.data.roomName, function(_id){
+    // Igonore devices that haven't been setup in HoloHub
+      if (_id != null){
+        responseSummary(req.body.data.state, function(responseJson){
+          sonosResponse[_id] = responseJson;
+          var options = {
+            method: 'POST',
+            url: BASESERVER + ':' + port + '/socketsend',
+            body: sonosResponse,
+            json: true
+          };
+      
+          //Send push notification request to /socketsend endpoint (Socket.IO emitter)
+          request(options, function (error, response, body) {
+            //#### DEBUG ####
+            //console.log(sonosResponse)
+            //console.log("Push Notification Sent");
+            if(error || response.statusCode != 200){
+              console.log(error);
+            }
+          });
+          res.send("ok");
+        });
+      }
+      else
+        res.send("error");
+    });
+  };
+});
+
+
+module.exports = router;
+```
+#### Wink Routing Modules
+
+```JS
+var express = require('express');
+var router = express.Router();
+var request = require('request');
+var WinkDM = require('../app/models/winkController');
+var setup = require('../setup');
+var WINK_HTTP_SERVER = "https://api.wink.com/"
+
+// convert Wink response into Wink HoloHub Object friendly response
+function winkSummary(body, callback) {
+    winkRequestData = body;
+    var winkSendData = {}
+
+    winkSendData["device_type"] = winkRequestData.data.object_type + "s";
+    winkSendData["device_id"] = winkRequestData.data.object_id;
+    winkSendData["vendor_logo"] = winkRequestData.data.vendor_logo;
+
+    if (winkRequestData.data.object_type == "powerstrip"){
+        winkSendData["outlets"] = [];
+        winkRequestData.data.outlets.forEach(function (item, index){
+            var tempWink = {};
+            tempWink["outlet_id"] = item.outlet_id;
+            tempWink["outlet_index"] = item.outlet_index;
+            tempWink["name"] = item.name;
+            winkSendData.outlets[index] = tempWink;
+        })
+    }
+
+    winkSendData["name"] = winkRequestData.data.name;
+    winkSendData["_id"] = winkRequestData.data._id;
+
+    return callback(winkSendData);
+}
+
+// Convert a vumark_id to a Wink device ID (the device_type/device_id/name)
+function getDeviceIDbyVumarkID(vumark_id, callback) {
+
+    //gets a wink object, if one doesn't exist with that vumark_id, return null
+    WinkDM.findById(vumark_id, function(err, wink) {
+        if (err) {
+            console.log(err);
+            return callback(null);
+        } else if (wink) {
+            return callback(wink);
+        } else {
+            return callback(null);
+        }
+    });
+};
+
+function getVumarkByDeviceID(device_id, callback) {
+
+    WinkDM.findOne({"device_id": device_id}, function(err, wink){
+        if (err) {
+            console.log(err);
+            return callback(null);
+        } else if (wink) {
+            return callback(wink._id); //if the obj exists return its vu id
+        } else {
+            return callback(null);
+        }
+    });
+};
+
+// GET shows we are connected to wink
+// POST processes new wink object
+router.route('/')
+
+    .get(function(req,res){
+        if (WINK_AUTHORIZATION != null) {
+            //console.log(WINK_AUTHORIZATION)
+            WinkDM.find(function(err, sonos) {
+              if (err)
+                  res.send(err);
+              
+              res.json(sonos);
+            });
+        } else {
+            //console.log("WINK_AUTHORIZATION is null");
+            res.json({message: 'Not connected to Wink!'});
+        }
+    })
+
+    .post(function(req,res) {
+        var wink = new WinkDM(); //new instance of wink object
+
+        if (req.body._id != null){
+            wink._id = req.body._id; //vumark id
+        }
+        if (req.body.device_id != null) {
+            wink.device_id = req.body.device_id;
+        }
+        if (req.body.device_type != null){
+            wink.device_type = req.body.device_type;
+        }
+        if (req.body.device_name != null){
+            wink.device_name = req.body.device_name;
+        }
+        if (req.body.vendor_logo != null) {
+            wink.vendor_logo = req.body.vendor_logo;
+        }
+        if (req.body.vendor != null) {
+            wink.vendor = req.body.vendor;
+        }
+        else{
+            wink.vendor = "2"; //vendor is wink
+        }
+
+        // wink controller is path to hololens VentanaConfig.json
+        if (wink.device_type == "light_bulbs") {
+            wink.controller = "Ventana/Prefabs/LightController";
+        } else if (wink.device_type == "powerstrips") {
+            wink.controller = "Ventana/Prefabs/PowerStripController";
+        } else {
+            wink.controller = null;
+        }
+
+        request({
+            method: 'GET',
+            url: WINK_HTTP_SERVER + wink._doc.device_type + "/" + wink._doc.device_id,
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': WINK_AUTHORIZATION
+            },
+        }, function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+                wink.save(function(err) {
+                    if (err) {
+                        res.send(err);
+                    } else {
+                        res.json({message: 'WinkDM object created!'});
+                    };
+                });
+                // res.json((JSON.parse(body)).data);
+            } else {
+                console.log("error in 'wink/' POST: " + response.statusCode)
+                //res.send(statusCode=500, "Not Started or Connected");
+                res.send({message : "this didn't work"});
+            };
+        });
+    });
+
+// get all wink devices connected to the account logged in
+router.get('/wink_devices', function(req, res){
+
+    //conosole.log("Authorization: " + WINK_AUTHORIZATION);
+    var winkDevices = {'device_list': []}
+    request({
+        method: 'GET',
+        url: WINK_HTTP_SERVER + 'users/me/wink_devices',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': WINK_AUTHORIZATION
+        },
+    }, function(error, response, body){
+        if (!error && response.statusCode == 200) {
+            //console.log('Status:', response.statusCode);
+            //console.log('Headers:', JSON.stringify(response.headers));
+            //console.log('Response:', JSON.parse(body));
+         
+            var winkResponseBody = JSON.parse(body);
+
+            winkResponseBody.data.forEach( function (item, index) {
+                var deviceTemp = {};
+                if (item.light_bulb_id != null){
+                    deviceTemp["device_id"] = item.light_bulb_id;
+                    deviceTemp["device_type"] = 'light_bulbs';
+                } else if (item.powerstrip_id != null){
+                    deviceTemp["device_id"] = item.powerstrip_id;
+                    deviceTemp["device_type"] = 'powerstrips';
+                }/* else if (item.manufacturer_device_model == "wink_hub") {
+                    deviceTemp["device_id"] = item.hub_id;
+                    deviceTemp["device_type"] = 'hubs';
+                }*/ else {
+                    console.log("Device type not supported");
+                }
+                deviceTemp["name"] = item.name;         //Kept for legacy. Need to test for removal
+                deviceTemp["device_name"] = item.name;
+                deviceTemp["vendor_logo"] = item.vendor_logo;
+                /*getVumarkByDeviceID(deviceTemp["device_id"], function (returnObject){
+                    if (returnObject != null) {
+                        // this device has a vumark id linked to item
+                        deviceTemp["_id"] = returnObject;
+                    } else {
+                        deviceTemp["_id"] = null;
+                    }
+                });*/
+                winkDevices.device_list[index] = deviceTemp;
+            });
+
+            res.json(winkDevices)
+        } else {
+            res.send(500, "Not started or connected");
+        }
+    });
+     
+});
+
+//GET all devices connected to the HoloHub
+router.get('/devices', function(req, res){
+    var winkDevices = {'paired_devices': [], 'unpaired_devices': []};
+    var connectedDevices = {};
+
+    // Retrieve all devices paired with the HoloHub, place into a dictionary {device_id: _id}
+    request(BASESERVER + ':' +  port + '/wink/', function(error, response, body){
+        if(!error && response.statusCode == 200) {
+        var temp1 = JSON.parse(body);
+        temp1.forEach(function(arrayItem){
+            connectedDevices[arrayItem.device_id] = arrayItem;
+        });
+
+        // Discover all Wink devices on the Wink.COM
+        request(BASESERVER + ':' +  port + '/wink/wink_devices/', function(error, response, body){
+            if (!error && response.statusCode == 200) {
+                var sonosRequestData = JSON.parse(body)['device_list'];
+
+                sonosRequestData.forEach( function(arrayItem) {
+                //If device name is in connectedDevices, then device is paired -- show w/ it's vumark ID
+                if(arrayItem.device_id in connectedDevices){
+                    winkDevices.paired_devices.push(connectedDevices[arrayItem.device_id]);
+                }        
+                else
+                {
+                    if(arrayItem.device_type in setup.supportedDevices){
+                        var temp1 = {
+                            "device_id": arrayItem.device_id,
+                            "device_type": arrayItem.device_type,
+                            "device_name": arrayItem.device_name,
+                            "controller": setup.supportedDevices[arrayItem.device_type],
+                            "vendor_logo": "https://www.winkapp.com/assets/mediakit/wink-logo-icon-knockout-50235153b274cdf35ef39fb780448596.png",
+                            "vendor": 2
+                        }
+                        winkDevices.unpaired_devices.push(temp1);
+                    }
+                    
+                }
+                });
+                res.json(winkDevices);       
+            }
+            else{
+            error = error1;
+            };
+        });
+        }
+        else{
+        console.log(error);
+        res.send("Error " + error, statusCode=500);
+        };
+    });
+});
+
+// gets the light_bulb status for the particular id
+router.get('/status/:vumark_id', function(req, res) {
+    
+    getDeviceIDbyVumarkID(req.params.vumark_id, function(returnObject) {
+        var device_id;
+        var device_type;
+        
+        if (returnObject == null) {
+            res.send({"message": "Invalid Wink vumark ID"});
+        } else {
+            device_id = returnObject._doc.device_id;
+            device_type = returnObject._doc.device_type;
+        }
+
+        request({
+            method: 'GET',
+            url: WINK_HTTP_SERVER + device_type + '/' + device_id,
+            //url: WINK_HTTP_SERVER + 'light_bulbs/' + req.params.vumark_id, //hardcoded with light bulbs rn
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': WINK_AUTHORIZATION
+            },
+            json: true
+        }, function(error, response, body) {
+            if (!error && response.statusCode == 200) {     
+                //console.log('Status:', response.statusCode);
+                //console.log('Headers:', JSON.stringify(response.headers));
+                //console.log('Response:', body);
+                //console.log(JSON.stringify(body.data.desired_state));
+                winkSummary(body, function(winky){
+                    //this will wait for winkSummary response to happen
+                    winky["_id"] = req.params.vumark_id;
+
+                    res.json(winky);
+                });
+
+                } else {
+                    res.send(500, "Not started or connected")
+                    //res.json({ message: 'Light bulb id ' + req.body.device_id });
+            }
+        });
+
+    });
+
+});
+
+// uses PUT to change the state for the particular device
+router.post('/change_power/:vumark_id', function(req, res) {
+    
+    getDeviceIDbyVumarkID(req.params.vumark_id, function(returnObject){
+        var device_id;
+        var device_type;
+        
+        if (returnObject == null) {
+            res.send({"message": "Invalid Wink vumark ID"});
+        } else {
+            device_id = returnObject._doc.device_id;
+            device_type = returnObject._doc.device_type;
+        }
+
+        var last_state; 
+
+        request({
+            method: 'GET',
+            url: WINK_HTTP_SERVER + device_type + '/' + device_id,
+            headers: {
+                'Content-Type': 'application/json', 
+                Authorization : WINK_AUTHORIZATION
+            },
+            json: true
+          }, function(error, response, body) {
+            if (!error && response.statusCode == 200) {     
+                if (device_type == "powerstrips"){
+                    device_type = "outlets";
+                    device_id = body.data.outlets[req.body.value].outlet_id;
+                    last_state = body.data.outlets[req.body.value].powered;
+                } else {
+                    last_state = body.data.last_reading.powered;
+                }
+
+                if (last_state == true) {
+                    new_state = { "desired_state" : {"powered" : false}};
+                } else {
+                    new_state = { "desired_state" : {"powered" : true}};
+                }
+
+                var options = {
+                    method: 'PUT',
+                    url: WINK_HTTP_SERVER + device_type + '/' + device_id + '/desired_state',
+                    headers: {
+                        'Content-Type': 'application/json', 
+                        Authorization : WINK_AUTHORIZATION
+                    },
+                    body: new_state,
+                    json: true
+                };
+                
+                request(options, function (error, response, body) {
+                    if (!error && response.statusCode == 200) {
+                        res.send({ message: 'Change power state'});
+                    } else {
+                        console.log(error + ' ' + response.statusCode)
+                        res.json({ message: 'Error change power state'});
+                    }        
+                });
+            } else {
+                    res.send(500, "Not successful change_power")
+            }
+        });
+
+    });
+
+});
+
+// changes brightness
+router.post('/change_brightness/:vumark_id', function(req, res) {
+    
+    getDeviceIDbyVumarkID(req.params.vumark_id, function(returnObject){
+        var device_id;
+        var device_type;
+        
+        if (returnObject == null) {
+            res.send({"message": "Invalid Wink vumark ID"});
+        } else {
+            device_id = returnObject._doc.device_id;
+            device_type = returnObject._doc.device_type;
+        }
+
+        var state;
+        var amount_change_brightness = req.body.value/100.0;
+
+        request({
+            method: 'GET',
+            url: WINK_HTTP_SERVER + device_type + '/' + device_id,
+            headers: {
+                'Content-Type': 'application/json', 
+                //'Authorization': req.body.Authorization 
+                Authorization : WINK_AUTHORIZATION
+            },
+            json: true
+          }, function(error, response, body) {
+            if (!error && response.statusCode == 200) {
+                state = parseFloat(body.data.last_reading.brightness);
+
+                if (amount_change_brightness != 0) {
+                     state += amount_change_brightness;
+                    if (state < 0) {
+                        state = 0.0;
+                    } else if (state > 1.0) {
+                        state = 1.0;
+                    }
+                }
+                
+                new_state = { "desired_state" : {"brightness" : state}};
+
+                var options = {
+                    method: 'PUT',
+                    //url: WINK_HTTP_SERVER + req.body.device_type + '/' + req.body.device_id + '/desired_state',
+                    url: WINK_HTTP_SERVER + device_type + '/' + device_id + '/desired_state',
+                    headers: {
+                        'Content-Type': 'application/json', 
+                        //'Authorization': req.body.Authorization 
+                        Authorization : WINK_AUTHORIZATION
+                    },
+                    //body: req.body,
+                    body: new_state,
+                    json: true
+                };
+
+                //console.log(JSON.stringify(new_state));
+                
+                request(options, function (error, response, body) {
+                    if (!error && response.statusCode == 200) {
+                        //console.log("request", options.body);
+                        //console.log('Status:', response.statusCode);
+                        //console.log('Headers:', JSON.stringify(response.headers));
+                        //console.log('Response:', body);
+                        res.send({ message: 'Change Brightness'});
+                    } else {
+                        console.log(error + ' ' + response.statusCode)
+                        res.json({ message: 'Error in changing brightness'});
+                    }        
+                });
+            } else {
+                    res.send(500, "Not Successful change_brightness")
+            }
+        });
+
+    });
+
+});
+
+module.exports = router;
+```
+### Database Models
+#### Sonos Model Schema
+```JS
+var mongoose     = require('mongoose');
+var Schema       = mongoose.Schema;
+
+var SonosSchema   = new Schema({
+    _id: String,			// THIS IS THE Vumark ID
+    device_id: String,
+    device_type: String,
+    device_name: String,    //equal to device_id
+	controller: String,
+    vendor_logo: String,
+    vendor: String
+});
+
+module.exports = mongoose.model('SonosDM', SonosSchema);
+```
+#### Wink Model Schema
+```JS
+var mongoose     = require('mongoose');
+var Schema       = mongoose.Schema;
+
+var WinkSchema   = new Schema({
+    _id: String,			// THIS IS THE Vumark ID
+    device_id: String,      // device_id used by Wink
+    device_type: String,    // device_type used by Wink
+    device_name: String,
+	controller: String,      // unnecessary, setup?
+    vendor_logo: String,
+    vendor: String
+});
+
+module.exports = mongoose.model('WinkDM', WinkSchema);
+```
+### Server and Setup Implementation
+
+#### Server Main Operations
+```JS
+// call the packages we need
+var express    = require('express');
+var bodyParser = require('body-parser');
+
+//OAUTH
+var session = require('express-session')
+var Grant = require('grant-express')
+var grant = new Grant(require('./config.json'))
+var app = express();
+
+//Socket.IO 
+var server = require('http').createServer(app); 
+var io = require('socket.io')(server);
+io.set('transports', ['websocket']);
+
+// //PubNub Notifications
+// var PubNub = require('pubnub')
+// var pubnub = new PubNub({
+//     subscribeKey: "sub-c-f7bf7f7e-0542-11e3-a5e8-02ee2ddab7fe",
+//     ssl: true
+// });
+
+// pubnub.addListener({
+//     status: function(statusEvent) {
+//         if (statusEvent.category === "PNConnectedCategory") {
+//             console.log("Connected to nubPub");
+//         }
+//     },
+//     message: function(message) {
+//         newDesiredState = JSON.parse(message).desired_state
+//         console.log("New Message!!", message);
+//     }
+// })      
+    
+//     console.log("Subscribing..");
+// pubnub.subscribe({
+//         channels: ['ab6a481d06f81d80acfab707eddb42bf60faf75e|light_bulb-2566198|user-616119'] 
+// });
+
+// Session for Grant OAUTH
+app.use(session({
+    secret:'3245tr,gfewere4re3e4d98eyoiul438p',
+    resave: true,
+    saveUninitialized: false
+}))
+app.use(grant)
+
+//Morgan Logging
+var morgan = require('morgan');
+app.use(morgan('dev')); // log requests to the console
+
+// Configure body parser
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+// Set BASE global variables
+port = process.env.PORT || 8081; // set our port
+BASESERVER = 'http://localhost';
+
+
+// wink tokens
+WINK_ACCESS_TOKEN = "";
+WINK_REFRESH_TOKEN = "";
+WINK_AUTHORIZATION = 'bearer 82pXcnWl6h-5wPyTIrBJBYqxve-ZHih7';
+
+// connect to our database
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://ventana:Pistachio1@ds054999.mlab.com:54999/ventana');
+
+// View Engine
+app.set('view engine', 'ejs');
+app.use(express.static('public'))
+
+// Setup JS
+var setup = require('./setup');
+
+// Add Routers (Modules)
+var sonos = require('./routes/sonos');
+var wink = require('./routes/wink');
+app.use('/wink', wink);
+app.use('/sonos', sonos);
+
+// GET Wink OAUTH response - via Grant
+// Grant OAUTH request: http://{serverURL}/connect/{module i.e wink}/
+// Responses successful authentications to http://{serverURL}/handle_wink_callback/
+app.get('/handle_wink_callback', function (req, res) {
+  //console.log(req.query)
+  //console.log(req.query.access_token)
+  //console.log(req.query.refresh_token)
+  WINK_ACCESS_TOKEN = req.query.access_token;
+  WINK_REFRESH_TOKEN = req.query.refresh_token;
+  WINK_AUTHORIZATION = req.query.raw.data.token_type + ' ' + WINK_ACCESS_TOKEN;
+  //console.log(WINK_AUTHORIZATION)
+  //res.end(JSON.stringify(req.query, null, 2))
+  //Handle wink callback will redirect to Sonos devices.
+  setup.getWink(function(devices){
+        console.log(devices);
+
+        if(devices['unpaired']){
+
+            devices['unpaired'].forEach(function(device) {
+             console.log(device);
+            });
+
+            res.render('pages/add', {"devices":devices['unpaired'], "host": req.get('host')});
+
+        }
+        else{
+            res.render('pages/add', {"devices":null, "host": req.get('host')});
+        } 
+    });
+});
+
+// Server Base Endpoint -- SETUP Dashboard
+
+app.get('/', function(req, res) {
+    setup.getDevices(function(devices){
+        console.log(devices);
+
+        if(devices['paired'].length > 0){
+
+            devices['paired'].forEach(function(device) {
+             console.log(device);
+            });
+
+            if (req.query.remove){
+                res.render('pages/delete', {"devices":devices['paired'], "host": req.get('host')})
+            }
+            else{ 
+                res.render('pages/index', {"devices":devices['paired'], "host": req.get('host')});
+            }
+
+        }
+        else{
+            res.render('pages/index', {"devices":null, "host": req.get('host')});
+        }
+        
+    });
+  //res.json({ message: 'Connected to Server' });
+});
+
+app.get('/remove/:_id', function(req, res){
+
+    setup.removeDevice(req.params._id, function(response){
+        console.log(response);
+        setup.getDevices(function(devices){
+            console.log(devices);
+
+            if(devices['paired'].length > 0){
+
+                devices['paired'].forEach(function(device) {
+                    console.log(device);
+                });
+                
+                res.render('pages/index', {"devices":devices['paired'], "host": req.get('host')});
+
+            }
+            else{
+                res.render('pages/index', {"devices":null, "host": req.get('host')});
+            }
+            
+        });
+    });
+});
+
+app.get('/vendors', function(req, res){
+    var requestWink;
+    if (WINK_ACCESS_TOKEN == "" | WINK_REFRESH_TOKEN == ""){
+        //Request Wink Credentials
+         requestWink = true;
+    }
+    else{
+        requestWink = false;
+    }
+    res.render('pages/vendors', {'requestWink': requestWink, "host": req.get('host')}); 
+});
+
+app.get('/vumark/:_id/:name', function(req, res){
+    res.render('pages/vumark', {"vumarkid": req.params._id, "name": req.params.name, "host": req.get('host') });
+});
+
+app.get('/addSonos', function(req, res) {
+    setup.getSonos(function(devices){
+        console.log(devices);
+
+        if(devices != null && devices['unpaired'].length > 0){
+
+            devices['unpaired'].forEach(function(device) {
+             console.log(device);
+            });
+
+                res.render('pages/add', {"devices":devices['unpaired'], "host": req.get('host')});
+
+        }
+        else{
+            res.render('pages/add', {"devices":null, "host": req.get('host')});
+        }
+        
+    });
+});
+
+app.get('/savenew/:vendor', function(req, res){
+    setup.getUsedIds(function(values){
+        //console.log(values);
+        if (req.params.vendor != "1" && req.params.vendor != "2") {
+            res.json({"message" : "incorrect vendor id entered"});
+        } else {
+
+            var newId = 1;
+            while (newId < 16) {
+                if (values.includes(newId.toString())) {
+                    newId++;
+                } else {
+                    break;
+                }
+            }
+
+            //console.log("New ID to use: " + newId);
+
+            if (newId >= 16) {
+                res.send({"message": "The number of vumark ids has been exhausted"});
+            }
+            // Based on vendor, create object in the correct SonosDM or WinkDM object
+            // vendor == 1 -- sonos
+            // vendor == 2 -- wink
+            // Will recieve value from url query parameters:
+            // - device_name
+            // - device_type
+            // - [all the things in the sonos/wink object]
+            // - assign it an _id that is not in the the `getUsedIDs` list less than 15.
+            var object = {
+                '_id' : newId.toString(),
+                'device_id' : req.query.device_id,
+                'device_type' : req.query.device_type,
+                'vendor' : req.params.vendor,
+                'vendor_logo': req.query.vendor_logo,
+                'device_name': req.query.device_name,
+                'controller': req.query.controller
+            }
+            
+            setup.saveNewDevice(object, function(returnValue){
+                //console.log(returnValue);
+                if (returnValue == null){
+                    // Create new view for errors.
+                    res.json({"message" : "unsuccessful saving of new device"});
+                } else {
+                    // successfully saved device with id == returnValue
+                    res.redirect('../../');
+                    //res.json({"message" : "success! with id #" + returnValue});
+                }
+            });
+        } 
+    });
+        
+        //res.json({ message: 'test'});       
+});
+
+app.get('/addWink', function(req, res) {
+    setup.getWink(function(devices){
+        console.log(devices);
+
+        if(devices != null && devices['unpaired'].length > 0){
+            
+            devices['unpaired'].forEach(function(device) {
+             console.log(device);
+            });
+
+            res.render('pages/add', {"devices":devices['unpaired'], "host": req.get('host')});
+
+        }
+        else{
+            res.render('pages/add', {"devices":null, "host": req.get('host')});
+        }
+        
+    });
+  //res.json({ message: 'Connected to Server' });
+});
+
+// used by the Ventana application to get config of paired devices
+app.get('/holoconfig', function(req, res){
+
+    setup.getConfig(function(returnJSON) {
+        //console.log(JSON.stringify(returnJSON));
+        
+        if (returnJSON != null) {
+            res.send(returnJSON);
+        } else {
+            res.send({"message": "Something went wrong in holoconfig endpoint"})
+        }
+    });
+
+});
+
+
+
+// Socket.IO POST endpoint to send a sockets message
+app.post('/socketsend', function(req, res) {
+    //Socket IO client connected
+    // io.emit('push', {'data': 'Hi Santy!'});
+    io.emit('push', req.body);
+    res.send("ok");
+});
+
+// catch 404 and forwarding to error handler
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+
+/// error handlers
+
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
+    });
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.json({
+        message: err.message,
+        error: {}
+    });
+});
+
+//Server-side requested socket send request
+io.on('connection', function(client) {  
+    console.log('Client connected...');
+    /* ### TESTING CODE ### */
+    io.on('beep', function(action){
+        console.log('beep heard')
+    });
+    
+});
+
+
+
+module.exports = app;
+
+// START THE SERVER
+// =============================================================================
+app.listen(port);
+server.listen(4200);
+console.log('Magic happens on port ' + port);
+console.log('Sockets wizardy on port 4200');
+```
+
+#### Server Setup Class
+```JS
+var request = require('request');
+var SonosDM = require('./app/models/sonosController');
+var WinkDM = require('./app/models/winkController');
+
+module.exports = {
+
+  supportedDevices: {
+        "Sonos Speaker": "Ventana/Prefabs/MusicController",
+        "light_bulbs": "Ventana/Prefabs/LightController",
+        "powerstrips":"Ventana/Prefabs/PowerStripController"
+    },
+
+  getDevices: function (callback) {
+    // Get Wink Data 
+
+    var paired = [];
+    var unpaired = [];
+
+    request(BASESERVER + ":" +  port + "/sonos/devices", function(error, response, body){
+        if(response.statusCode == 200){
+            var responseJson = JSON.parse(body);
+
+            var sonosPaired = responseJson["paired_devices"];
+            var sonosUnpaired = responseJson["unpaired_decies"];
+
+            if(sonosPaired){
+                paired = paired.concat(sonosPaired);
+            }
+
+            if(sonosUnpaired){
+                unpaired = unpaired.concat(sonosUnpaired);
+            }
+        }
+        request(BASESERVER + ":" +  port + "/wink/devices", function(error, response, body){
+            if(!error){
+                var responseJson = JSON.parse(body);
+
+                var winkPaired = responseJson["paired_devices"];
+                var winkUnPaired = responseJson["unpaired_devices"];
+
+                if(winkPaired){
+                    paired = paired.concat(winkPaired);
+                }
+
+                if(winkUnPaired){
+                    unpaired = unpaired.concat(winkUnPaired);
+                }
+
+                return callback({"paired": paired, "unpaired": unpaired});
+            }
+        });  
+    });
+  },
+
+  // gets a json specific for the HoloLens required config file
+  getConfig: function(callback) {
+
+    var configJSON = {}; 
+
+    configJSON["User"] = "VentanaUser"; //hard coded for now, until I know how it updates
+    configJSON["VentanaMarks"] = []
+
+    var vmIndex = 0; //uses to index the VentanaMarks
+
+    request(BASESERVER + ":" +  port + "/sonos/devices", function(error, response, body){
+        if(response.statusCode == 200){
+            var responseJson = JSON.parse(body);
+            
+            var sonosPaired = responseJson["paired_devices"];
+
+            sonosPaired.forEach(function(item, index) {
+                var tempSonos = {};
+                tempSonos["id"] = "0x0" + (item._id).toString(16);
+                tempSonos["name"] = item.device_name;
+                tempSonos["path"] = item.controller;
+                configJSON.VentanaMarks[vmIndex] = tempSonos;
+                vmIndex++;
+            });
+
+        }
+        request(BASESERVER + ":" +  port + "/wink/devices", function(error, response, body){
+            if(!error){
+                var responseJson = JSON.parse(body);
+                
+                var winkPaired = responseJson["paired_devices"];
+
+                winkPaired.forEach(function(item, index){
+                    var tempWink = {};
+                    tempWink["id"] = "0x0" + (item._id).toString(16);
+                    tempWink["name"] = item.device_name;
+                    tempWink["path"] = item.controller;
+                    configJSON.VentanaMarks[vmIndex] = tempWink; 
+                    vmIndex++;
+                });
+            }
+            return callback(configJSON); //even if no paired devices, the structure for config is still sent back
+        });  
+    });
+
+ 
+  },
+
+  getSonos: function (callback) {
+    // Get Sonos Data 
+
+    var paired = [];
+    var unpaired = [];
+
+    request(BASESERVER + ":" +  port + "/sonos/devices", function(error, response, body){
+        if(response.statusCode == 200){
+            var responseJson = JSON.parse(body);
+
+            var sonosPaired = responseJson["paired_devices"];
+            var sonosUnpaired = responseJson["unpaired_devices"];
+
+            if(sonosPaired.length > 0){
+                paired = paired.concat(sonosPaired);
+            }
+
+            if(sonosUnpaired.length > 0){
+                unpaired = unpaired.concat(sonosUnpaired);
+            }  
+
+            return callback({"paired": paired, "unpaired": unpaired});
+        }
+        else {
+            return callback({"paired": [], "unpaired": []});
+        }
+        
+
+    });
+  },
+
+  getWink: function (callback) {
+    // Get Wink Data 
+
+    var paired = [];
+    var unpaired = [];
+
+    request(BASESERVER + ":" +  port + "/wink/devices", function(error, response, body){
+        if(error){
+            // No Wink Devices Found
+            return callback({"paired": [], "unpaired": []});
+        }
+        var responseJson = JSON.parse(body);
+
+        var winkPaired = responseJson["paired_devices"];
+        var winkUnPaired = responseJson["unpaired_devices"];
+
+        if(winkPaired){
+            paired = paired.concat(winkPaired);
+        }
+
+        if(winkUnPaired){
+            unpaired = unpaired.concat(winkUnPaired);
+        }
+
+        return callback({"paired": paired, "unpaired": unpaired});
+
+    });
+    
+  },
+
+  getUsedIds: function (callback) {
+    // get ids (vumark) that have been used
+    var ids = []
+
+    WinkDM.find(function(err, wink) {
+        if (!err){
+            wink.forEach(function(id){
+                ids.push(id["_doc"]["_id"])
+            });
+                SonosDM.find(function(err, sonos) {
+                if (!err){
+                    sonos.forEach(function(id){
+                        ids.push(id["_doc"]["_id"])
+                    });
+
+                    return callback(ids);
+                }
+            }).select('_id');
+        }
+    }).select('_id');
+   
+   },
+
+   saveNewDevice: function (object, callback) {
+
+        console.log(JSON.stringify(object));
+        if (object == null) {
+            console.log("ERROR: object to save was NULL");
+            return callback(null);
+        } else {
+            if (object.vendor == "1") {
+                // vendor is sonos
+                request({
+                    method: 'POST',
+                    url: BASESERVER + ":" +  port + "/sonos/",
+                    body: {
+                        '_id' : object._id,
+                        'device_id' : object.device_id,
+                        'controller' : object.controller,
+                        'vendor_logo' : 'https://lh6.googleusercontent.com/-Px2Steg_XRM/AAAAAAAAAAI/AAAAAAAAFa4/kpB3EVdNHGw/s0-c-k-no-ns/photo.jpg'
+                    },
+                    json: true
+                }, function(error, response, body){
+                    if (!error && response.statusCode == 200) {
+                        return callback(object._id);
+                    } else {
+                        return callback(null);
+                    } 
+                });
+
+            } else if (object.vendor == "2") {
+                // vendor is wink
+                request({
+                    method: 'POST',
+                    url: BASESERVER + ":" +  port + "/wink/",
+                    body: {
+                        '_id' : object._id,
+                        'device_id' : object.device_id,
+                        'device_type': object.device_type,
+                        'device_name' : object.device_name,
+                        'controller': object.controller,
+                        'vendor_logo' : 'https://www.winkapp.com/assets/mediakit/wink-logo-icon-knockout-50235153b274cdf35ef39fb780448596.png',
+                        'vendor': object.vendor
+                    },
+                    json: true
+                }, function(error, response, body){
+                    if (!error && response.statusCode == 200) {
+                        return callback(object._id);
+                    } else {
+                        return callback(null);
+                    } 
+                });
+
+            } else {
+                // vendor not sonos or wink
+                console.log("Incorrect vendor number entered: " + object.vendor + " is not a supported number");
+            }
+
+        }
+   },
+
+  removeDevice: function(id, callback) {
+      //Remove a device. magically. I don't know how this will work. Try/Catch?
+
+      //Is it sonos?
+      SonosDM.findById(id, function(err, res){
+        if (err | !res){
+            WinkDM.findById(id, function(err, res){
+                if (err | !res){
+                    return callback(null);
+                }
+            }).remove().exec();
+        } else{   // Found in Sonos
+            //
+        }
+      }).remove().exec()
+
+      return callback("ok");
+  }
+};
+```
+
+### HoloHub Web Application
+
+#### Add a Device (add.ejs)
+```JS
+<!-- views/pages/add.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body class="container">
+
+    <% include ../partials/nav %>
+
+    <main>
+        <!-- Page Content -->
+        <div class="container">
+
+        <!-- Page Heading -->
+        <div class="row">
+            <div class="col-lg-12 text-center"  style="margin-top: -40px;"">
+                <h1 class="page-header text-center">Add Device
+                </h1>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <%if (!devices) { %>
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="page-header">No devices found! Please check your network and connections.
+                    </h3>
+                </div>
+            </div>
+        <% } else { %>
+
+            <% devices.forEach(function(device) { %>
+
+                <div class="row">
+                    <div class="col-xs-8 vcenter">
+
+                        <%if ("device_name" in device) { %>
+                            <h3> <%= device.device_name %> </h3>
+                        <% } else{ %>
+                            <h3> <%= device.device_id %> </h3>
+                        <% } %>
+                        <h4> <%= device.device_type %> </h4>  
+                    </div>
+                    <div class="col-xs-4 vcenter" style="padding-top: 30px;">
+                        <a class="btn btn-primary" href="http://<%= host %>/savenew/<%= device.vendor %>/?device_id=<%= device.device_id %>&device_type=<%= device.device_type %>&device_name=<%= device.device_name %>&controller=<%= device.controller %>&vendor_logo=<%= device.vendor_logo %>"> Pair Device <span class="glyphicon glyphicon-chevron-right"></span></a>
+                    </div>
+                </div>
+                <!-- /.row -->
+
+                <hr>
+            
+            <% }); %>
+        <% }; %>
+
+
+    </main>
+
+    [... abstracted ...]
+    
+</body>
+</html>
+```
+
+#### Remove a Device (delete.ejs)
+```JS
+<!-- views/pages/index.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body class="container">
+
+    <% include ../partials/nav %>
+
+    <main>
+        <!-- Page Content -->
+        <div class="container">
+
+        <!-- Page Heading -->
+        <div class="row">
+            <div class="col-lg-12 text-center"  style="margin-top: -40px;">
+                <h1 class="page-header">Remove a Device
+                </h1>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <% devices.forEach(function(device) { %>
+
+            <div class="row">
+                <div class="col-xs-3 vcenter">
+                    <img class="img-responsive" src="<%= device.vendor_logo %>" height="400" alt="">
+                </div>
+                <div class="col-xs-5 text-center vcenter">
+
+                    <%if ("device_name" in device) { %>
+                        <h4> <%= device.device_name %> </h4>
+                    <% } else{ %>
+                        <h4> <%= device.device_id %> </h4>
+                    <% } %>
+                    <h4> <%= device.device_type %> </h4>  
+                </div>
+                <div class="col-xs-3 vcenter" style="padding-top: 10px;">
+
+                    <%if ("device_name" in device) { %>
+                        <a class="btn btn-danger" onclick="return confirm('Removing this device will require you to remove it from the HoloLens manually. Are you sure you want to continue?');" href="http://<%= host %>/remove/<%= device._id %>">Delete</a>
+                    <% } else{ %>
+                        <a class="btn btn-danger" onclick="return confirm('Removing this device will require you to remove it from the HoloLens manually. Are you sure you want to continue?');" href="http://<%= host %>/remove/<%= device._id %>">Delete</a>
+                    <% } %>
+                </div>
+            </div>
+            <!-- /.row -->
+
+            <hr>
+        
+        <% }); %>
+
+
+    </main>
+
+    [... abstracted ...]
+    
+</body>
+</html>
+```
+#### Main App View (index.ejs)
+```JS
+<!-- views/pages/index.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body class="container">
+
+    <% include ../partials/nav %>
+
+    <main>
+        <!-- Page Content -->
+        <div class="container">
+
+        <!-- Page Heading -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Device List
+                </h1>
+            </div>
+        </div>
+        <!-- /.row -->
+        <%if (!devices) { %>
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="page-header">No Devices Paired. Add a new device to get started!
+                    </h3>
+                </div>
+            </div>
+        <% } else { %> 
+            <% devices.forEach(function(device) { %>
+
+                <div class="row">
+                    <div class="col-xs-3 vcenter">
+                        <img class="img-responsive" src="<%= device.vendor_logo %>" height="400" alt="">
+                    </div>
+                    <div class="col-xs-5 text-center vcenter">
+
+                        <%if ("device_name" in device) { %>
+                            <h4> <%= device.device_name %> </h4>
+                        <% } else{ %>
+                            <h4> <%= device.device_id %> </h4>
+                        <% } %>
+                        <h4> <%= device.device_type %> </h4>  
+                    </div>
+                    <div class="col-xs-3 vcenter" style="padding-top: 10px;">
+
+                        <%if ("device_name" in device) { %>
+                            <a class="btn btn-primary" href="http://<%= host %>/vumark/<%= device._id %>/<%= device.device_name %>">Open <br /> VuMark<span class="glyphicon glyphicon-chevron-right"></span></a>
+                        <% } else{ %>
+                            <a class="btn btn-primary" href="http://<%= host %>/vumark/<%= device._id %>/<%= device.device_id %>">Open <br /> VuMark<span class="glyphicon glyphicon-chevron-right"></span></a>
+                        <% } %>
+                    </div>
+                </div>
+                <!-- /.row -->
+
+                <hr>
+            
+            <% }); %>
+        <% }; %>
+
+
+    </main>
+
+    [... abstracted ...]
+    
+</body>
+</html>
+```
+
+#### Vendor Selection View
+```JS
+<!-- views/pages/index.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body class="container">
+
+    <% include ../partials/nav %>
+
+    <main>
+        <!-- Page Content -->
+        <div class="container">
+
+        <!-- Page Heading -->
+        <div class="row">
+            <div class="col-lg-12 text-center"  style="margin-top: -40px;"">
+                <h1 class="page-header text-center">Add Device
+                </h1>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <!-- Project One -->
+        <div class="row">
+            <div class="col-xs-4 vcenter">
+                <img class="img-responsive" src="https://lh6.googleusercontent.com/-Px2Steg_XRM/AAAAAAAAAAI/AAAAAAAAFa4/kpB3EVdNHGw/s0-c-k-no-ns/photo.jpg" height="200" alt="">
+            </div>
+            <div class="col-xs-8 vcenter" style="padding-top: 30px;">
+                <a class="btn btn-primary" href="http://<%= host %>/addSonos/"> Connect to Sonos Devices <span class="glyphicon glyphicon-chevron-right"></span></a>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <hr>
+
+        <!-- Project Two -->
+        <div class="row">
+            <div class="col-xs-4 vcenter">
+                <img class="img-responsive" src="https://www.winkapp.com/assets/mediakit/wink-logo-icon-knockout-50235153b274cdf35ef39fb780448596.png" height="200" alt="">
+            </div>
+            <div class="col-xs-8 vcenter" style="padding-top: 30px;">
+                <% if(requestWink) { %>
+                    <a class="btn btn-primary" href="http://<%= host %>/connect/wink/"> Connect to Wink Devices <span class="glyphicon glyphicon-chevron-right"></span></a>
+                <% }else { %>
+                    <a class="btn btn-primary" href="http://<%= host %>/addWink/"> Connect to Wink Devices <span class="glyphicon glyphicon-chevron-right"></span></a>
+                <% }; %> 
+            </div>
+        </div>
+        <!-- /.row -->
+
+
+    [... abstracted ...]
+    
+</body>
+</html>
+```
