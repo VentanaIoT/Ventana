@@ -7,6 +7,7 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
     public Material highlightButtonMaterial;
     public Material normalButtonMaterial;
     public Transform parentObject;
+    public bool leftToRight;
     [Tooltip("Speed at which the object is resized.")]
     [SerializeField]
     float ResizeSpeedFactor = 1.0f;
@@ -29,6 +30,8 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
     private Vector3 lastScale;
 
     private Vector3 lastManipulationPosition;
+
+    private bool shouldRespond = false;
 
 
     [SerializeField]
@@ -75,6 +78,9 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
     {
         
         Vector3 camHandDelta = Camera.main.transform.InverseTransformDirection(newScale);
+        if ( leftToRight ) {
+            camHandDelta.Scale(new Vector3(-1, 1, 1));
+        }
         // send data to EditModeController.cs once the manipulation gesture is updated
         //gameObject.SendMessageUpwards("scaleButtonClicked", newScale);
         float resizeX, resizeY, resizeZ;
@@ -92,11 +98,13 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
 
     public void OnFocusEnter() {
         gameObject.SendMessageUpwards("DisableHandDraggable");
+        shouldRespond = true;
         gameObject.GetComponent<Renderer>().material = highlightButtonMaterial;
     }
 
     public void OnFocusExit() {
         gameObject.SendMessageUpwards("EnableHandDraggable");
+        shouldRespond = false;
         gameObject.GetComponent<Renderer>().material = normalButtonMaterial;
     }
 }

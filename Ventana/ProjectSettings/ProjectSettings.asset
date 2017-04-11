@@ -462,13 +462,17 @@ PlayerSettings:
   metroCertificateNotAfter: 806f7f17d7c7d301
   metroApplicationDescription: Ventana
   wsaImages:
-    131272: Assets/Resources/Ventana/Prefabs/Materials/Logo1240x600.png
+    131172: Assets/Resources/Ventana/Prefabs/Materials/LogoWide620x300.png
+    131272: Assets/Resources/Ventana/Prefabs/Materials/Stupid Flat Application Icon.png
     720996: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall.png
     852048: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall24x24.png
+    1507428: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall.png
+    2031640: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall24x24.png
     2031816: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall88x88.png
     2162788: Assets/Resources/Ventana/Prefabs/Materials/LogoSmall.png
+    2162888: Assets/Resources/Ventana/Prefabs/Materials/Ventana Logo White Lines 300x300.png
     2293960: Assets/Resources/Ventana/Prefabs/Materials/LogoWide620x300.png
-    2294160: Assets/Resources/Ventana/Prefabs/Materials/Logo1240x600.png
+    2294160: Assets/Resources/Ventana/Prefabs/Materials/Stupid Flat Application Icon.png
   metroTileShortName: Ventana
   metroCommandLineArgsFile: 
   metroTileShowName: 0

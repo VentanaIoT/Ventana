@@ -26,7 +26,7 @@ public class VentanaMusicController : BaseVentanaController  {
     }
 
     // Use this for initialization
-    void makeAPIRequest(string child) {
+    void makeAPIRequest(string child) { //bubbled from child 
         requestFactory = VentanaRequestFactory.Instance;
         switch ( child ) {
             case "play":
