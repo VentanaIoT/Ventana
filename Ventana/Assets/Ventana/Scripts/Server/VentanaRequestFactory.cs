@@ -39,7 +39,6 @@ public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
         //post data is not needed for this endpoint
         //Debug.Log("ACTION: " + action + " URL: " + url.ToString());
         url.Append(id.ToString());
-        
         url.Append("/");
 
         Debug.Log("ACTION: " + action + " URL: " + url.ToString());
@@ -52,8 +51,6 @@ public class VentanaRequestFactory : Singleton<VentanaRequestFactory> {
         } else {
             Debug.Log("WWW Error: " + holoHubRequest.error);
         }
-
-
     }
 
     public IEnumerator GetFromMusicAPIEndpoint(string action, int id, Action<VentanaInteractable> callback) {

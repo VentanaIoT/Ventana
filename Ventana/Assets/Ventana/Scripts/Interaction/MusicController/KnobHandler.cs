@@ -314,7 +314,6 @@ public class KnobHandler : HandDraggable, IFocusable {
         //pls change state based on slider levels
         //for this one i'm just going to send a message to the root object...
         gameObject.SendMessageUpwards("OnSliderChangeRequest", levels);
-
     }
 
     public void DisableInteraction(bool yes) {
