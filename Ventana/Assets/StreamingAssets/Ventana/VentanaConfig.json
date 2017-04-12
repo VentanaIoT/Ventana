@@ -3,8 +3,8 @@
     "VentanaMarks": [
         {
             "name": "Cosmo",
-            "id": "0x05",
-            "path": "Ventana/Prefabs/LightController"
+            "id": "0x01",
+            "path": "Ventana/Prefabs/MusicController"
         },
         {
             "name": "Woody",
