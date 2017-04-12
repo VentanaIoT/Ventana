@@ -23,8 +23,6 @@ public class KnobHandler : HandDraggable, IFocusable {
     private AudioSource source;
     public Material highlightButtonMaterial;
     public Material normalButtonMaterial;
-    public Vector3 scale = new Vector3(0.0009f, 0.0009f, 0.0009f);
-    private Vector3 normalizedVector;
 
     override public void Start() {
         base.Start();
@@ -34,9 +32,9 @@ public class KnobHandler : HandDraggable, IFocusable {
         gameObject.transform.localPosition = new Vector3(0, 0, 0);
         gameObject.transform.localRotation = Quaternion.identity;
         source = GetComponent<AudioSource>();
-        normalizedVector = gameObject.GetComponentInParent<Renderer>().bounds.size.normalized;
-        bounds = normalizedVector;
-        bounds.Scale(scale);
+        bounds = containerObject.GetComponent<MeshFilter>().sharedMesh.bounds.extents;
+        var scale = containerObject.transform.localScale;
+        
         gameObject.transform.localRotation = baseRotation;
         gameObject.transform.localPosition = baseLocation;
         gameObject.SetActive(true);
@@ -56,10 +54,7 @@ public class KnobHandler : HandDraggable, IFocusable {
 
     public override void Update() {
         base.Update();
-        //Debug.Log("BOUNDS: " + bounds.x + " " + bounds.y + " " + bounds.z);
-
-        bounds = normalizedVector;
-        bounds.Scale(scale);
+        
         //Debug.Log(gameObject.transform.parent.localScale);
         //Debug.Log(gameObject.transform.localPosition.x + gameObject.transform.parent.localPosition.x);
         //we know we want to keep the x and y position at a certain place, only want the y offset. so lets constantly keep putting this thing there
@@ -67,24 +62,15 @@ public class KnobHandler : HandDraggable, IFocusable {
             {
                 var position = gameObject.transform.localPosition;
 
-                //Debug.Log(baseRotation.x);
-                //Debug.Log(baseRotation.y);
-                //Debug.Log(baseRotation.z);
-
-
                 Vector3 origin = baseLocation;
                 
                 //gives x y z values for the size. we want to go .5 times the axis of freedom max.
                 float[] allowedThreshold = new float[3];
 
-                allowedThreshold[0] = bounds.x * 0.5f;
-                allowedThreshold[1] = bounds.y * 0.5f;
-                allowedThreshold[2] = bounds.z * 0.5f;
-                /*Debug.Log("POSITION: " + position.x + " " + position.y + " " + position.z);
-                Debug.Log("BOUNDS: " + bounds.x + " " + bounds.y + " " + bounds.z);
-                Debug.Log("MIDRANGE: " + allowedThreshold[0] + " " + allowedThreshold[1] + " " + allowedThreshold[2]);
-                */
-
+                allowedThreshold[0] = bounds.x;
+                allowedThreshold[1] = bounds.y;
+                allowedThreshold[2] = bounds.z;
+                
                 if ( !allowX ) {
                     //change x to be the origin 
                     position.x = origin.x;
@@ -126,6 +112,11 @@ public class KnobHandler : HandDraggable, IFocusable {
 
                 gameObject.transform.localPosition = position;
                 gameObject.transform.localRotation = baseRotation;
+
+                /*
+                Debug.Log("POSITION: " + position.x + " " + position.y + " " + position.z);
+                Debug.Log("BOUNDS: " + bounds.x + " " + bounds.y + " " + bounds.z);
+                */
 
 
                 //do we want to do this right here? i guess start a CoRoutine to tell sonos to turn the fuck up...
@@ -183,14 +174,12 @@ public class KnobHandler : HandDraggable, IFocusable {
     public void performLevelCalculations() {
         Vector3 origin = baseLocation;
         Vector3 currentLocation = gameObject.transform.localPosition;
-        var bounds = containerObject.GetComponent<MeshRenderer>().bounds.size.normalized;
-        bounds.Scale(new Vector3(0.001f, 0.001f, 0.001f));
         SliderLevels sliders = new SliderLevels();
         //gives x y z values for the size. we want to go .5 times the axis of freedom max.
         float[] allowedThreshold = new float[3];
-        allowedThreshold[0] = bounds.x * 0.5f;
-        allowedThreshold[1] = bounds.y * 0.5f;
-        allowedThreshold[2] = bounds.z * 0.5f;
+        allowedThreshold[0] = bounds.x;
+        allowedThreshold[1] = bounds.y;
+        allowedThreshold[2] = bounds.z;
 
         if ( allowX ) {
             //calculate what % of the allowed direction im at.

@@ -18,6 +18,7 @@ public class EditModeController : MonoBehaviour {
     public AudioClip clickSound;
     public Vector3 lastScale;
     private HandDraggable handDraggable;
+    private bool isDragging = false;
     private AudioSource source;
 
 
@@ -47,8 +48,7 @@ public class EditModeController : MonoBehaviour {
         moreButtons.gameObject.SetActive(true);
         deleteDone.gameObject.SetActive(false);
         scaleHandles.gameObject.SetActive(false);
-
-       
+               
         handDraggable = gameObject.GetComponent<HandDraggable>();
 
         if (handDraggable != null ) {
@@ -58,15 +58,17 @@ public class EditModeController : MonoBehaviour {
 
     }
 
+   
     private void HandDraggable_StartedDragging() {
         SpatialMappingManager.Instance.DrawVisualMeshes = true;
+        isDragging = true;
         Debug.Log(gameObject.name + " : Removing existing world anchor if any.");
         WorldAnchorManager.Instance.RemoveAnchor(gameObject);
     }
 
     private void HandDraggable_StoppedDragging() {
         SpatialMappingManager.Instance.DrawVisualMeshes = false;
-
+        isDragging = false;
         // Add world anchor when object placement is done.
         BaseVentanaController bvc = gameObject.GetComponent<BaseVentanaController>();
         if ( bvc ) {
@@ -182,29 +184,27 @@ public class EditModeController : MonoBehaviour {
     {
         // manipulation gesture ended, calculate and set the new scale 
         /* https://www.billmccrary.com/holotoolkit-simple-dragresizerotate/ modified from HandResize.cs */
+        if ( !isDragging ) {
+            float resizeX, resizeY, resizeZ;
+            //if we are warping, honor axis delta, else take the x
+            if ( AllowResizeWarp ) {
+                resizeX = newScale.x * ResizeScaleFactor;
+                resizeY = newScale.y * ResizeScaleFactor;
+                resizeZ = newScale.z * ResizeScaleFactor;
+            } else {
+                resizeX = resizeY = resizeZ = newScale.x * ResizeScaleFactor;
+            }
 
-        float resizeX, resizeY, resizeZ;
-        //if we are warping, honor axis delta, else take the x
-        if (AllowResizeWarp)
-        {
-            resizeX = newScale.x * ResizeScaleFactor;
-            resizeY = newScale.y * ResizeScaleFactor;
-            resizeZ = newScale.z * ResizeScaleFactor;
+            resizeX = Mathf.Clamp(lastScale.x + resizeX, MinScale, MaxScale);
+            resizeY = Mathf.Clamp(lastScale.y + resizeY, MinScale, MaxScale);
+            resizeZ = Mathf.Clamp(lastScale.z + resizeZ, MinScale, MaxScale);
+
+            Vector3 newTransform = new Vector3(resizeX, resizeY, resizeZ);
+
+            Transform currentTransform = gameObject.GetComponent<Transform>();
+            //Debug.Log("before scale" + currentTransform);
+            currentTransform.localScale = Vector3.Lerp(transform.localScale, newTransform, ResizeSpeedFactor);
+            //Debug.Log("scale:" + currentTransform.localScale);
         }
-        else
-        {
-            resizeX = resizeY = resizeZ = newScale.x * ResizeScaleFactor;
-        }
-
-        resizeX = Mathf.Clamp(lastScale.x + resizeX, MinScale, MaxScale);
-        resizeY = Mathf.Clamp(lastScale.y + resizeY, MinScale, MaxScale);
-        resizeZ = Mathf.Clamp(lastScale.z + resizeZ, MinScale, MaxScale);
-
-        Vector3 newTransform = new Vector3(resizeX, resizeY, resizeZ);
-
-        Transform currentTransform = gameObject.GetComponent<Transform>();
-        //Debug.Log("before scale" + currentTransform);
-        currentTransform.localScale = Vector3.Lerp(transform.localScale, newTransform, ResizeSpeedFactor);
-        //Debug.Log("scale:" + currentTransform.localScale);
     }
 }
