@@ -2413,6 +2413,7 @@ MonoBehaviour:
   normalButtonMaterial: {fileID: 2100000, guid: a772cb29754fdc6408270b8b9cca42f9,
     type: 2}
   parentObject: {fileID: 4213768129924512}
+  leftToRight: 0
   ResizeSpeedFactor: 1
   ResizeScaleFactor: 0.75
   AllowResizeWarp: 0
@@ -2435,6 +2436,7 @@ MonoBehaviour:
   normalButtonMaterial: {fileID: 2100000, guid: a772cb29754fdc6408270b8b9cca42f9,
     type: 2}
   parentObject: {fileID: 4213768129924512}
+  leftToRight: 1
   ResizeSpeedFactor: 1
   ResizeScaleFactor: 0.75
   AllowResizeWarp: 0
@@ -2534,6 +2536,7 @@ MonoBehaviour:
   normalButtonMaterial: {fileID: 2100000, guid: a772cb29754fdc6408270b8b9cca42f9,
     type: 2}
   parentObject: {fileID: 4213768129924512}
+  leftToRight: 1
   ResizeSpeedFactor: 1
   ResizeScaleFactor: 0.75
   AllowResizeWarp: 0
@@ -2600,6 +2603,7 @@ MonoBehaviour:
   normalButtonMaterial: {fileID: 2100000, guid: a772cb29754fdc6408270b8b9cca42f9,
     type: 2}
   parentObject: {fileID: 4213768129924512}
+  leftToRight: 0
   ResizeSpeedFactor: 1
   ResizeScaleFactor: 0.75
   AllowResizeWarp: 0

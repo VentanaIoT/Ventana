@@ -15,10 +15,6 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
     [SerializeField]
     float ResizeScaleFactor = 0.75f;
 
-    [Tooltip("When warp is checked, we allow resizing of all three scale axes - otherwise we scale each axis by the same amount.")]
-    [SerializeField]
-    bool AllowResizeWarp = false;
-
     [Tooltip("Minimum resize scale allowed.")]
     [SerializeField]
     float MinScale = 0.0f;
@@ -26,12 +22,11 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
     [Tooltip("Maximum resize scale allowed.")]
     [SerializeField]
     float MaxScale = 0.7f;
+    private HandDraggable handDraggable;
 
     private Vector3 lastScale;
 
-    private Vector3 lastManipulationPosition;
-
-    private bool shouldRespond = false;
+    private bool scalingDisabled = false;
 
 
     [SerializeField]
@@ -43,6 +38,20 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
         {
             gameObject.AddComponent<BoxCollider>();
         }
+
+        handDraggable = gameObject.GetComponentInParent<HandDraggable>();
+        if ( handDraggable ) {
+            handDraggable.StartedDragging += HandDraggable_StartedDragging;
+            handDraggable.StoppedDragging += HandDraggable_StoppedDragging;
+        }
+    }
+
+    private void HandDraggable_StoppedDragging() {
+        scalingDisabled = false;
+    }
+
+    private void HandDraggable_StartedDragging() {
+        scalingDisabled = true;
     }
 
     public void SetResizing(bool enabled)
@@ -52,22 +61,27 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
 
     public void OnManipulationStarted(ManipulationEventData eventData)
     {
-        gameObject.SendMessageUpwards("scaleStarted");
-        lastScale = parentObject.localScale;
-        InputManager.Instance.PushModalInputHandler(gameObject);
+        if ( !scalingDisabled ) {
+            gameObject.SendMessageUpwards("scaleStarted");
+            lastScale = parentObject.localScale;
+            InputManager.Instance.PushModalInputHandler(gameObject);
+        }
+        
     }
 
     public void OnManipulationUpdated(ManipulationEventData eventData)
     {
-        if ( resizingEnabled ) {
+        if ( resizingEnabled && !scalingDisabled ) {
             Resize(eventData.CumulativeDelta);
         }
     }
 
     public void OnManipulationCompleted(ManipulationEventData eventData)
     {
-        gameObject.SendMessageUpwards("scaleEnded");
-        InputManager.Instance.PopModalInputHandler();
+        if ( !scalingDisabled ) {
+            gameObject.SendMessageUpwards("scaleEnded");
+            InputManager.Instance.PopModalInputHandler();
+        }
     }
 
     public void OnManipulationCanceled(ManipulationEventData eventData)
@@ -96,15 +110,18 @@ public class scalingHandler : MonoBehaviour, IManipulationHandler, IFocusable
 
     }
 
+
     public void OnFocusEnter() {
-        gameObject.SendMessageUpwards("DisableHandDraggable");
-        shouldRespond = true;
+        if( !scalingDisabled ) {
+            gameObject.SendMessageUpwards("DisableHandDraggable");
+        }
         gameObject.GetComponent<Renderer>().material = highlightButtonMaterial;
     }
 
     public void OnFocusExit() {
-        gameObject.SendMessageUpwards("EnableHandDraggable");
-        shouldRespond = false;
+        if ( !scalingDisabled ) {
+            gameObject.SendMessageUpwards("EnableHandDraggable");
+        }
         gameObject.GetComponent<Renderer>().material = normalButtonMaterial;
     }
 }
