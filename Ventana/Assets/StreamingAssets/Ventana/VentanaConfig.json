@@ -4,12 +4,17 @@
         {
             "name": "Cosmo",
             "id": "0x01",
-            "path": "Ventana/Prefabs/MusicController"
+            "path": "Ventana/Prefabs/PowerStripController"
         },
         {
             "name": "Woody",
-            "id": "0x04",
+            "id": "0x02",
             "path": "Ventana/Prefabs/LightController"
+        },
+        {
+            "name": "Sonos",
+            "id": "0x03",
+            "path": "Ventana/Prefabs/MusicController"
         }
     ]
 }
