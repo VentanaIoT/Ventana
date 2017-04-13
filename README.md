@@ -213,7 +213,7 @@ Users familiar with the HoloLens and basic gestures can skip this step. When a u
 
 `10.` When the user finishes interacting with the holograms, the application can be exited. The user does a bloom gesture, finds Ventana's application tile, and taps the remove button in the top right corner or the tile, to close the application. The user's holograms will automatically be saved in their last locations when the user exits the application, in case the user choose to "Load Last Sesson," when launching Ventana next time. 
 
-## Operating Mode 2: Abnormal - Tess
+## Operating Mode 2: Abnormal
 
 ### Server Down
 If Ventana crashes without warning on the HoloLens when the user tries to use one of the buttons to control a device, it is possible that the server may be down. To determine if the server is down, Ventana can be run in debug mode. Connect the HoloLens to Visual Studio, as in the initial deployment of the application. From the drop down menu at the top, select "Debug" instead of "Release." When the application deploys, Visual Studio will show the debug statements in the editor. If a couldn't connect to web socket exception appears, then the server is down. Relaunch the HoloHub, and the Ventana should not crash, once the server is back up and running.
