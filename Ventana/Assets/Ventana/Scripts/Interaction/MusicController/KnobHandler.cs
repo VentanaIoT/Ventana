@@ -5,7 +5,7 @@ using HoloToolkit.Unity.InputModule;
 using System;
 
 [ExecuteInEditMode]
-public class KnobHandler : HandDraggable, IFocusable {
+public class KnobHandler : VentanaHandDraggable, IFocusable {
     //only allow y displacment up to a quarter of the rail's width in either direction... 
     //then just return to the position it was at. 
     [Tooltip("Where in the local Coordinate system this object will return to")]
