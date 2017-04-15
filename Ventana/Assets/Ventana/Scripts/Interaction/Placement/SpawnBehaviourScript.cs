@@ -48,41 +48,6 @@ public class SpawnBehaviourScript : MonoBehaviour, IHoldHandler {
 
     #endregion //MONOBEHAVIOUR_METHODS
 
-
-    #region PRIVATE_METHODS
-
-    private void HandleTap()
-    {
-        if (mTapCount == 1)
-        {
-            mTimeSinceLastTap += Time.deltaTime;
-            if (mTimeSinceLastTap > DOUBLE_TAP_MAX_DELAY)
-            {
-                // too late for double tap, 
-                // we confirm it was a single tap
-                OnSingleTapConfirmed();
-
-                // reset touch count and timer
-                mTapCount = 0;
-                mTimeSinceLastTap = 0;
-            }
-        }
-        else if (mTapCount == 2)
-        {
-            // we got a double tap
-            OnDoubleTap();
-
-            // reset touch count and timer
-            mTimeSinceLastTap = 0;
-            mTapCount = 0;
-        }
-
-        
-    }
-
-    #endregion // PRIVATE_METHODS
-
-
     #region PROTECTED_METHODS
 
     /// <summary>
@@ -99,9 +64,8 @@ public class SpawnBehaviourScript : MonoBehaviour, IHoldHandler {
         Debug.Log("sb OSTC reached");
     }
 
-    protected virtual void OnDoubleTap()
+    protected virtual void clone()
     {
-        Debug.Log("sb ODT reached");
         if ( shouldSpawn )
         {
             //Copying Controller...
@@ -114,7 +78,9 @@ public class SpawnBehaviourScript : MonoBehaviour, IHoldHandler {
             prefabObjectClone.transform.rotation = gameObject.transform.rotation;
             EditModeController edit = prefabObjectClone.GetComponent<EditModeController>();
             edit.scaleModeTriggered = true;
-
+            Transform dupButton = prefabObjectClone.transform.Find("BillBoard/ttpContainer/Duplicate Button");
+            dupButton.parent = null;
+            Destroy(dupButton.gameObject);
             Destroy(prefabObjectClone.GetComponent<SpawnBehaviourScript>());
 
             HandDraggable hd = prefabObjectClone.AddComponent<HandDraggable>();
@@ -124,18 +90,7 @@ public class SpawnBehaviourScript : MonoBehaviour, IHoldHandler {
 
         }
     }
-
-    /*
-    public void OnInputClicked(InputClickedEventData eventData)
-    {
-        Debug.Log("<color=yellow>EY BAY BAY</color>");
-        mTapCount++;
-        HandleTap();
-
-
-    }
-    */
-    // replacing double tap to spawn with click and hold
+    
     public void OnHoldStarted(HoldEventData eventData)
     {
 
@@ -143,7 +98,13 @@ public class SpawnBehaviourScript : MonoBehaviour, IHoldHandler {
 
     public void OnHoldCompleted(HoldEventData eventData)
     {
-        OnDoubleTap();
+        clone();
+    }
+
+    void makeAPIRequest(string child) {
+        if ( child == "Duplicate" ) {
+            clone();
+        }
     }
 
     public void OnHoldCanceled(HoldEventData eventData)

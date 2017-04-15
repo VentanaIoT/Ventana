@@ -57,8 +57,8 @@ public class EditModeController : MonoBehaviour {
         }
 
     }
+    
 
-   
     private void HandDraggable_StartedDragging() {
         SpatialMappingManager.Instance.DrawVisualMeshes = true;
         isDragging = true;

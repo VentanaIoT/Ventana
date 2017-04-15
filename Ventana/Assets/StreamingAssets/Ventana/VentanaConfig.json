@@ -2,14 +2,24 @@
     "User": "VentanaUser",
     "VentanaMarks": [
         {
-            "name": "Cosmo",
-            "id": "0x01",
+            "name": "Living Room",
+            "id": "0x03",
             "path": "Ventana/Prefabs/MusicController"
+        },
+        {
+            "name": "Cosmo",
+            "id": "0x05",
+            "path": "Ventana/Prefabs/LightController"
         },
         {
             "name": "Woody",
             "id": "0x04",
             "path": "Ventana/Prefabs/LightController"
+        },
+        {
+            "name": "Pivot Power Genius",
+            "id": "0x09",
+            "path": "Ventana/Prefabs/PowerStripController"
         }
     ]
 }
