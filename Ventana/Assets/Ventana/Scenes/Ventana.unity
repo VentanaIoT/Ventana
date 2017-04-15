@@ -139,12 +139,12 @@ Prefab:
     - target: {fileID: 114000012009196210, guid: 3eddd1c29199313478dd3f912bfab2ab,
         type: 2}
       propertyPath: MaxGazeCollisionDistance
-      value: 50
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 114000011980027866, guid: 3eddd1c29199313478dd3f912bfab2ab,
         type: 2}
       propertyPath: StoredStabilitySamples
-      value: 72
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 1000010559312462, guid: 3eddd1c29199313478dd3f912bfab2ab, type: 2}
       propertyPath: m_IsActive

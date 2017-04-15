@@ -477,15 +477,16 @@ namespace SocketIO {
             websocket = new MessageWebSocket();
             Uri server = new Uri(HoloHubWS);
 
+            websocket.Control.MessageType = SocketMessageType.Utf8;
+            websocket.MessageReceived += Websocket_MessageReceived;
+            websocket.Closed += Websocket_Closed;
+
             try {
                 await websocket.ConnectAsync(server);
                 isConnected = true;
-                if (websocket != null ) {
-                    websocket.Control.MessageType = SocketMessageType.Utf8;
-                    websocket.MessageReceived += Websocket_MessageReceived;
-                    websocket.Closed += Websocket_Closed;
-                    writer = new DataWriter(websocket.OutputStream);
-                }
+                
+                writer = new DataWriter(websocket.OutputStream);
+                
             }
             catch ( Exception ex ) // For debugging
             {
