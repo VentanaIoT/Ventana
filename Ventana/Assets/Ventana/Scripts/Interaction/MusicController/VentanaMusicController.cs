@@ -19,7 +19,7 @@ public class VentanaMusicController : BaseVentanaController  {
 
 
     // Use this for initialization
-    void Start() {
+   new void Start() {
         base.Start();
         requestFactory = VentanaRequestFactory.Instance;
         requestAlbum();
@@ -60,7 +60,7 @@ public class VentanaMusicController : BaseVentanaController  {
     }
 
     // Update is called once per frame
-    void Update() { 
+     new void Update() { 
         if ( isModelShowing ) {
             if ( !isMusicPlaying ) {
                 SetPlayButton();

@@ -20,7 +20,6 @@ public class SpawnBehaviourScript : MonoBehaviour, IHoldHandler {
 
     private const float DOUBLE_TAP_MAX_DELAY = 0.5f;
     //seconds
-    private float mTimeSinceLastTap = 0;
 
     #endregion //PRIVATE_MEMBERS
 
@@ -38,7 +37,6 @@ public class SpawnBehaviourScript : MonoBehaviour, IHoldHandler {
     void Start()
     {
         mTapCount = 0;
-        mTimeSinceLastTap = 0;
     }
 
     void Update()

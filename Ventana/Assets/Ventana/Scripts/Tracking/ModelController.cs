@@ -155,7 +155,6 @@ public static ModelController Instance {
         Task.Run(
             async () => {
             string newFile = JsonUtility.ToJson(newUser, true);
-            Debug.Log("NEW: " + newFile);
             try {
                     //Get local folder
                     StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
@@ -168,7 +167,6 @@ public static ModelController Instance {
                     //Read file
                     string plainText = "";
                     plainText = await FileIO.ReadTextAsync(textFileForRead);
-                    Debug.Log("New file written: " + plainText);
                 } catch ( Exception ex ) {
                     Debug.Log(ex.Message);
             }

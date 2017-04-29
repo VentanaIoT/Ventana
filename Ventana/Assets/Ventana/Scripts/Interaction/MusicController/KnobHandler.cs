@@ -42,12 +42,12 @@ public class KnobHandler : HandDraggable, IFocusable {
 
     }
     
-    public void OnFocusEnter() {
+    public new void OnFocusEnter() {
         base.OnFocusEnter();
         gameObject.GetComponent<Renderer>().material = highlightButtonMaterial;
     }
 
-    public void OnFocusExit() {
+    public new void OnFocusExit() {
         base.OnFocusExit();
         gameObject.GetComponent<Renderer>().material = normalButtonMaterial;
     }
@@ -189,13 +189,13 @@ public class KnobHandler : HandDraggable, IFocusable {
             if (currentLocation.x < origin.x ) { //left side of origin
                 var delta = Mathf.Abs(currentLocation.x - origin.x);
                 if ( delta > (0.61f * allowedThreshold[0]) ) {
-                    Debug.Log("LEVEL 3 DECREASE");
+                    //Debug.Log("LEVEL 3 DECREASE");
                     sliders.XAxisLevel = -3;
                 } else if ( delta > (0.31f * allowedThreshold[0]) && delta < (0.60f * allowedThreshold[0]) ) {
-                    Debug.Log("LEVEL 2 DECREASE");
+                    //Debug.Log("LEVEL 2 DECREASE");
                     sliders.XAxisLevel = -2;
                 } else if (delta > (0.01f * allowedThreshold[0]) && delta < (0.30f * allowedThreshold[0])) {
-                    Debug.Log("LEVEL 1 DECREASE");
+                    //Debug.Log("LEVEL 1 DECREASE");
                     sliders.XAxisLevel = -1;
                 } else {
                     //do nothing weird numbers....
@@ -205,13 +205,13 @@ public class KnobHandler : HandDraggable, IFocusable {
             } else if (currentLocation.x >= origin.x  ) { //right side of origin
                 var delta = Mathf.Abs(currentLocation.x - origin.x);
                 if ( delta > (0.61f * allowedThreshold[0]) ) {
-                    Debug.Log("LEVEL 3 INCREASE");
+                    //Debug.Log("LEVEL 3 INCREASE");
                     sliders.XAxisLevel = 3;
                 } else if ( delta > (0.31f * allowedThreshold[0]) && delta < (0.60f * allowedThreshold[0]) ) {
-                    Debug.Log("LEVEL 2 INCREASE");
+                    //Debug.Log("LEVEL 2 INCREASE");
                     sliders.XAxisLevel = 2;
                 } else if ( delta > (0.01f * allowedThreshold[0]) && delta < (0.30f * allowedThreshold[0]) ) {
-                    Debug.Log("LEVEL 1 INCREASE");
+                    //Debug.Log("LEVEL 1 INCREASE");
                     sliders.XAxisLevel = 1;
                 } else {
                     //do nothing weird numbers....
