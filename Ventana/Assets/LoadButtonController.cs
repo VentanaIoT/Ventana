@@ -27,4 +27,9 @@ public class LoadButtonController : MonoBehaviour, IInputClickHandler
     void Update()
     {
     }
+
+    public void CallOnInputClicked() {
+        InputClickedEventData data = null;
+        this.OnInputClicked(data);
+    }
 }

@@ -1,4 +1,5 @@
-﻿using SocketIO;
+﻿using HoloToolkit.Unity;
+using SocketIO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +18,21 @@ public class TrackingAreaManager : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        ModelController mc = ModelController.Instance;
+        GameObject child = mc.GetFirstMusicControllerInstance(); //will default to "first" item if none found
+
+        EditModeController ed = child.GetComponent<EditModeController>();
+        ed.shouldAnchor = false;
+        child.transform.SetParent(thimbleObject.transform);
+        child.layer = 9;
+        child.transform.localScale = new Vector3(.35f, .35f, .35f);
+        child.transform.localPosition = new Vector3(0f, 0f, 0f);
+        child.transform.localRotation = thimbleObject.transform.localRotation;
+        
+        Billboard bb = child.GetComponentInChildren<Billboard>();
+        bb.enabled = true;
+        
+
         socket = VentanaRequestFactory.Instance.socket;
         socket.On("position", HandlePositionUpdate);
         /*

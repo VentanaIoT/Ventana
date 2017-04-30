@@ -12,6 +12,7 @@ public class EditModeController : MonoBehaviour {
 
     public Transform moreButtons;
     public Transform deleteDone;
+    public bool shouldAnchor = true;
     public Transform scaleHandles;
     public bool scaleEnabled = false;
     public bool scaleModeTriggered = false;
@@ -41,8 +42,12 @@ public class EditModeController : MonoBehaviour {
     [SerializeField]
     float MaxScale = 0.7f;
 
+    private Transform dupButton;
+
     // Use this for initialization
     void Start () {
+        dupButton = gameObject.transform.Find("BillBoard/ttpContainer/Duplicate Button");
+        
         source = gameObject.GetComponent<AudioSource>();
         // initialize to regular mode, with tap to place controls inactive
         moreButtons.gameObject.SetActive(true);
@@ -71,7 +76,7 @@ public class EditModeController : MonoBehaviour {
         isDragging = false;
         // Add world anchor when object placement is done.
         BaseVentanaController bvc = gameObject.GetComponent<BaseVentanaController>();
-        if ( bvc ) {
+        if ( bvc && shouldAnchor ) {
             string currentTime = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();
             string savedAnchorName = bvc.VentanaID + ":" + gameObject.transform.lossyScale.x.ToString()+ ":" + currentTime;
             Debug.Log("<color=yellow>Name: </color>" + savedAnchorName);
@@ -89,11 +94,17 @@ public class EditModeController : MonoBehaviour {
             moreButtons.gameObject.SetActive(false);
             deleteDone.gameObject.SetActive(true);
             scaleHandles.gameObject.SetActive(true);
+            if (dupButton != null ) {
+                dupButton.gameObject.SetActive(false);
+            }
             gameObject.BroadcastMessage("DisableInteraction", true);
         } else {
             moreButtons.gameObject.SetActive(true);
             deleteDone.gameObject.SetActive(false);
             scaleHandles.gameObject.SetActive(false);
+            if ( dupButton != null ) {
+                dupButton.gameObject.SetActive(true);
+            }
             gameObject.BroadcastMessage("DisableInteraction", false);
         }
 	}
@@ -161,7 +172,7 @@ public class EditModeController : MonoBehaviour {
 
     void scaleEnded() {
         BaseVentanaController bvc = gameObject.GetComponent<BaseVentanaController>();
-        if ( bvc ) {
+        if ( bvc && shouldAnchor ) {
             Debug.Log(gameObject.name + " : Removing existing world anchor if any after scaling");
             WorldAnchorManager.Instance.RemoveAnchor(gameObject);
             string currentTime = DateTime.Now.Subtract(DateTime.MinValue.AddYears(1969)).TotalMilliseconds.ToString();

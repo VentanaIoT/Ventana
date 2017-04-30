@@ -4,6 +4,7 @@ using UnityEngine;
 using HoloToolkit.Unity.InputModule;
 using System;
 using HoloToolkit.Unity.SpatialMapping;
+using HoloToolkit.Unity;
 
 public class SpawnBehaviourScript : MonoBehaviour, IHoldHandler {
     #region PUBLIC_MEMBERS
@@ -76,6 +77,11 @@ public class SpawnBehaviourScript : MonoBehaviour, IHoldHandler {
             prefabObjectClone.transform.rotation = gameObject.transform.rotation;
             EditModeController edit = prefabObjectClone.GetComponent<EditModeController>();
             edit.scaleModeTriggered = true;
+            edit.shouldAnchor = true;
+            Billboard bb = prefabObjectClone.GetComponentInChildren<Billboard>();
+            bb.enabled = false;
+            Transform billboardObject = prefabObjectClone.transform.Find("BillBoard");
+            billboardObject.localRotation = Quaternion.identity;
             Transform dupButton = prefabObjectClone.transform.Find("BillBoard/ttpContainer/Duplicate Button");
             dupButton.parent = null;
             Destroy(dupButton.gameObject);

@@ -4,6 +4,7 @@ using VentanaModelDictionary = System.Collections.Generic.Dictionary<int, string
 using System.IO;
 using System;
 using System.Text;
+using System.Linq;
 #if !UNITY_EDITOR
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -77,6 +78,47 @@ public static ModelController Instance {
         return vmDictionary;
     }
     
+    //This will look through the keys and find the first music controller instance that is found. if it fails, return whatever element.
+    public GameObject GetFirstMusicControllerInstance() {
+        GameObject prefab = null;
+        var keysWithMatchingValues = modelDictionary.Where(p => p.Value == "Ventana/Prefabs/MusicController").Select(p => p.Key);
+        int count = 0;
+        int vumarkID = 0;
+        string path = "Ventana/Prefabs/MusicController";
+        foreach ( var key in keysWithMatchingValues ) {
+            vumarkID = key;
+            count += 1;
+            break;
+        }
+        if ( count == 0 ) { //somthing was not found
+            var firstObject = modelDictionary.First();
+            path = firstObject.Value;
+            vumarkID = firstObject.Key;
+        }
+
+        //now check if a prefab exists...
+        UnityEngine.Object possiblePrefab = Resources.Load(path);
+        if ( possiblePrefab ) {
+            if ( !(prefab = GameObject.Instantiate(possiblePrefab) as GameObject) ) {
+                Debug.Log("<color=red>Error: the prefab at " + path + " does not exist</color>");
+                throw new ModelControllerException("prefab not found");
+            }
+        }
+
+        BaseVentanaController bvc = prefab.GetComponent<BaseVentanaController>();
+        if ( bvc ) {
+            bvc.OnVumarkFound();
+            bvc.VentanaID = vumarkID;
+
+        }
+
+        SpawnBehaviourScript spb = prefab.gameObject.AddComponent<SpawnBehaviourScript>();
+        spb.ControllerID = vumarkID;
+        spb.shouldSpawn = true;
+        spb.scaleMultiplier = prefab.transform.localScale;
+
+        return prefab;
+    }
 
     public GameObject GetPrefabWithId(int id) {
         GameObject prefab = null;
