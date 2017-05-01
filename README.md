@@ -117,7 +117,17 @@ once the project has been successfully cloned, it will be able to be opened usin
 
 to avoid issues with dependencies, one must ensure that the HoloLens application settings are set correctly using [this](https://developer.microsoft.com/en-us/windows/mixed-reality/holograms_101e) reference.
 
-a shortcut to the above would be to select `HoloToolkit>Configure>Apply HoloLens Project Settings` from thedrop down menu and relaunch the project. 
+a shortcut to the above would be to select `HoloToolkit>Configure>Apply HoloLens Project Settings` from the drop down menu and relaunch the project. 
+
+If HoloToolkit does not appear, you will have to go to `File>Build Settings` select Windows Store (make sure you have the right components installed if you don't see it) and set up the project to use 
+
+SDK: Universal 10
+Target Device: HoloLens
+UWP Build Type: D3D
+Build and Run: Local Machine
+Unity C# Project: True
+
+Once this is done, select Switch Platform at the bottom of the Build Settings window and build the project in unity by hitting the play button at the top. 
 
 Once the project is verified to compile, it can be built to run on the HoloLens.
 
