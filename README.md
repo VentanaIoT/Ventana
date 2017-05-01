@@ -1,4 +1,4 @@
-# Senior Design User Manual
+# User Manual
 ![Ventana Logo](https://github.com/VentanaIoT/Ventana/blob/master/images/Ventana%20Favicons/android-icon-192x192.png?raw=true)
 # Executive Summary
 Technology in the home is hard to use. In modern homes, internet connected devices surround people, from smart TVs to wireless speakers. Controlling these different devices means using multiple clunky and inconsistent applications across various types of devices, making the experience miserable. Using Microsoft HoloLens, the team created Ventana, an open source platform to find, connect, track, and control these existing internet connected devices.
