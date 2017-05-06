@@ -1,4 +1,13 @@
 # Senior Design User Manual
+
+## Attention for Reviewers
+
+In order to best review our project, it is important to understand the structure of the repositories. We have three main repos: 
+1. [Vive-Diy-Position-Sensor](https://github.com/VentanaIoT/vive-diy-position-sensor/) This repository houses the Hardware and Software code and details for the positional tracking sensor.
+2. [HoloHub](https://github.com/VentanaIoT/HoloHub/tree/bluetooth_serial) This repository contains the server code that facilitates and communications to the HoloLens and the Positional Tracking Sensor.
+3. [Ventana](https://github.com/VentanaIoT/Ventana/tree/feature-PositionalTracking) This repository contains the HoloLens code built on Unity & C# to run the Ventana app with the positional tracking features enabled.
+
+
 ![Ventana Logo](https://github.com/VentanaIoT/Ventana/blob/master/images/Ventana%20Favicons/android-icon-192x192.png?raw=true)
 # Executive Summary
 Technology in the home is hard to use. In modern homes, internet connected devices surround people, from smart TVs to wireless speakers. Controlling these different devices means using multiple clunky and inconsistent applications across various types of devices, making the experience miserable. Using Microsoft HoloLens, the team created Ventana, an open source platform to find, connect, track, and control these existing internet connected devices.
